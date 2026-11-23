@@ -11,9 +11,9 @@
 
 | # | 问题 | 影响 | 建议 |
 |---|---|---|---|
-| — | **当前无未决问题** | — | 新问题请开 issue 并在此登记 |
+| Q10 | 双平台 SDK 下限：ADR-0007 定"两个都支持"（NEXT API12+ + 纯 OpenHarmony API9+），但本机 DevEco 26 的 SDK Manager 无 API 9（最低 API 18），旧 API 9 SDK 与新 hvigor 相差 3 年 | 决定 `build-profile.json5` 的 `compatibleSdkVersion` 与双 product 配置；影响 M4 双平台验收范围 | Owner 三选一：(A) 下限放宽 API 18+（改 ADR-0007）｜(B) 另装 DevEco 3.1 + API 9 SDK｜(C) 本期只验 HarmonyOS、OpenHarmony 后置。详见 `docs/plan/plan-harmony-env-init-2026-11-23.md` §5，GitHub issue #21 |
 
-> 已全部决策：Q1/Q7/Q8/Q9 见 `docs/decisions/ADR-0007-...md`；Q2-Q6 见 ADR-0001..0005。03 契约字段级与 App UI 架构见 `docs/design/03-contracts.md`（v0.3）与 `docs/design/06-app-ui-architecture.md`（v0.2）。
+> 已决：Q1/Q7/Q8/Q9 见 ADR-0007；Q2-Q6 见 ADR-0001..0005；CA 生命周期见 ADR-0008。03 契约字段级见 `docs/design/03-contracts.md`（v0.4），App UI 架构见 `docs/design/06-app-ui-architecture.md`（v0.2）。
 
 ## 历史资料：Q1 双平台对比（调研结论；决策=两个都支持）
 

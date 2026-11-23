@@ -25,6 +25,6 @@
 ## 4 去哪查
 
 - 架构分层 → `docs/design/02-architecture.md` §2
-- 字段级契约 → `docs/design/03-contracts.md`（v0.1 草案）
+- 字段级契约 → `docs/design/03-contracts.md`（v0.4）
 - CA 生命周期 / pin 能力探测 → `docs/decisions/ADR-0008-ca-lifecycle.md`
 - 垂直切片 → `docs/plan/plan-project-init-2026-11-23.md` §5
