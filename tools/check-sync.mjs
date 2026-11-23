@@ -23,6 +23,9 @@ const ENDPOINTS = [
   { key: 'api', path: '/mobile/api' },
   { key: 'ws', path: '/mobile/ws' },
   { key: 'version', path: '/mobile/version' },
+  { key: 'ca', path: '/mobile/ca' },
+  { key: 'ca-leaf-rotate', path: '/mobile/ca/leaf/rotate' },
+  { key: 'ca-rotate', path: '/mobile/ca/rotate' },
 ];
 
 let failed = false;

@@ -28,3 +28,7 @@ export function errorResponse(error: GatewayError): GatewayResponse {
 export function unauthorized(message?: string): GatewayError {
   return new GatewayError(ERROR_CODES.UNAUTHORIZED, message);
 }
+
+export function invalidRequest(message?: string): GatewayError {
+  return new GatewayError(ERROR_CODES.INVALID_REQUEST, message);
+}

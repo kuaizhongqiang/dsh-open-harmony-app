@@ -1,18 +1,21 @@
 // @ohos.net.http wrapper (via @kit.NetworkKit). HTTPS only, no plaintext fallback.
-// Endpoints and fields follow docs/design/03-contracts.md v0.4 §1/§3.1/§3.2/§5.
+// Endpoints and fields follow docs/design/03-contracts.md v0.5 §1/§3.1/§3.2/§5.
 import { http } from '@kit.NetworkKit';
-import { HealthResult, PairRequest, PairResult, PairingPayload, DshError, ErrorFrameBody, describeError } from '../common/DshTypes';
+import { HealthResult, PairRequest, PairResult, PairingPayload, VersionResponse, DshError, ErrorFrameBody, describeError } from '../common/DshTypes';
 import { PlatformAdapter } from '../adapter/PlatformAdapter';
 
 const HEALTH_PATH: string = '/mobile/health';
+const VERSION_PATH: string = '/mobile/version';
 const PAIR_PATH: string = '/mobile/pair';
+const REFRESH_PATH: string = '/mobile/token/refresh';
 const ORIGIN_RE: RegExp = /^https:\/\/[^\/:?#]+:\d{1,5}$/;
 
 export class HttpClient {
   private readonly origin: string;
   private readonly platform: PlatformAdapter;
+  private readonly caPath: string;
 
-  constructor(origin: string, platform: PlatformAdapter) {
+  constructor(origin: string, platform: PlatformAdapter, caPath?: string) {
     if (!origin.startsWith('https://')) {
       throw new Error('HTTPS only: origin must start with https://');
     }
@@ -22,6 +25,7 @@ export class HttpClient {
     }
     this.origin = origin;
     this.platform = platform;
+    this.caPath = caPath !== undefined ? caPath : '';
   }
 
   async health(): Promise<HealthResult> {
@@ -37,7 +41,8 @@ export class HttpClient {
           expectDataType: http.HttpDataType.STRING,
           usingCache: false,
           connectTimeout: 10000,
-          readTimeout: 10000
+          readTimeout: 10000,
+          caPath: this.caPath
         }
       );
       if (response.responseCode !== 200) {
@@ -49,6 +54,72 @@ export class HttpClient {
         throw e;
       }
       throw new DshError(-1, 'TRANSPORT_ERROR', 'health request failed: ' + describeError(e as Object));
+    } finally {
+      request.destroy();
+    }
+  }
+
+  async version(): Promise<VersionResponse> {
+    this.assertTlsSupported();
+    const request: http.HttpRequest = http.createHttp();
+    try {
+      const response: http.HttpResponse = await request.request(
+        this.origin + VERSION_PATH,
+        {
+          method: http.RequestMethod.GET,
+          header: { 'Content-Type': 'application/json' },
+          expectDataType: http.HttpDataType.STRING,
+          usingCache: false,
+          connectTimeout: 10000,
+          readTimeout: 10000,
+          caPath: this.caPath
+        }
+      );
+      if (response.responseCode !== 200) {
+        throw new DshError(response.responseCode, 'HTTP_ERROR', 'version returned HTTP ' + response.responseCode.toString());
+      }
+      return JSON.parse(response.result as string) as VersionResponse;
+    } catch (e) {
+      if (e instanceof DshError) {
+        throw e;
+      }
+      throw new DshError(-1, 'TRANSPORT_ERROR', 'version request failed: ' + describeError(e as Object));
+    } finally {
+      request.destroy();
+    }
+  }
+
+  async refreshToken(deviceId: string, token: string): Promise<PairResult> {
+    this.assertTlsSupported();
+    const headers: Record<string, string> = {
+      'Content-Type': 'application/json',
+      'Accept': 'application/json',
+      'Authorization': 'Bearer ' + token,
+      'X-Device-Id': deviceId
+    };
+    const request: http.HttpRequest = http.createHttp();
+    try {
+      const response: http.HttpResponse = await request.request(
+        this.origin + REFRESH_PATH,
+        {
+          method: http.RequestMethod.POST,
+          header: headers,
+          expectDataType: http.HttpDataType.STRING,
+          usingCache: false,
+          connectTimeout: 10000,
+          readTimeout: 10000,
+          caPath: this.caPath
+        }
+      );
+      if (response.responseCode !== 200) {
+        throw new DshError(response.responseCode, 'HTTP_ERROR', 'token refresh returned HTTP ' + response.responseCode.toString());
+      }
+      return JSON.parse(response.result as string) as PairResult;
+    } catch (e) {
+      if (e instanceof DshError) {
+        throw e;
+      }
+      throw new DshError(-1, 'TRANSPORT_ERROR', 'token refresh failed: ' + describeError(e as Object));
     } finally {
       request.destroy();
     }
@@ -80,7 +151,8 @@ export class HttpClient {
           expectDataType: http.HttpDataType.STRING,
           usingCache: false,
           connectTimeout: 10000,
-          readTimeout: 10000
+          readTimeout: 10000,
+          caPath: this.caPath
         }
       );
       if (response.responseCode !== 201) {

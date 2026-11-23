@@ -1,4 +1,4 @@
-// Field-level models mirror docs/design/03-contracts.md v0.4 (the single source of truth).
+// Field-level models mirror docs/design/03-contracts.md v0.5 (the single source of truth).
 // Keep names camelCase; timestamps are ISO8601 UTC. Do not add fields here without
 // changing the contract first and shipping the plugin side in the same change.
 
@@ -42,6 +42,19 @@ export interface WsEvent {
   toolName?: string;
   status?: string;
   raw: string;
+}
+
+export interface VersionInfo {
+  current: string;
+  latest: string;
+  url: string;
+  sha256: string;
+  required: boolean;
+}
+
+export interface VersionResponse {
+  plugin: VersionInfo;
+  app: VersionInfo;
 }
 
 export interface AuthFrame {

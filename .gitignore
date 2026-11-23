@@ -55,6 +55,8 @@ build/
 *.har
 *.hcb
 local.properties
+# DevEco writes local signing passwords into this file; tracked template is app/build-profile.example.json5
+app/build-profile.json5
 # DevEco previewer-generated placeholder pages (not business source)
 **/src/main/ets/generated/
 # NOTE: oh-package-lock.json5 is committed on purpose (lock file); do not ignore.

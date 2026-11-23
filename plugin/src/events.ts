@@ -1,7 +1,7 @@
 /**
  * WebSocket event mapping skeleton.
  *
- * Source of truth: docs/design/03-contracts.md v0.4 section 4 and
+ * Source of truth: docs/design/03-contracts.md v0.5 section 4 and
  * docs/review/02-contracts-review.md "Event vocabulary check". DSH emits
  * namespace/verb names; the contract names are synthetic and MUST be mapped,
  * never passed through verbatim.

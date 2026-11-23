@@ -31,6 +31,7 @@ export { MobileGateway } from './gateway.js';
 export type { GatewayDeps } from './gateway.js';
 export { GatewayState, defaultClock } from './state.js';
 export type { StateClock } from './state.js';
+export * from './store.js';
 export { startGateway } from './server.js';
 export {
   mobileAccessDir,

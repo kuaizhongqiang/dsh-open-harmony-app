@@ -3,7 +3,7 @@
 import { createHash } from 'node:crypto';
 import { CONTRACT_VERSION, ERROR_CODES } from './constants.js';
 import { contractHeaders } from './config.js';
-import { GatewayError, errorResponse, unauthorized } from './errors.js';
+import { GatewayError, errorResponse, invalidRequest, unauthorized } from './errors.js';
 import { isLoopbackIp } from './network.js';
 import type { GatewayState } from './state.js';
 import type { GatewayResponse, RequestLike, ResolvedConfig } from './types.js';
@@ -89,10 +89,10 @@ export class MobileGateway {
     try {
       parsed = JSON.parse(req.body.toString('utf8')) as unknown;
     } catch {
-      throw unauthorized('invalid JSON body');
+      throw invalidRequest('malformed JSON body');
     }
     if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {
-      throw unauthorized('JSON body must be an object');
+      throw invalidRequest('JSON body must be an object');
     }
     return parsed as Record<string, unknown>;
   }
@@ -101,8 +101,7 @@ export class MobileGateway {
     const method = req.method.toUpperCase();
     const path = req.path.split('?')[0] ?? '';
 
-    // Contract section 1: 1 MiB request ceiling. The contract has no 400 code,
-    // so malformed bodies are reported as 401 UNAUTHORIZED elsewhere.
+    // Contract section 1: 1 MiB request ceiling. Malformed bodies are 400 INVALID_REQUEST.
     if (!['GET', 'HEAD'].includes(method) && (req.body?.length ?? 0) > this.deps.config.maxRequestBytes) {
       throw new GatewayError(ERROR_CODES.PAYLOAD_TOO_LARGE, 'request body exceeds 1 MiB');
     }
@@ -128,7 +127,8 @@ export class MobileGateway {
     if (method === 'POST' && path === '/mobile/token/refresh') {
       this.checkWhitelist(req);
       const token = this.requireAuth(req);
-      const next = this.deps.state.rotateToken(token.token, token.deviceId);
+      const rawToken = headerValue(req.headers, 'authorization')?.replace(/^Bearer\s+/i, '') ?? '';
+      const next = this.deps.state.rotateToken(rawToken, token.deviceId);
       return this.json(200, { token: next.token, issuedAt: next.issuedAt, expiresAt: next.expiresAt });
     }
 
@@ -161,7 +161,7 @@ export class MobileGateway {
       const body = this.parseBody(req);
       if (!Array.isArray(body.trustedProxies) || !Array.isArray(body.allowUsers)
         || typeof body.userHeader !== 'string') {
-        throw unauthorized('whitelist must contain trustedProxies, allowUsers and userHeader');
+        throw invalidRequest('whitelist must contain trustedProxies, allowUsers and userHeader');
       }
       this.deps.state.setWhitelist({
         trustedProxies: body.trustedProxies.filter((entry): entry is string => typeof entry === 'string'),
@@ -284,6 +284,9 @@ export class MobileGateway {
     }
 
     const bytes = Buffer.from(await upstream.arrayBuffer());
+    if (bytes.length > this.deps.config.maxReplyBytes) {
+      throw new GatewayError(ERROR_CODES.PAYLOAD_TOO_LARGE, 'upstream reply exceeds 12 MiB');
+    }
     const responseHeaders: Record<string, string> = {
       'x-contract-version': upstream.headers.get('x-contract-version') ?? CONTRACT_VERSION,
       'cache-control': 'no-store',

@@ -1,3 +1,5 @@
+// Copy to app/build-profile.json5 for local builds.
+// DevEco auto-sign writes local passwords into the copy; never commit that file.
 {
   "app": {
     "signingConfigs": [],

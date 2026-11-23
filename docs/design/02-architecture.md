@@ -96,7 +96,7 @@ dsh 是 Cordis 微内核、"Everything is a plugin"。本插件为**进程内插
 
 ## 4 App ↔ Plugin 契约（HTTP + WS）
 
-> 字段级契约见 `docs/design/03-contracts.md`（v0.4）。此处只定形状。
+> 字段级契约见 `docs/design/03-contracts.md`（v0.5）。此处只定形状。
 
 | 类别 | 端点 | 说明 |
 |---|---|---|
@@ -108,6 +108,7 @@ dsh 是 Cordis 微内核、"Everything is a plugin"。本插件为**进程内插
 | 代理 | `* /mobile/api/**` | 回环转发到 DSH Host |
 | 事件 | `WS /mobile/ws` | 会话/工具/状态事件流 |
 | 版本 | `GET /mobile/version` | 返回最新 tag（plugin/app 各一） |
+| CA | `GET /mobile/ca`、`POST /mobile/ca/leaf/rotate`、`POST /mobile/ca/rotate` | CA 元数据、叶子续期、换锚重配 |
 
 ## 5 安全矩阵
 

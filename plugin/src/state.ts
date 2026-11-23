@@ -1,9 +1,11 @@
-/** In-memory M3 state: devices, tokens, one-shot pairing keys, whitelist, rate limit. */
+/** Persistent gateway state: devices, tokens, one-shot pairing keys, whitelist. */
 
 import { randomBytes, randomUUID } from 'node:crypto';
 import { ERROR_CODES } from './constants.js';
 import { GatewayError, unauthorized } from './errors.js';
 import { isLoopbackIp, normalizeIp } from './network.js';
+import { MemoryStateStore, secretHash } from './store.js';
+import type { PersistedState, StateStore, StoredDevice, StoredPairing, StoredToken } from './store.js';
 import type {
   Device,
   PairingKeyPayload,
@@ -13,13 +15,23 @@ import type {
   WhitelistConfig,
 } from './types.js';
 
-interface TokenRecord extends TokenInfo {
+interface TokenRecord {
+  tokenHash: string;
+  deviceId: string;
+  issuedAt: string;
+  expiresAt: string;
   revoked: boolean;
 }
 
-interface DeviceRecord extends Device {
+interface DeviceRecord {
+  deviceId: string;
+  name: string;
+  platform: string;
+  origin: string;
+  reachable: boolean;
+  lastSeenAt: string;
   status: 'active' | 'revoked';
-  token: string;
+  tokenHash: string;
   caFingerprint: string;
 }
 
@@ -54,14 +66,68 @@ export class GatewayState {
   private readonly tokens = new Map<string, TokenRecord>();
   private readonly devices = new Map<string, DeviceRecord>();
   private readonly pairing = new Map<string, PairingRecord>();
-  private readonly pairingAttempts = new Map<string, number[]>();
+  private pairingAttempts = new Map<string, number[]>();
   private whitelist: WhitelistConfig;
 
   constructor(
     private readonly config: ResolvedConfig,
     private readonly clock: StateClock = defaultClock,
+    private readonly store: StateStore = new MemoryStateStore(),
   ) {
     this.whitelist = { ...config.whitelist };
+    const stored = this.store.load();
+    if (stored) this.hydrate(stored);
+  }
+
+  private hydrate(stored: PersistedState): void {
+    for (const token of stored.tokens) {
+      this.tokens.set(token.tokenHash, { ...token });
+    }
+    for (const device of stored.devices) {
+      this.devices.set(device.deviceId, { ...device });
+    }
+    for (const item of stored.pairing) {
+      this.pairing.set(item.keyHash, {
+        payload: { ...item.payload, pairingKey: '' },
+        consumed: item.consumed,
+        createdAtMs: item.createdAtMs,
+      });
+    }
+    this.pairingAttempts = new Map(Object.entries(stored.pairingAttempts));
+    this.whitelist = {
+      trustedProxies: [...stored.whitelist.trustedProxies],
+      allowUsers: [...stored.whitelist.allowUsers],
+      userHeader: stored.whitelist.userHeader,
+    };
+  }
+
+  private snapshot(): PersistedState {
+    const devices: StoredDevice[] = [...this.devices.values()].map((device) => ({ ...device }));
+    const tokens: StoredToken[] = [...this.tokens.values()].map((token) => ({ ...token }));
+    const pairing: StoredPairing[] = [...this.pairing.entries()].map(([keyHash, record]) => ({
+      keyHash,
+      payload: { ...record.payload, pairingKey: '' },
+      consumed: record.consumed,
+      createdAtMs: record.createdAtMs,
+    }));
+    const pairingAttempts: Record<string, number[]> = {};
+    for (const [ip, times] of this.pairingAttempts) pairingAttempts[ip] = [...times];
+    return {
+      schemaVersion: 1,
+      devices,
+      tokens,
+      pairing,
+      pairingAttempts,
+      whitelist: {
+        trustedProxies: [...this.whitelist.trustedProxies],
+        allowUsers: [...this.whitelist.allowUsers],
+        userHeader: this.whitelist.userHeader,
+      },
+    };
+  }
+
+  private persist(): void {
+    this.store.save(this.snapshot());
   }
 
   get caFingerprint(): string {
@@ -72,7 +138,7 @@ export class GatewayState {
     return { ...this.whitelist, trustedProxies: [...this.whitelist.trustedProxies], allowUsers: [...this.whitelist.allowUsers] };
   }
 
-  /** PC side generates the one-shot key; M3 does not expose a management endpoint for it. */
+  /** PC side generates the one-shot key; only its hash is persisted. */
   createPairingKey(): PairingKeyPayload {
     const payload: PairingKeyPayload = {
       v: 1,
@@ -81,16 +147,17 @@ export class GatewayState {
       expiresAt: new Date(this.clock.now().getTime() + this.config.pairingTtlMs).toISOString(),
       caFingerprint: this.config.ca.fingerprint,
     };
-    this.pairing.set(payload.pairingKey, {
+    this.pairing.set(secretHash(payload.pairingKey), {
       payload,
       consumed: false,
       createdAtMs: this.clock.now().getTime(),
     });
+    this.persist();
     return payload;
   }
 
   getPairingRecord(key: string): PairingRecord | undefined {
-    const record = this.pairing.get(key);
+    const record = this.pairing.get(secretHash(key));
     if (!record) return undefined;
     if (record.consumed || this.clock.now().getTime() >= Date.parse(record.payload.expiresAt)) {
       throw new GatewayError(ERROR_CODES.PAIRING_CONSUMED, 'pairing key is used or expired');
@@ -108,11 +175,13 @@ export class GatewayState {
       reachable: true,
       lastSeenAt: this.clock.now().toISOString(),
       status: 'active',
-      token: '',
+      tokenHash: '',
       caFingerprint,
     };
     this.devices.set(deviceId, device);
-    return { device: this.publicDevice(device), token: this.issueToken(deviceId) };
+    const token = this.issueToken(deviceId);
+    this.persist();
+    return { device: this.publicDevice(device), token };
   }
 
   private publicDevice(record: DeviceRecord): Device {
@@ -121,13 +190,13 @@ export class GatewayState {
       name: record.name,
       platform: record.platform,
       origin: record.origin,
-      reachable: record.status === 'active' && !this.isTokenExpired(record.token),
+      reachable: record.status === 'active' && !this.isTokenExpired(record.tokenHash),
       lastSeenAt: record.lastSeenAt,
     };
   }
 
-  private isTokenExpired(token: string): boolean {
-    const record = this.tokens.get(token);
+  private isTokenExpired(tokenHash: string): boolean {
+    const record = this.tokens.get(tokenHash);
     return !record || record.revoked || this.clock.now().getTime() >= Date.parse(record.expiresAt);
   }
 
@@ -139,23 +208,35 @@ export class GatewayState {
       issuedAt: issuedAt.toISOString(),
       expiresAt: new Date(issuedAt.getTime() + this.config.tokenTtlMs).toISOString(),
     };
-    this.tokens.set(token.token, { ...token, revoked: false });
+    const tokenHash = secretHash(token.token);
+    this.tokens.set(tokenHash, {
+      tokenHash,
+      deviceId,
+      issuedAt: token.issuedAt,
+      expiresAt: token.expiresAt,
+      revoked: false,
+    });
     const device = this.devices.get(deviceId);
     if (device) {
-      device.token = token.token;
+      device.tokenHash = tokenHash;
       device.lastSeenAt = token.issuedAt;
     }
+    this.persist();
     return token;
   }
 
   consume(key: string): void {
-    const record = this.pairing.get(key);
-    if (record) record.consumed = true;
+    const record = this.pairing.get(secretHash(key));
+    if (record) {
+      record.consumed = true;
+      this.persist();
+    }
   }
 
   validateToken(token: string | undefined, deviceId: string | undefined): TokenRecord {
     if (!token || !deviceId) throw unauthorized('Authorization and X-Device-Id are required');
-    const record = this.tokens.get(token);
+    const tokenHash = secretHash(token);
+    const record = this.tokens.get(tokenHash);
     if (!record || record.revoked || this.clock.now().getTime() >= Date.parse(record.expiresAt)) {
       throw unauthorized('token is expired, revoked or unknown');
     }
@@ -167,12 +248,13 @@ export class GatewayState {
       throw new GatewayError(ERROR_CODES.DEVICE_UNAUTHORIZED, 'device is not authorized');
     }
     device.lastSeenAt = this.clock.now().toISOString();
+    this.persist();
     return record;
   }
 
   rotateToken(token: string, deviceId: string): TokenInfo {
     this.validateToken(token, deviceId);
-    const old = this.tokens.get(token);
+    const old = this.tokens.get(secretHash(token));
     if (old) old.revoked = true;
     return this.issueToken(deviceId);
   }
@@ -185,8 +267,9 @@ export class GatewayState {
     const device = this.devices.get(deviceId);
     if (!device) return false;
     device.status = 'revoked';
-    const token = this.tokens.get(device.token);
+    const token = this.tokens.get(device.tokenHash);
     if (token) token.revoked = true;
+    this.persist();
     return true;
   }
 
@@ -196,9 +279,10 @@ export class GatewayState {
     this.config.origin = newOrigin;
     for (const device of this.devices.values()) {
       device.status = 'revoked';
-      const token = this.tokens.get(device.token);
+      const token = this.tokens.get(device.tokenHash);
       if (token) token.revoked = true;
     }
+    this.persist();
   }
 
   checkWhitelist(peerIp: string | undefined, headers: RequestLike['headers']): void {
@@ -223,10 +307,12 @@ export class GatewayState {
     const previous = (this.pairingAttempts.get(ip) ?? []).filter((time) => now - time < PAIR_RATE_WINDOW_MS);
     if (previous.length >= PAIR_RATE_LIMIT) {
       this.pairingAttempts.set(ip, previous);
+      this.persist();
       return false;
     }
     previous.push(now);
     this.pairingAttempts.set(ip, previous);
+    this.persist();
     return true;
   }
 
@@ -236,5 +322,6 @@ export class GatewayState {
       allowUsers: [...next.allowUsers],
       userHeader: next.userHeader,
     };
+    this.persist();
   }
 }

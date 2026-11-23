@@ -24,4 +24,4 @@
 - 插件 API / 内核契约 → `vendor/deepseek-harness/packages/`（`core`、`web`、`host/webserver`、`sdk`）
 - 架构分层 → `docs/design/02-architecture.md` §3
 - CA 生命周期 → `docs/decisions/ADR-0008-ca-lifecycle.md`
-- 字段级契约 → `docs/design/03-contracts.md`（v0.4）
+- 字段级契约 → `docs/design/03-contracts.md`（v0.5）

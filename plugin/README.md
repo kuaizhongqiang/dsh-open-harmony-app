@@ -5,7 +5,7 @@ in-process DSH plugin that opens a separate HTTPS gateway on port 3443 and
 relays `/mobile/api/**` to the DSH Host listener obtained from
 `ctx.webServer.getOrigin()` (normally `http://127.0.0.1:3080`).
 
-The field-level truth is `docs/design/03-contracts.md` v0.4. This README does
+The field-level truth is `docs/design/03-contracts.md` v0.5. This README does
 not redefine contract fields.
 
 ## Layout
