@@ -43,4 +43,7 @@
 - [x] `decisions/ADR-0001..0005` — 决策（经 issue+PR 流程）
 - [x] `open-questions.md` — 未决问题（Q1 目标平台等）
 - [x] `docs/AGENT.md` / `app/AGENT.md` / `plugin/AGENT.md` — 路径纪律（需求 #10）
-- [x] `design/03-contracts.md` — App↔Plugin 字段级契约（v0.1 草案，待评审）
+- [x] `design/03-contracts.md` — App↔Plugin 字段级契约（v0.2，评审有条件通过）
+- [x] `design/06-app-ui-architecture.md` — App 原生 UI 信息架构（9 页面 + 导航 + 状态）
+- [x] `review/01-doc-review.md` / `review/02-contracts-review.md` — 两轮评审
+- [x] `handoffs/README.md` — 结构化交接落点

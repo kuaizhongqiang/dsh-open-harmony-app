@@ -131,6 +131,7 @@ dsh 是 Cordis 微内核、"Everything is a plugin"。本插件为**进程内插
   - 自更新链路：查 GitHub Release tag → 下载新 hap → 校验签名/SHA-256 → 拉起系统安装。
   - 注意：企业应用（MDM/HEM）仅支持鸿蒙电脑擎云设备，**手机不适用**，故手机必须走 In-house。
 - 版本监控范围：**plugin + app 都监控**（Q6）。
+- **⚠ Q7 待定**：App 版本 tag 拉取通道——本 §7 写"直查 GitHub Release"，而 03 §3.7 经网关 `/mobile/version`；两者二选一（评审 R2 Critical），未定前 App 不实现升级检查。
 
 ## 8 垂直切片（纯原生版）
 

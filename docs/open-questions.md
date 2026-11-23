@@ -12,8 +12,11 @@
 | # | 问题 | 影响 | 建议 |
 |---|---|---|---|
 | Q1 | 目标平台：HarmonyOS NEXT（API 12+）还是纯 OpenHarmony（API 9+）？ | 决定 `@ohos.*` 可用面、HUKS/通知/后台任务 API、以及能否用 TailMesh/HarmoTail（要求 HarmonyOS NEXT） | 见下方对比 |
-| - | 03-contracts.md 字段级契约（配对/令牌/设备/WS 事件/版本） | 阻塞 app 与 plugin 并行开发 | 下一步优先级最高 |
-| - | App 原生 UI 的信息架构与页面清单 | 决定工作量与设计稿 | 需要负责人认可 UI 结构 |
+| Q7 | App 版本 tag 拉取通道：App 直查 GitHub vs 经网关 `/mobile/version` | 02 §7 与 03 §6 口径冲突（评审 R2 Critical） | 负责人定夺后同步 02/03；未定前 App 不实现升级检查 |
+| Q8 | 配对 payload 格式（`PairingKey.origin` 用法）+ 是否绑定 CA 指纹 | 影响扫码配对实现与凭据安全 | Plugin 出方案 |
+| Q9 | 是否新增二进制上传端点（03 §1 提及但 §3 无端点） | 影响消息上限契约完整性 | 用户确认需求后定 |
+
+> 已完成项（03 契约字段级、App UI 信息架构）已产出自 `docs/design/03-contracts.md`（v0.2）与 `docs/design/06-app-ui-architecture.md`，从本表移除。
 
 ## Q1 对比（调研结论，2026-11-23）
 
