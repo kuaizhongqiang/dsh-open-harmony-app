@@ -19,7 +19,8 @@
 ## 3 平台 / 环境
 
 - **Q1 已定：双平台都支持**（HarmonyOS NEXT API12+ + 纯 OpenHarmony API9+，ADR-0007）。平台相关能力一律走 `PlatformAdapter`（能力探测 + 条件编译），禁止在业务层散落平台判断；适配清单见 `docs/design/06-app-ui-architecture.md` §7。
-- 本机无 DevEco：先设计/契约，后构建；出包（M4）需装环境，两个目标各验一次。
+- 本机已装 DevEco（见根 `AGENT.md` §7）：可构建 HarmonyOS 目标；**纯 OpenHarmony API 9 SDK 未装**，两个目标各验一次尚未达成，见 `docs/plan/plan-harmony-env-init-2026-11-23.md` §5。
+- 工程骨架：`app/` 为 DevEco Stage 工程根（`AppScope/` + `entry/` + `hvigor/`），bundleName `com.kuaizhongqiang.dshharmony`；当前仅占位页，无业务 UI。
 
 ## 4 去哪查
 

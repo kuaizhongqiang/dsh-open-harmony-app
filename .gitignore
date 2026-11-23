@@ -1,20 +1,24 @@
-# IDE / editor (generated, per-user)
+# ===== IDE / editor (generated, per-user) =====
 .idea/
 *.iml
 .vscode/
 *.swp
+*.swo
 
-# Node (plugin build)
+# ===== AI tooling workspace (per-user; .codegenie contains a nested .git) =====
+.codegenie/
+
+# ===== Node (plugin build) =====
 node_modules/
 dist/
 *.tsbuildinfo
 
-# Python (dsh local tooling, if any)
+# ===== Python (dsh local tooling, if any) =====
 __pycache__/
 *.pyc
 .venv/
 
-# Local secrets - exact entries only (no *.env* wildcard)
+# ===== Local secrets - exact entries only (no *.env* wildcard) =====
 .env
 .env.local
 *.key
@@ -23,10 +27,34 @@ __pycache__/
 *.crt.local
 # NOTE: generated CA/keystore lives under $DSH_HOME (outside repo); never commit.
 
-# OS
+# ===== HarmonyOS signing material (never commit private parts) =====
+*.keystore
+*.jks
+*.p7b
+*.cer
+*.csr
+signature/
+
+# ===== OS =====
 .DS_Store
 Thumbs.db
 
-# Temp / scratch
+# ===== Temp / scratch =====
 .plan/
 *.log
+
+# ===== HarmonyOS / DevEco (generated, per-build) =====
+.hvigor/
+oh_modules/
+build/
+.test/
+.cxx/
+.preview/
+*.hap
+*.hsp
+*.har
+*.hcb
+local.properties
+# DevEco previewer-generated placeholder pages (not business source)
+**/src/main/ets/generated/
+# NOTE: oh-package-lock.json5 is committed on purpose (lock file); do not ignore.
