@@ -1,17 +1,27 @@
-name: CI
+name: CI (verify only)
 
+# Merge CI: validation ONLY. Never builds, tags, or publishes (ADR-0006).
 on:
   pull_request:
   push:
     branches: [main]
 
+permissions:
+  contents: read
+
 jobs:
-  check-docs:
+  gates:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          submodules: false
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-      - name: Check docs discipline
-        run: node tools/check-docs.mjs
+      - name: Run all doc/contract gates
+        run: |
+          for gate in check-docs check-sync check-data check-contracts check-plugin-version; do
+            echo "=== $gate ==="
+            node "tools/$gate.mjs"
+          done

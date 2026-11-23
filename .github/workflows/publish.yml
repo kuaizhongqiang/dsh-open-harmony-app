@@ -1,0 +1,54 @@
+name: Publish (tag only)
+
+# Publish pipeline: fires ONLY on an explicit version tag or manual dispatch.
+# Ordinary merges never trigger this (ADR-0006). CI verifies; publish releases.
+on:
+  push:
+    tags:
+      - 'v*'
+      - 'plugin-v*'
+      - 'app-v*'
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Existing tag to publish (e.g. v0.1.0)'
+        required: true
+
+permissions:
+  contents: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Verify gates before publish
+        run: |
+          for gate in check-docs check-sync check-data check-contracts check-plugin-version; do
+            echo "=== $gate ==="
+            node "tools/$gate.mjs"
+          done
+      - name: Resolve publish tag
+        id: pubtag
+        run: |
+          if [ -n "${{ github.event.inputs.tag }}" ]; then
+            TAG="${{ github.event.inputs.tag }}"
+          else
+            TAG="${GITHUB_REF_NAME}"
+          fi
+          echo "Publishing tag: $TAG"
+          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
+          test -f CHANGELOG.md || { echo "CHANGELOG.md missing"; exit 1; }
+          grep -q "$TAG" CHANGELOG.md || echo "WARNING: $TAG not found in CHANGELOG.md"
+      # Future: npm publish dsh-harmony (tag plugin-v*) / upload hap (tag app-v*).
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.pubtag.outputs.tag }}
+          body_path: CHANGELOG.md
+          generate_release_notes: true

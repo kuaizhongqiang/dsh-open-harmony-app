@@ -40,7 +40,7 @@
 - [x] `design/04-agent-collaboration.md` — Agent 分工与协作协议
 - [x] `design/05-github-collaboration.md` — GitHub 协作机制（替代 TODO/RECORD/DECISION）
 - [x] `plan/plan-project-init-2026-11-23.md` — 项目初始化主计划
-- [x] `decisions/ADR-0001..0005` — 决策（经 issue+PR 流程）
+- [x] `decisions/ADR-0001..0006` — 决策（经 issue+PR 流程；ADR-0006 = 禁直推 + CI/publish 分离）
 - [x] `open-questions.md` — 未决问题（Q1 目标平台等）
 - [x] `docs/AGENT.md` / `app/AGENT.md` / `plugin/AGENT.md` — 路径纪律（需求 #10）
 - [x] `design/03-contracts.md` — App↔Plugin 字段级契约（v0.2，评审有条件通过）

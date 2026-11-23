@@ -53,12 +53,19 @@
 2. issue 内讨论，负责人拍板（comment 明确"已定"）。
 3. 定稿 PR 新增 `docs/decisions/ADR-NNNN-<slug>.md`（含"为什么 + 影响面"），review 后 merge。
 
+### 4.0 提交与发布纪律（ADR-0006）
+
+- **禁止直接 push/提交到 main**（含 agent）：所有变更走 feature 分支 → PR → CI 绿 → merge。
+- **merge CI 与 publish 分离**：merge 只验证，不打包、不打 tag、不发 release；**只有显式打 tag 才触发 publish**，不是所有 merge 都发版。
+- main 开启分支保护：require pull request + require status checks（`check-docs` 等门禁）。
+
 ### 4.3 版本发布（替代 RECORD + 收口）
 
-1. milestone 的 issue 全部关闭。
-2. `CHANGELOG.md`（根目录）追加本次变更。
-3. 打 tag：`v<major>.<minor>.<patch>`（semver），推到 origin。
-4. 发 GitHub Release，正文贴 CHANGELOG；附件放 app 的 hap 与 plugin 的 tarball。
+1. milestone 的 issue 全部关闭；变更已通过 PR merge 进 main。
+2. `CHANGELOG.md`（根目录）追加本次变更（经 PR）。
+3. **手动**打 tag：`v<major>.<minor>.<patch>` / `plugin-v*` / `app-v*`（semver），推到 origin。
+4. tag push 触发 `publish.yml`：校验 tag ↔ CHANGELOG ↔ 版本声明 → 发 GitHub Release（正文贴 CHANGELOG；附件放 app hap + plugin tarball）。
+5. 普通 merge **不触发** publish；只有 tag 或 `workflow_dispatch` 触发。
 
 ## 5 三路径规划
 
@@ -71,7 +78,8 @@
 | `ISSUE_TEMPLATE/bug.md` | 缺陷 issue 模板 |
 | `PULL_REQUEST_TEMPLATE.md` | PR 模板（关联 issue + 验收 + 契约同批勾选） |
 | `CODEOWNERS` | 路径 → 人类 owner（AI owner 边界仍以 04 为准） |
-| `workflows/ci.yml` | 门禁 CI：文档自检 + lint + 契约一致性（`check-docs`/`check-contracts`） |
+| `workflows/ci.yml` | **merge CI**（仅验证）：PR + push main 触发，跑 5 道门禁；不打 tag、不打包、不发 release |
+| `workflows/publish.yml` | **publish 流水线**：仅 tag（`v*`/`plugin-v*`/`app-v*`）+ 手动触发；校验版本一致性后发 Release |
 
 ### 5.2 `.agent/`（agent 运行与交接）
 
