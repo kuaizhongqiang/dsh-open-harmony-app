@@ -1,0 +1,1435 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DSH App 高保真 Mockup · P1–P9 · 源码级 UI 规格</title>
+<style>/* Base variables referenced by the token sheets and component CSS but defined
+ * upstream (deepsuite theme/global.css) — supplied here so the composite
+ * --dsw-font-* variables resolve and motion rides the upstream curve. Code
+ * font stack deliberately omits a bare `monospace` tail (Windows CJK falls
+ * back to SimSun otherwise). */
+:root {
+  --dsh-font-family-text-default: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC',
+    'Hiragino Sans GB', 'Microsoft YaHei', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  --dsw-font-family: var(--dsh-font-family-text-default);
+  --dsw-font-family-brand: 'Montserrat', var(--dsh-font-family-text-default);
+  --dsh-font-family-code-default: 'SF Mono', 'JetBrains Mono', 'Fira Code', Consolas,
+    'Liberation Mono', Menlo, Courier, 'PingFang SC', 'Microsoft YaHei';
+  --ds-font-family-code: var(--dsh-font-family-code-default);
+  --ds-ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+  --ds-transition-duration: 0.2s;
+  --ds-transition-duration-fast: 0.1s;
+  --ds-transition-duration-slow: 0.3s;
+  --dsw-radius-xs: 4px;
+  --dsw-radius-sm: 8px;
+  --dsw-radius-md: 12px;
+  --dsw-radius-lg: 16px;
+  --dsw-radius-xl: 20px;
+  --dsw-radius-panel: 28px;
+}
+
+/* User font lists (--dsh-font-family-text/-code, written on body by the theme
+ * boot script and ThemePresenter) lead the built-in stacks. An unset list
+ * falls back to the built-in stack itself; the repeated families are inert. */
+body {
+  --dsw-font-family: var(--dsh-font-family-text, var(--dsh-font-family-text-default)), var(--dsh-font-family-text-default);
+  --ds-font-family-code: var(--dsh-font-family-code, var(--dsh-font-family-code-default)), var(--dsh-font-family-code-default);
+  --dsw-alias-settings-card-fill: var(--dsw-alias-bg-layer-2);
+  --dsw-alias-settings-card-stroke: var(--dsw-alias-border-l4);
+}
+
+[data-dsh-automatic-focus]:focus,
+[data-dsh-automatic-focus]:focus:focus-visible {
+  outline: none;
+}
+/* === end of base.css === */
+/* Figma font-weight 510 (an SF Pro variable-font weight) always renders as
+   font-weight: 500 in this UI — non-variable webfonts snap intermediate
+   weights unpredictably across platforms. */
+body {
+  --dsw-static-amber-100: rgb(254, 245, 231);
+  --dsw-static-amber-400: rgb(247, 173, 49);
+  --dsw-static-amber-500: rgb(245, 158, 11);
+  --dsw-static-amber-600: rgb(221, 134, 41);
+  --dsw-static-amber-900: rgb(39, 36, 31);
+  --dsw-static-blue-100: rgb(219, 234, 254);
+  --dsw-static-blue-300: rgb(147, 197, 253);
+  --dsw-static-blue-400: rgb(96, 165, 250);
+  --dsw-static-blue-450: rgb(77, 147, 248);
+  --dsw-static-blue-500: rgb(59, 130, 246);
+  --dsw-static-blue-50: rgb(239, 246, 255);
+  --dsw-static-blue-50p: rgb(234, 243, 255);
+  --dsw-static-blue-600: rgb(37, 99, 235);
+  --dsw-static-blue-75: rgb(229, 240, 255);
+  --dsw-static-blue-800: rgb(30, 64, 175);
+  --dsw-static-blue-900: rgb(14, 48, 116);
+  --dsw-static-blue-950: rgb(23, 37, 84);
+  --dsw-static-deepseek-100: rgb(228, 237, 253);
+  --dsw-static-deepseek-200: rgb(211, 226, 255);
+  --dsw-static-deepseek-300: rgb(183, 200, 254);
+  /* Brightened from the platform rgb(103, 158, 254) at the designer's request: legibility on the dark toast surface. */
+  --dsw-static-deepseek-400: rgb(122, 170, 255);
+  --dsw-static-deepseek-450: rgb(86, 134, 254);
+  --dsw-static-deepseek-500: rgb(65, 118, 230);
+  --dsw-static-deepseek-50: rgb(237, 243, 254);
+  --dsw-static-deepseek-600: rgb(72, 104, 178);
+  --dsw-static-deepseek-700-delete: rgb(47, 76, 143);
+  --dsw-static-deepseek-800: rgb(52, 65, 91);
+  --dsw-static-deepseek-900: rgb(40, 49, 66);
+  --dsw-static-green-100: rgb(230, 250, 237);
+  --dsw-static-green-400: rgb(78, 209, 126);
+  --dsw-static-green-500: rgb(34, 197, 94);
+  --dsw-static-green-500-a08: rgb(34 197 94 / 8%);
+  --dsw-static-green-500-a12: rgb(34 197 94 / 12%);
+  --dsw-static-green-900: rgb(35, 60, 44);
+  --dsw-static-neutral-00: rgb(255, 255, 255);
+  --dsw-static-neutral-1000: rgb(0, 0, 0);
+  --dsw-static-neutral-100: rgb(245, 245, 245);
+  --dsw-static-neutral-150: rgb(237, 237, 237);
+  --dsw-static-neutral-200: rgb(229, 229, 229);
+  --dsw-static-neutral-250: rgb(220, 220, 220);
+  --dsw-static-neutral-300: rgb(212, 212, 212);
+  --dsw-static-neutral-400: rgb(162, 164, 166);
+  --dsw-static-neutral-500: rgb(127, 130, 135);
+  --dsw-static-neutral-50: rgb(250, 250, 250);
+  --dsw-static-neutral-550: rgb(101, 103, 107);
+  --dsw-static-neutral-600: rgb(84, 85, 87);
+  --dsw-static-neutral-700: rgb(60, 60, 61);
+  --dsw-static-neutral-800: rgb(41, 41, 41);
+  --dsw-static-neutral-850: rgb(33, 33, 35);
+  --dsw-static-neutral-900: rgb(15, 15, 15);
+  --dsw-static-neutral-bluish-00: rgb(255, 255, 255);
+  --dsw-static-neutral-bluish-1000: rgb(15, 17, 21);
+  --dsw-static-neutral-bluish-100: rgb(235, 238, 242);
+  --dsw-static-neutral-bluish-150: rgb(233, 236, 242);
+  --dsw-static-neutral-bluish-200: rgb(225, 229, 238);
+  --dsw-static-neutral-bluish-300: rgb(207, 211, 214);
+  --dsw-static-neutral-bluish-310: rgb(202, 210, 219);
+  --dsw-static-neutral-bluish-400: rgb(173, 178, 184);
+  --dsw-static-neutral-bluish-500: rgb(151, 157, 166);
+  --dsw-static-neutral-bluish-50: rgb(249, 250, 251);
+  --dsw-static-neutral-bluish-55: rgb(245, 247, 250);
+  --dsw-static-neutral-bluish-600: rgb(129, 133, 140);
+  --dsw-static-neutral-bluish-60: rgb(245, 246, 247);
+  --dsw-static-neutral-bluish-700: rgb(97, 102, 107);
+  --dsw-static-neutral-bluish-750: rgb(67, 69, 74);
+  --dsw-static-neutral-bluish-75: rgb(241, 243, 245);
+  --dsw-static-neutral-bluish-800: rgb(53, 54, 56);
+  --dsw-static-neutral-bluish-850: rgb(44, 44, 46);
+  --dsw-static-neutral-bluish-875: rgb(35, 35, 36);
+  --dsw-static-neutral-bluish-900: rgb(27, 27, 28);
+  --dsw-static-neutral-bluish-90: rgb(237, 240, 244);
+  --dsw-static-neutral-bluish-950: rgb(21, 21, 23);
+  --dsw-static-red-100: rgb(254, 226, 226);
+  --dsw-static-red-400: rgb(242, 90, 90);
+  --dsw-static-red-400-a12: rgb(242 90 90 / 12%);
+  --dsw-static-red-500: rgb(239, 68, 68);
+  --dsw-static-red-50: rgb(254, 242, 242);
+  --dsw-static-red-600: rgb(236, 19, 19);
+  --dsw-static-red-600-a08: rgb(236 19 19 / 8%);
+  --dsw-static-red-900: rgb(87, 12, 12);
+  --dsw-static-violet-400: rgb(167, 139, 250);
+  --dsw-static-violet-600: rgb(124, 58, 237);
+}
+
+body[data-ds-dark-theme] {
+  --dsw-static-amber-100: rgb(254, 245, 231);
+  --dsw-static-amber-400: rgb(247, 173, 49);
+  --dsw-static-amber-500: rgb(245, 158, 11);
+  --dsw-static-amber-600: rgb(221, 134, 41);
+  --dsw-static-amber-900: rgb(39, 36, 31);
+  --dsw-static-blue-100: rgb(219, 234, 254);
+  --dsw-static-blue-300: rgb(147, 197, 253);
+  --dsw-static-blue-400: rgb(96, 165, 250);
+  --dsw-static-blue-450: rgb(77, 147, 248);
+  --dsw-static-blue-500: rgb(59, 130, 246);
+  --dsw-static-blue-50: rgb(239, 246, 255);
+  --dsw-static-blue-50p: rgb(234, 243, 255);
+  --dsw-static-blue-600: rgb(37, 99, 235);
+  --dsw-static-blue-75: rgb(229, 240, 255);
+  --dsw-static-blue-800: rgb(30, 64, 175);
+  --dsw-static-blue-900: rgb(14, 48, 116);
+  --dsw-static-blue-950: rgb(23, 37, 84);
+  --dsw-static-deepseek-100: rgb(228, 237, 253);
+  --dsw-static-deepseek-200: rgb(211, 226, 255);
+  --dsw-static-deepseek-300: rgb(183, 200, 254);
+  /* Brightened from the platform rgb(103, 158, 254) at the designer's request: legibility on the dark toast surface. */
+  --dsw-static-deepseek-400: rgb(122, 170, 255);
+  --dsw-static-deepseek-450: rgb(86, 134, 254);
+  --dsw-static-deepseek-500: rgb(65, 118, 230);
+  --dsw-static-deepseek-50: rgb(237, 243, 254);
+  --dsw-static-deepseek-600: rgb(72, 104, 178);
+  --dsw-static-deepseek-700-delete: rgb(47, 76, 143);
+  --dsw-static-deepseek-800: rgb(52, 65, 91);
+  --dsw-static-deepseek-900: rgb(40, 49, 66);
+  --dsw-static-green-100: rgb(230, 250, 237);
+  --dsw-static-green-400: rgb(78, 209, 126);
+  --dsw-static-green-500: rgb(34, 197, 94);
+  --dsw-static-green-500-a08: rgb(34 197 94 / 8%);
+  --dsw-static-green-500-a12: rgb(34 197 94 / 12%);
+  --dsw-static-green-900: rgb(35, 60, 44);
+  --dsw-static-neutral-00: rgb(255, 255, 255);
+  --dsw-static-neutral-1000: rgb(0, 0, 0);
+  --dsw-static-neutral-100: rgb(245, 245, 245);
+  --dsw-static-neutral-150: rgb(237, 237, 237);
+  --dsw-static-neutral-200: rgb(229, 229, 229);
+  --dsw-static-neutral-250: rgb(220, 220, 220);
+  --dsw-static-neutral-300: rgb(212, 212, 212);
+  --dsw-static-neutral-400: rgb(162, 164, 166);
+  --dsw-static-neutral-500: rgb(127, 130, 135);
+  --dsw-static-neutral-50: rgb(250, 250, 250);
+  --dsw-static-neutral-550: rgb(101, 103, 107);
+  --dsw-static-neutral-600: rgb(84, 85, 87);
+  --dsw-static-neutral-700: rgb(60, 60, 61);
+  --dsw-static-neutral-800: rgb(41, 41, 41);
+  --dsw-static-neutral-850: rgb(33, 33, 35);
+  --dsw-static-neutral-900: rgb(15, 15, 15);
+  --dsw-static-neutral-bluish-00: rgb(255, 255, 255);
+  --dsw-static-neutral-bluish-1000: rgb(15, 17, 21);
+  --dsw-static-neutral-bluish-100: rgb(235, 238, 242);
+  --dsw-static-neutral-bluish-150: rgb(233, 236, 242);
+  --dsw-static-neutral-bluish-200: rgb(225, 229, 238);
+  --dsw-static-neutral-bluish-300: rgb(207, 211, 214);
+  --dsw-static-neutral-bluish-310: rgb(202, 210, 219);
+  --dsw-static-neutral-bluish-400: rgb(173, 178, 184);
+  --dsw-static-neutral-bluish-500: rgb(151, 157, 166);
+  --dsw-static-neutral-bluish-50: rgb(249, 250, 251);
+  --dsw-static-neutral-bluish-55: rgb(245, 247, 250);
+  --dsw-static-neutral-bluish-600: rgb(129, 133, 140);
+  --dsw-static-neutral-bluish-60: rgb(249, 250, 251);
+  --dsw-static-neutral-bluish-700: rgb(97, 102, 107);
+  --dsw-static-neutral-bluish-750: rgb(67, 69, 74);
+  --dsw-static-neutral-bluish-75: rgb(241, 243, 245);
+  --dsw-static-neutral-bluish-800: rgb(53, 54, 56);
+  --dsw-static-neutral-bluish-850: rgb(44, 44, 46);
+  --dsw-static-neutral-bluish-875: rgb(35, 35, 36);
+  --dsw-static-neutral-bluish-900: rgb(27, 27, 28);
+  --dsw-static-neutral-bluish-90: rgb(237, 240, 244);
+  --dsw-static-neutral-bluish-950: rgb(21, 21, 23);
+  --dsw-static-red-100: rgb(254, 226, 226);
+  --dsw-static-red-400: rgb(242, 90, 90);
+  --dsw-static-red-400-a12: rgb(242 90 90 / 12%);
+  --dsw-static-red-500: rgb(239, 68, 68);
+  --dsw-static-red-50: rgb(254, 242, 242);
+  --dsw-static-red-600: rgb(236, 19, 19);
+  --dsw-static-red-600-a08: rgb(236 19 19 / 8%);
+  --dsw-static-red-900: rgb(87, 12, 12);
+  --dsw-static-violet-400: rgb(167, 139, 250);
+  --dsw-static-violet-600: rgb(124, 58, 237);
+}
+
+body {
+  --dsw-alias-bg-base: var(--dsw-static-neutral-bluish-00);
+  --dsw-alias-bg-document-preview: var(--dsw-static-neutral-bluish-100);
+  --dsw-alias-bg-document-selection: color-mix(in srgb, var(--dsw-static-blue-500) 40%, transparent);
+  --dsw-alias-label-document-preview: var(--dsw-static-neutral-bluish-700);
+  --dsw-alias-bg-layer-1: var(--dsw-static-neutral-bluish-00);
+  --dsw-alias-bg-layer-2: var(--dsw-static-neutral-bluish-00);
+  --dsw-alias-bg-layer-3: var(--dsw-static-neutral-bluish-00);
+  --dsw-alias-bg-mask-1: rgba(0, 0, 0, 0.24);
+  --dsw-alias-bg-mask-2: rgba(0, 0, 0, 0.12);
+  --dsw-alias-bg-mask-3: rgba(0, 0, 0, 0.48);
+  --dsw-alias-bg-mask-photo: rgba(0, 0, 0, 0.88);
+  --dsw-alias-bg-mask-drop: rgba(255, 255, 255, 0.7);
+  --dsw-alias-bg-module-platform: var(--dsw-static-neutral-bluish-60);
+  --dsw-alias-bg-multi-select: var(--dsw-static-neutral-bluish-60);
+  --dsw-alias-bg-overlay: var(--dsw-static-neutral-bluish-150);
+  --dsw-alias-bg-skeleton: rgba(0, 0, 0, 0.04);
+  --dsw-alias-border-inverted2: rgba(0, 0, 0, 0);
+  --dsw-alias-border-inverted: rgba(0, 0, 0, 0);
+  --dsw-alias-border-l1: rgba(0, 0, 0, 0.04);
+  --dsw-alias-border-l2-darkmode-thin: rgba(0, 0, 0, 0.1);
+  --dsw-alias-border-l2: rgba(0, 0, 0, 0.1);
+  --dsw-alias-border-l3: rgba(0, 0, 0, 0.12);
+  --dsw-alias-border-l4: rgba(0, 0, 0, 0.16);
+  --dsw-alias-border-selected: var(--dsw-static-neutral-bluish-400);
+  --dsw-alias-brand-primary-invert: var(--dsw-static-neutral-bluish-1000);
+  --dsw-alias-brand-primary-new-colorprimary-new-color: rgb(65, 118, 230);
+  --dsw-alias-brand-primary: var(--dsw-static-neutral-bluish-1000);
+  --dsw-alias-brand-text: var(--dsw-static-neutral-bluish-1000);
+  --dsw-alias-button-contrast-fill: var(--dsw-static-neutral-bluish-700);
+  --dsw-alias-button-elevated-fill: var(--dsw-static-neutral-bluish-00);
+  --dsw-alias-button-floating-fill: var(--dsw-static-neutral-bluish-00);
+  --dsw-alias-button-floating-hover: var(--dsw-static-neutral-bluish-75);
+  --dsw-alias-button-ghost-active-border: var(--dsw-static-neutral-bluish-500);
+  --dsw-alias-button-ghost-active-fill: var(--dsw-static-neutral-bluish-100);
+  --dsw-alias-button-ghost-active-hover: var(--dsw-static-neutral-bluish-150);
+  --dsw-alias-button-info-fill: var(--dsw-static-deepseek-500);
+  --dsw-alias-button-info-hover: var(--dsw-static-deepseek-400);
+  --dsw-alias-button-primary-dimmed: var(--dsw-static-neutral-bluish-100);
+  --dsw-alias-button-primary-fill: var(--dsw-alias-brand-primary);
+  --dsw-alias-button-primary-hover: var(--dsw-static-neutral-bluish-750);
+  --dsw-alias-button-tool-bar-fill-invisible: rgba(31, 31, 31, 0.36);
+  --dsw-alias-button-tool-bar-fill: rgba(84, 85, 87, 0.5);
+  --dsw-alias-button-tool-bar-hover: rgba(84, 85, 87, 0.6);
+  --dsw-alias-card-fill: var(--dsw-static-neutral-50);
+  --dsw-alias-card-fill-hover: var(--dsw-static-neutral-100);
+  --dsw-alias-card-tile-fill: color-mix(in srgb, var(--dsw-static-neutral-00) 50%, transparent);
+  --dsw-alias-chart-messages: var(--dsw-static-blue-450);
+  --dsw-alias-chart-system: var(--dsw-static-neutral-bluish-400);
+  --dsw-alias-chart-tools: var(--dsw-static-violet-400);
+  --dsw-alias-hovercard-bg: var(--dsw-static-neutral-bluish-850);
+  --dsw-alias-hovercard-label-primary: var(--dsw-static-neutral-bluish-00);
+  --dsw-alias-hovercard-label-secondary: var(--dsw-static-neutral-bluish-300);
+  --dsw-alias-hovercard-label-tertiary: var(--dsw-static-neutral-bluish-400);
+  --dsw-alias-hovercard-state-done: var(--dsw-static-violet-400);
+  --dsw-alias-hovercard-state-error: var(--dsw-static-red-400);
+  --dsw-alias-illustration-background: var(--dsw-static-neutral-bluish-55);
+  --dsw-alias-illustration-backing: var(--dsw-static-neutral-bluish-310);
+  --dsw-alias-illustration-detail: var(--dsw-static-neutral-bluish-310);
+  --dsw-alias-illustration-inset: var(--dsw-alias-illustration-surface);
+  --dsw-alias-illustration-shadow: var(--dsw-alias-illustration-surface);
+  --dsw-alias-illustration-surface: var(--dsw-static-neutral-bluish-90);
+  --dsw-alias-interactive-bg-active: rgba(38, 49, 72, 0.1);
+  --dsw-alias-interactive-bg-hover-accent: rgba(38, 49, 72, 0.14);
+  --dsw-alias-interactive-bg-hover-danger: rgba(236, 19, 19, 0.05);
+  --dsw-alias-interactive-bg-hover-solid: var(--dsw-static-neutral-bluish-75);
+  --dsw-alias-interactive-bg-hover: rgba(38, 49, 72, 0.06);
+  --dsw-alias-json-tree-hover: rgb(60 64 67 / 4%);
+  --dsw-alias-json-tree-icon: #5f6368;
+  --dsw-alias-json-tree-keyword: #1c00cf;
+  --dsw-alias-json-tree-number: #1c00cf;
+  --dsw-alias-json-tree-property: #881391;
+  --dsw-alias-json-tree-punctuation: #202124;
+  --dsw-alias-json-tree-string: #c41a16;
+  --dsw-alias-label-caption: var(--dsw-static-neutral-bluish-400);
+  --dsw-alias-label-deep-diving: color-mix(in srgb, var(--dsw-static-deepseek-500) 70%, var(--dsw-static-blue-950));
+  --dsw-alias-label-deep-diving-shimmer: color-mix(in srgb, var(--dsw-static-deepseek-500) 30%, var(--dsw-static-blue-950));
+  --dsw-alias-label-dimmed: var(--dsw-static-neutral-bluish-200);
+  --dsw-alias-label-on-color: var(--dsw-static-neutral-bluish-00);
+  --dsw-alias-label-primary-bluish: var(--dsw-static-blue-900);
+  --dsw-alias-label-primary-dimmed: var(--dsw-static-neutral-bluish-950);
+  --dsw-alias-label-primary-foreground: var(--dsw-static-neutral-bluish-00);
+  --dsw-alias-label-primary-inverted: var(--dsw-static-neutral-bluish-00);
+  --dsw-alias-label-primary: var(--dsw-static-neutral-bluish-1000);
+  --dsw-alias-label-secondary: var(--dsw-static-neutral-bluish-700);
+  --dsw-alias-label-shimmer: color-mix(in srgb, var(--dsw-static-neutral-1000) 30%, transparent);
+  --dsw-alias-label-tertiary: var(--dsw-static-neutral-bluish-600);
+  --dsw-alias-menu-icon: var(--dsw-static-neutral-bluish-800);
+  --dsw-alias-link: var(--dsw-static-deepseek-500);
+  --dsw-alias-markdown-citation: var(--dsw-static-neutral-bluish-100);
+  --dsw-alias-markdown-code-block-banner: var(--dsw-static-neutral-bluish-50);
+  --dsw-alias-markdown-code-block: var(--dsw-static-neutral-bluish-50);
+  --dsw-alias-markdown-code-segment-selected: var(--dsw-static-neutral-bluish-00);
+  --dsw-alias-markdown-code-segment-unselected: var(--dsw-static-neutral-bluish-75);
+  --dsw-alias-markdown-inline-code: var(--dsw-static-neutral-50);
+  --dsw-alias-markdown-placeholder: var(--dsw-static-neutral-bluish-60);
+  --dsw-alias-markdown-tag: var(--dsw-static-neutral-bluish-75);
+  --dsw-alias-scrollbar-bg-l1: var(--dsw-static-neutral-200);
+  --dsw-alias-scrollbar-bg-l2: var(--dsw-static-neutral-200);
+  --dsw-alias-scrollbar-hover-l1: var(--dsw-static-neutral-300);
+  --dsw-alias-scrollbar-hover-l2: var(--dsw-static-neutral-300);
+  --dsw-alias-state-business-primary: var(--dsw-static-deepseek-500);
+  --dsw-alias-state-business-tertiary: var(--dsw-static-deepseek-100);
+  --dsw-alias-code-diff-added: var(--dsw-static-green-500-a08);
+  --dsw-alias-code-diff-deleted: var(--dsw-static-red-600-a08);
+  --dsw-alias-file-diff-added-bg: rgb(230, 244, 231);
+  --dsw-alias-file-diff-added-gutter: rgb(237, 247, 237);
+  --dsw-alias-file-diff-added-marker: rgb(1, 162, 65);
+  --dsw-alias-file-diff-deleted-bg: rgb(252, 230, 226);
+  --dsw-alias-file-diff-deleted-gutter: rgb(253, 236, 233);
+  --dsw-alias-file-diff-deleted-marker: rgb(186, 39, 35);
+  --dsw-alias-state-done-primary: var(--dsw-static-violet-600);
+  --dsw-alias-state-error-primary: var(--dsw-static-red-600);
+  --dsw-alias-state-error-secondary: var(--dsw-static-red-400);
+  --dsw-alias-state-idle-primary: var(--dsw-static-neutral-300);
+  --dsw-alias-state-success-primary: var(--dsw-static-green-500);
+  --dsw-alias-state-success-secondary: var(--dsw-static-green-400);
+  --dsw-alias-state-success-tertiary: var(--dsw-static-green-100);
+  --dsw-alias-state-warn-label: var(--dsw-static-amber-600);
+  --dsw-alias-state-warn-primary: var(--dsw-static-amber-500);
+  --dsw-alias-state-warn-secondary: var(--dsw-static-amber-400);
+  --dsw-alias-state-warn-tertiary: var(--dsw-static-amber-100);
+  --dsw-alias-switch-thumb: var(--dsw-static-neutral-bluish-00);
+  --dsw-alias-toast-action: var(--dsw-static-deepseek-400);
+  --dsw-alias-toast-bg: var(--dsw-static-neutral-bluish-800);
+  --dsw-alias-toast-label: var(--dsw-static-neutral-bluish-00);
+  --dsw-alias-tooltip-bg: var(--dsw-static-neutral-bluish-850);
+  --dsw-alias-tooltip-key-bg: color-mix(in srgb, var(--dsw-alias-tooltip-bg), white 18%);
+  --dsw-alias-tooltip-label: var(--dsw-static-neutral-bluish-00);
+  --dsw-alias-trajectory-accent: var(--dsw-static-blue-500);
+  --dsw-alias-turn-trigger-bg: var(--dsw-alias-markdown-code-block);
+  --dsw-alias-turn-trigger-bg-hover: var(--dsw-alias-interactive-bg-hover);
+  --dsw-specific-bubble-highlight: var(--dsw-static-deepseek-200);
+  --dsw-specific-bubble: var(--dsw-static-deepseek-50);
+  /* Black 8% in both palettes: the upload card keeps its original track value. */
+  --dsw-specific-file-upload-track: rgba(0, 0, 0, 0.08);
+  --dsw-specific-guide-hero: var(--dsw-static-neutral-200);
+  --dsw-specific-sidebar-right-flash: var(--dsw-alias-brand-primary-new-colorprimary-new-color);
+  --dsw-specific-input-major: var(--dsw-static-neutral-bluish-00);
+  --dsw-specific-login-input: var(--dsw-static-neutral-bluish-50);
+  --dsw-menu-surface-fill: rgba(252, 253, 254, 0.7);
+  --dsw-alias-menu-group-header-fill: rgba(248, 249, 250, 0.94);
+  --dsw-specific-menu: var(--dsw-menu-surface-fill);
+  --dsw-specific-selector: var(--dsw-static-neutral-bluish-60);
+  --dsw-specific-sidebar-fill: var(--dsw-static-neutral-bluish-50);
+  --dsw-specific-sidebar-nav-item-active-accent: var(--dsw-static-deepseek-100);
+  --dsw-specific-sidebar-nav-item-active: var(--dsw-static-neutral-bluish-100);
+  --dsw-specific-tip: var(--dsw-static-neutral-bluish-60);
+
+  background-color: var(--dsw-alias-bg-base);
+}
+
+body[data-ds-dark-theme] {
+  --dsw-alias-bg-base: var(--dsw-static-neutral-bluish-950);
+  --dsw-alias-bg-document-preview: var(--dsw-static-neutral-bluish-950);
+  --dsw-alias-bg-document-selection: color-mix(in srgb, var(--dsw-static-blue-500) 40%, transparent);
+  --dsw-alias-label-document-preview: var(--dsw-static-neutral-bluish-300);
+  --dsw-alias-bg-layer-1: var(--dsw-static-neutral-bluish-875);
+  --dsw-alias-bg-layer-2: var(--dsw-static-neutral-bluish-850);
+  --dsw-alias-bg-layer-3: var(--dsw-static-neutral-bluish-800);
+  --dsw-alias-bg-mask-1: rgba(0, 0, 0, 0.5);
+  --dsw-alias-bg-mask-2: rgba(0, 0, 0, 0.2);
+  --dsw-alias-bg-mask-3: rgba(0, 0, 0, 0.48);
+  --dsw-alias-bg-mask-photo: rgba(0, 0, 0, 0.88);
+  --dsw-alias-bg-mask-drop: rgba(39, 39, 48, 0.7);
+  --dsw-alias-bg-module-platform: var(--dsw-static-neutral-bluish-800);
+  --dsw-alias-bg-multi-select: var(--dsw-static-neutral-850);
+  --dsw-alias-bg-overlay: var(--dsw-static-neutral-bluish-700);
+  --dsw-alias-bg-skeleton: rgba(255, 255, 255, 0.08);
+  --dsw-alias-border-inverted2: rgba(255, 255, 255, 0.08);
+  --dsw-alias-border-inverted: rgba(255, 255, 255, 0.06);
+  --dsw-alias-border-l1: rgba(255, 255, 255, 0.06);
+  --dsw-alias-border-l2-darkmode-thin: rgba(255, 255, 255, 0.06);
+  --dsw-alias-border-l2: rgba(255, 255, 255, 0.12);
+  --dsw-alias-border-l3: rgba(255, 255, 255, 0.16);
+  --dsw-alias-border-l4: rgba(255, 255, 255, 0.2);
+  --dsw-alias-border-selected: var(--dsw-static-neutral-bluish-400);
+  --dsw-alias-brand-primary-invert: var(--dsw-static-neutral-bluish-50);
+  --dsw-alias-brand-primary-new-colorprimary-new-color: var(--dsw-static-deepseek-450);
+  --dsw-alias-brand-primary: var(--dsw-static-neutral-bluish-50);
+  --dsw-alias-brand-text: var(--dsw-static-neutral-bluish-50);
+  --dsw-alias-button-contrast-fill: var(--dsw-static-neutral-bluish-50);
+  --dsw-alias-button-elevated-fill: var(--dsw-static-neutral-bluish-750);
+  --dsw-alias-button-floating-fill: var(--dsw-static-neutral-bluish-850);
+  --dsw-alias-button-floating-hover: var(--dsw-static-neutral-bluish-800);
+  --dsw-alias-button-ghost-active-border: var(--dsw-static-neutral-bluish-600);
+  --dsw-alias-button-ghost-active-fill: var(--dsw-static-neutral-bluish-750);
+  --dsw-alias-button-ghost-active-hover: var(--dsw-static-neutral-bluish-700);
+  --dsw-alias-button-info-fill: var(--dsw-static-deepseek-400);
+  --dsw-alias-button-info-hover: var(--dsw-static-deepseek-500);
+  --dsw-alias-button-primary-dimmed: var(--dsw-static-neutral-bluish-750);
+  --dsw-alias-button-primary-fill: var(--dsw-alias-brand-primary);
+  --dsw-alias-button-primary-hover: var(--dsw-static-neutral-bluish-100);
+  --dsw-alias-button-tool-bar-fill-invisible: rgba(31, 31, 31, 0.36);
+  --dsw-alias-button-tool-bar-fill: rgba(84, 85, 87, 0.5);
+  --dsw-alias-button-tool-bar-hover: rgba(84, 85, 87, 0.6);
+  --dsw-alias-card-fill: var(--dsw-static-neutral-850);
+  --dsw-alias-card-fill-hover: var(--dsw-static-neutral-800);
+  --dsw-alias-card-tile-fill: color-mix(in srgb, var(--dsw-static-neutral-00) 5%, transparent);
+  --dsw-alias-chart-messages: var(--dsw-static-blue-450);
+  --dsw-alias-chart-system: var(--dsw-static-neutral-bluish-400);
+  --dsw-alias-chart-tools: var(--dsw-static-violet-400);
+  --dsw-alias-hovercard-bg: var(--dsw-static-neutral-bluish-850);
+  --dsw-alias-hovercard-label-primary: var(--dsw-static-neutral-bluish-00);
+  --dsw-alias-hovercard-label-secondary: var(--dsw-static-neutral-bluish-300);
+  --dsw-alias-hovercard-label-tertiary: var(--dsw-static-neutral-bluish-400);
+  --dsw-alias-hovercard-state-done: var(--dsw-static-violet-400);
+  --dsw-alias-hovercard-state-error: var(--dsw-static-red-400);
+  --dsw-alias-illustration-background: var(--dsw-static-neutral-bluish-850);
+  --dsw-alias-illustration-backing: var(--dsw-static-neutral-bluish-750);
+  --dsw-alias-illustration-detail: var(--dsw-static-neutral-bluish-600);
+  --dsw-alias-illustration-inset: var(--dsw-alias-illustration-backing);
+  --dsw-alias-illustration-shadow: var(--dsw-alias-illustration-backing);
+  --dsw-alias-illustration-surface: var(--dsw-static-neutral-bluish-700);
+  --dsw-alias-interactive-bg-active: rgba(255, 255, 255, 0.14);
+  --dsw-alias-interactive-bg-hover-accent: rgba(255, 255, 255, 0.24);
+  --dsw-alias-interactive-bg-hover-danger: rgba(242, 90, 90, 0.15);
+  --dsw-alias-interactive-bg-hover-solid: var(--dsw-static-neutral-bluish-800);
+  --dsw-alias-interactive-bg-hover: rgba(255, 255, 255, 0.08);
+  --dsw-alias-json-tree-hover: rgb(232 234 237 / 5%);
+  --dsw-alias-json-tree-icon: #9aa0a6;
+  --dsw-alias-json-tree-keyword: #99c8ff;
+  --dsw-alias-json-tree-number: #99c8ff;
+  --dsw-alias-json-tree-property: #5db0d7;
+  --dsw-alias-json-tree-punctuation: #e8eaed;
+  --dsw-alias-json-tree-string: #f28b82;
+  --dsw-alias-label-caption: var(--dsw-static-neutral-bluish-600);
+  --dsw-alias-label-deep-diving: color-mix(in srgb, var(--dsw-static-deepseek-450) 55%, var(--dsw-static-neutral-bluish-400));
+  --dsw-alias-label-deep-diving-shimmer: color-mix(in srgb, var(--dsw-static-blue-300) 65%, var(--dsw-static-deepseek-400));
+  --dsw-alias-label-dimmed: var(--dsw-static-neutral-bluish-750);
+  --dsw-alias-label-on-color: var(--dsw-static-neutral-bluish-00);
+  --dsw-alias-label-primary-bluish: var(--dsw-static-neutral-bluish-50);
+  --dsw-alias-label-primary-dimmed: var(--dsw-static-neutral-bluish-100);
+  --dsw-alias-label-primary-foreground: var(--dsw-static-neutral-bluish-1000);
+  --dsw-alias-label-primary-inverted: var(--dsw-static-neutral-bluish-800);
+  --dsw-alias-label-primary: var(--dsw-static-neutral-bluish-50);
+  --dsw-alias-label-secondary: var(--dsw-static-neutral-bluish-300);
+  --dsw-alias-label-shimmer: color-mix(in srgb, var(--dsw-static-neutral-00) 45%, transparent);
+  --dsw-alias-label-tertiary: var(--dsw-static-neutral-bluish-400);
+  --dsw-alias-menu-icon: var(--dsw-alias-label-primary-dimmed);
+  --dsw-alias-link: var(--dsw-static-deepseek-400);
+  --dsw-alias-markdown-citation: var(--dsw-static-neutral-bluish-800);
+  --dsw-alias-markdown-code-block-banner: var(--dsw-static-neutral-bluish-850);
+  --dsw-alias-markdown-code-block: var(--dsw-static-neutral-bluish-900);
+  --dsw-alias-markdown-code-segment-selected: var(--dsw-static-neutral-bluish-800);
+  --dsw-alias-markdown-code-segment-unselected: var(--dsw-static-neutral-bluish-900);
+  --dsw-alias-markdown-inline-code: var(--dsw-static-neutral-800);
+  --dsw-alias-markdown-placeholder: var(--dsw-static-neutral-bluish-850);
+  --dsw-alias-markdown-tag: var(--dsw-static-neutral-bluish-850);
+  --dsw-alias-scrollbar-bg-l1: var(--dsw-static-neutral-700);
+  --dsw-alias-scrollbar-bg-l2: var(--dsw-static-neutral-600);
+  --dsw-alias-scrollbar-hover-l1: var(--dsw-static-neutral-600);
+  --dsw-alias-scrollbar-hover-l2: var(--dsw-static-neutral-550);
+  --dsw-alias-state-business-primary: var(--dsw-static-deepseek-400);
+  --dsw-alias-state-business-tertiary: var(--dsw-static-deepseek-800);
+  --dsw-alias-code-diff-added: var(--dsw-static-green-500-a12);
+  --dsw-alias-code-diff-deleted: var(--dsw-static-red-400-a12);
+  --dsw-alias-file-diff-added-bg: rgb(31, 49, 36);
+  --dsw-alias-file-diff-added-gutter: rgb(19, 32, 22);
+  --dsw-alias-file-diff-added-marker: rgb(65, 201, 119);
+  --dsw-alias-file-diff-deleted-bg: rgb(60, 31, 27);
+  --dsw-alias-file-diff-deleted-gutter: rgb(40, 19, 14);
+  --dsw-alias-file-diff-deleted-marker: rgb(250, 66, 62);
+  --dsw-alias-state-done-primary: var(--dsw-static-violet-400);
+  --dsw-alias-state-error-primary: var(--dsw-static-red-400);
+  --dsw-alias-state-error-secondary: var(--dsw-static-red-400);
+  --dsw-alias-state-idle-primary: var(--dsw-static-neutral-600);
+  --dsw-alias-state-success-primary: var(--dsw-static-green-500);
+  --dsw-alias-state-success-secondary: var(--dsw-static-green-400);
+  --dsw-alias-state-success-tertiary: var(--dsw-static-green-900);
+  --dsw-alias-state-warn-label: var(--dsw-static-amber-600);
+  --dsw-alias-state-warn-primary: var(--dsw-static-amber-500);
+  --dsw-alias-state-warn-secondary: var(--dsw-static-amber-400);
+  --dsw-alias-state-warn-tertiary: var(--dsw-static-amber-900);
+  --dsw-alias-switch-thumb: var(--dsw-static-neutral-bluish-400);
+  --dsw-alias-toast-action: var(--dsw-static-deepseek-400);
+  --dsw-alias-toast-bg: var(--dsw-static-neutral-bluish-750);
+  --dsw-alias-toast-label: var(--dsw-static-neutral-bluish-00);
+  --dsw-alias-turn-trigger-bg: var(--dsw-alias-interactive-bg-hover);
+  --dsw-alias-turn-trigger-bg-hover: var(--dsw-alias-interactive-bg-active);
+  --dsw-alias-tooltip-bg: var(--dsw-static-neutral-bluish-750);
+  --dsw-alias-tooltip-key-bg: color-mix(in srgb, var(--dsw-alias-tooltip-bg), white 18%);
+  --dsw-alias-tooltip-label: var(--dsw-static-neutral-bluish-00);
+  --dsw-alias-trajectory-accent: var(--dsw-static-blue-500);
+  --dsw-specific-bubble-highlight: var(--dsw-static-neutral-bluish-750);
+  --dsw-specific-bubble: var(--dsw-static-neutral-bluish-850);
+  --dsw-specific-file-upload-track: rgba(0, 0, 0, 0.08);
+  --dsw-specific-guide-hero: var(--dsw-static-neutral-700);
+  --dsw-specific-sidebar-right-flash: var(--dsw-static-neutral-00);
+  --dsw-specific-input-major: var(--dsw-static-neutral-bluish-850);
+  --dsw-specific-login-input: var(--dsw-static-neutral-bluish-900);
+  --dsw-menu-surface-fill: rgba(48, 49, 54, 0.64);
+  --dsw-alias-menu-group-header-fill: rgba(48, 49, 54, 0.94);
+  --dsw-specific-menu: var(--dsw-menu-surface-fill);
+  --dsw-specific-selector: var(--dsw-static-neutral-bluish-800);
+  --dsw-specific-sidebar-fill: var(--dsw-static-neutral-bluish-900);
+  --dsw-specific-sidebar-nav-item-active-accent: var(--dsw-static-neutral-bluish-800);
+  --dsw-specific-sidebar-nav-item-active: var(--dsw-static-neutral-bluish-750);
+  --dsw-specific-tip: var(--dsw-static-neutral-bluish-800);
+}
+
+/* Overlays without MenuSurface's opaque backing cannot blur page content over
+ * native vibrancy reliably, so their fill stays nearly opaque on macOS. */
+html[data-platform='darwin'] body {
+  --dsw-specific-menu: rgba(248, 249, 250, 0.94);
+}
+
+html[data-platform='darwin'] body[data-ds-dark-theme] {
+  --dsw-specific-menu: rgba(48, 49, 54, 0.94);
+}
+
+/* macOS vibrancy sidebar: glass control fills (the collapsed rail drops the
+ * light fill but keeps the dark one), the column's top and bottom
+ * washes with their fully transparent ends, and its translucent tint. Dark drops the tint's blue cast (it reads
+ * purple over dark fills) and thins it so more wallpaper shows. */
+html[data-platform='darwin'] body {
+  --dsw-specific-sidebar-glass-collapsed-fill: transparent;
+  --dsw-specific-sidebar-glass-collapsed-hover: var(--dsw-alias-interactive-bg-hover);
+  --dsw-specific-sidebar-glass-fill: rgb(255 255 255 / 0.55);
+  --dsw-specific-sidebar-glass-hover: rgb(255 255 255 / 0.3);
+  --dsw-specific-sidebar-tint: color-mix(in srgb, color-mix(in srgb, var(--dsw-specific-sidebar-fill) 97%, rgb(122 155 240)) 40%, transparent);
+  --dsw-specific-sidebar-wash-bottom: rgb(143 137 184 / 0.09);
+  --dsw-specific-sidebar-wash-bottom-clear: rgb(143 137 184 / 0);
+  --dsw-specific-sidebar-wash-top: rgb(122 155 240 / 0.1);
+  --dsw-specific-sidebar-wash-top-clear: rgb(122 155 240 / 0);
+}
+
+html[data-platform='darwin'] body[data-ds-dark-theme] {
+  --dsw-specific-sidebar-glass-collapsed-fill: var(--dsw-specific-sidebar-glass-fill);
+  --dsw-specific-sidebar-glass-collapsed-hover: var(--dsw-specific-sidebar-glass-hover);
+  --dsw-specific-sidebar-glass-fill: rgb(255 255 255 / 0.15);
+  --dsw-specific-sidebar-glass-hover: rgb(255 255 255 / 0.2);
+  --dsw-specific-sidebar-tint: color-mix(in srgb, var(--dsw-specific-sidebar-fill) 50%, transparent);
+  --dsw-specific-sidebar-wash-bottom: rgb(143 137 184 / 0.07);
+  --dsw-specific-sidebar-wash-top: rgb(122 155 240 / 0.08);
+}
+/* === end of design-platform.css === */
+
+/* --- mockup-only layout (no visual tokens) --- */
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+body { font-family: var(--dsw-font-family); color: var(--dsw-alias-label-primary); background: var(--dsw-alias-bg-module-platform); }
+button, input, textarea { font-family: var(--dsw-font-family); }
+button { cursor: pointer; }
+[hidden] { display: none !important; }
+
+.x-shell { display: flex; flex-direction: column; gap: 12px; align-items: center; padding: 14px; min-height: 100vh; }
+.x-top { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px; width: 100%; max-width: 1280px; }
+.x-main { display: flex; flex-wrap: wrap; align-items: flex-start; justify-content: center; gap: 14px; width: 100%; max-width: 1280px; }
+.x-left { display: flex; flex-direction: column; align-items: center; gap: 10px; }
+.x-right { width: 372px; max-height: 844px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; padding: 12px; border-radius: var(--dsw-radius-lg); background: var(--dsw-alias-bg-layer-2); border: var(--dsh-hairline-width, 0.5px) solid var(--dsw-alias-border-l2); }
+.x-nav { display: flex; flex-wrap: wrap; gap: 5px; justify-content: center; width: 390px; }
+.x-phone { position: relative; width: 390px; height: 844px; overflow: hidden; flex: none; border: 10px solid var(--dsw-alias-brand-primary); border-radius: var(--dsw-radius-panel); background: var(--dsw-alias-bg-base); }
+.x-island { position: absolute; top: 11px; left: 50%; transform: translateX(-50%); z-index: 5; width: 104px; height: 26px; border-radius: var(--dsw-radius-xl); background: var(--dsw-alias-brand-primary); }
+.x-status { position: relative; z-index: 4; height: 48px; display: flex; align-items: center; justify-content: space-between; padding: 0 22px; font-size: 11px; line-height: 15px; font-weight: 600; color: var(--dsw-alias-label-primary); }
+.x-signal-row { gap: 3px; }
+.signal-bar { width: 3px; border-radius: var(--dsw-radius-xs); background: var(--dsw-alias-label-primary); }
+.signal-bar.one { height: 5px; }
+.signal-bar.two { height: 7px; }
+.signal-bar.three { height: 9px; }
+.battery { width: 16px; height: 8px; display: flex; align-items: center; padding: 1px; border: var(--dsh-hairline-width, 0.5px) solid var(--dsw-alias-border-l4); border-radius: var(--dsw-radius-xs); }
+.battery-fill { display: block; width: 11px; height: 4px; border-radius: var(--dsw-radius-xs); background: var(--dsw-alias-state-success-primary); }
+.x-home { position: absolute; bottom: 8px; left: 50%; transform: translateX(-50%); z-index: 5; width: 128px; height: 5px; border-radius: var(--dsw-radius-sm); background: var(--dsw-alias-label-primary); }
+.x-screen { position: relative; height: calc(844px - 48px); overflow-y: auto; overflow-x: hidden; background: var(--dsw-alias-bg-base); }
+.x-page { display: flex; flex-direction: column; gap: 10px; padding: 6px 14px 28px; min-height: 100%; }
+.x-page.x-app { height: 100%; padding: 0; gap: 0; overflow: hidden; }
+.x-row { display: flex; align-items: center; gap: 8px; }
+.x-row-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; }
+.x-wrap { display: flex; flex-wrap: wrap; gap: 6px; }
+.x-col { display: flex; flex-direction: column; gap: 6px; }
+.x-grow { flex: 1; min-width: 0; }
+.x-kv { display: grid; grid-template-columns: minmax(76px, auto) 1fr; gap: 3px 8px; align-items: start; }
+.x-block { padding: 10px 12px; border-radius: var(--dsw-radius-md); background: var(--dsw-alias-bg-layer-2); }
+.x-thin { height: 1px; width: 100%; background: var(--dsw-alias-border-l1); }
+.x-title { font-size: 19px; line-height: 25px; font-weight: 600; color: var(--dsw-alias-label-primary); }
+.x-sub { font-size: 11px; line-height: 15px; color: var(--dsw-alias-label-secondary); }
+.x-micro { font-size: 10px; line-height: 15px; color: var(--dsw-alias-label-tertiary); }
+.x-strong-sm { font-size: 12px; line-height: 17px; font-weight: 600; }
+.x-strong-md { font-size: 14px; line-height: 20px; font-weight: 600; }
+.x-product-card.center { align-items: center; }
+.x-progress { height: 6px; width: 100%; overflow: hidden; border-radius: var(--dsw-radius-xs); background: var(--dsw-alias-markdown-code-segment-unselected); }
+.x-progress-fill { width: 38%; height: 6px; background: var(--dsw-alias-button-info-fill); }
+.x-note { padding: 8px 10px; border-left: 2px solid var(--dsw-alias-state-warn-primary); border-radius: var(--dsw-radius-xs); background: var(--dsw-alias-state-warn-tertiary); font-size: 10px; line-height: 15px; color: var(--dsw-alias-label-secondary); }
+.x-product-card { display: flex; flex-direction: column; gap: 6px; padding: 10px 12px; border-radius: var(--dsw-radius-md); background: var(--dsw-alias-card-fill); border: var(--dsh-hairline-width, 0.5px) solid var(--dsw-alias-border-l2); }
+.x-product-card h3 { margin: 0; font-size: 13px; line-height: 18px; color: var(--dsw-alias-label-primary); }
+.x-product-card p { margin: 0; font-size: 11px; line-height: 16px; color: var(--dsw-alias-label-secondary); }
+.x-btn { border: 0; border-radius: var(--dsw-radius-sm); background: var(--dsw-alias-button-elevated-fill); color: var(--dsw-alias-label-primary); padding: 9px 12px; font-size: 12px; line-height: 17px; font-weight: 600; }
+.x-btn.primary { background: var(--dsw-alias-button-primary-fill); color: var(--dsw-alias-label-on-color); }
+.x-btn.ghost { border: var(--dsh-hairline-width, 0.5px) solid var(--dsw-alias-border-l4); background: var(--dsw-alias-bg-layer-1); color: var(--dsw-alias-label-secondary); }
+.x-btn.mini { padding: 5px 7px; border-radius: var(--dsw-radius-xs); font-size: 10px; line-height: 14px; font-weight: 400; background: var(--dsw-alias-markdown-tag); color: var(--dsw-alias-label-secondary); }
+.x-icon-btn { width: 28px; height: 28px; flex: none; border: 0; border-radius: var(--dsw-radius-sm); background: var(--dsw-alias-markdown-tag); color: var(--dsw-alias-label-secondary); display: inline-flex; align-items: center; justify-content: center; font-size: 14px; line-height: 1; }
+.x-icon-btn.push { margin-left: auto; }
+.x-icon-btn:focus-visible, .x-btn:focus-visible, .x-nav button:focus-visible, .x-aside-btn:focus-visible, .srow:focus-visible, .p3-new-btn:focus-visible, .settings-rail button:focus-visible, .qbtn:focus-visible { outline: var(--dsh-hairline-width, 0.5px) solid var(--dsw-alias-border-l4); outline-offset: 1px; }
+.x-chip { display: inline-flex; align-items: center; border-radius: var(--dsw-radius-xs); background: var(--dsw-alias-markdown-tag); color: var(--dsw-alias-label-secondary); padding: 2px 6px; font-size: 9px; line-height: 13px; }
+.x-chip.ok { background: var(--dsw-alias-state-success-tertiary); color: var(--dsw-alias-label-primary); }
+.x-chip.warn { background: var(--dsw-alias-state-warn-tertiary); color: var(--dsw-alias-state-warn-label); }
+.x-chip.err { background: var(--dsw-alias-state-error-secondary); color: var(--dsw-alias-label-on-color); }
+.x-qr { display: grid; grid-template-columns: repeat(21, 1fr); grid-template-rows: repeat(21, 1fr); width: 168px; height: 168px; padding: 10px; border-radius: var(--dsw-radius-sm); background: var(--dsw-alias-label-on-color); }
+.x-qr span { width: 8px; height: 8px; }
+.x-qron { background: var(--dsw-alias-label-primary); }
+.x-details { border-radius: var(--dsw-radius-sm); background: var(--dsw-alias-bg-layer-2); border: var(--dsh-hairline-width, 0.5px) solid var(--dsw-alias-border-l1); padding: 6px 10px; color: var(--dsw-alias-label-tertiary); }
+.x-details summary { cursor: pointer; font-size: 10px; line-height: 15px; }
+.x-details pre { max-height: 220px; overflow: auto; margin: 6px 0; white-space: pre-wrap; word-break: break-all; font: 400 10px/14px var(--ds-font-family-code); color: var(--dsw-alias-label-secondary); }
+.x-trace { margin: 0 auto 24px; width: 100%; max-width: 1280px; border-radius: var(--dsw-radius-sm); background: var(--dsw-alias-bg-layer-2); border: var(--dsh-hairline-width, 0.5px) solid var(--dsw-alias-border-l1); padding: 6px 10px; color: var(--dsw-alias-label-tertiary); }
+.x-trace summary { cursor: pointer; font-size: 10px; line-height: 15px; }
+.x-trace pre { max-height: 240px; overflow: auto; margin: 6px 0; white-space: pre-wrap; word-break: break-all; font: 400 10px/14px var(--ds-font-family-code); color: var(--dsw-alias-label-secondary); }
+
+.x-nav button { border: 0; border-radius: var(--dsw-radius-xs); background: var(--dsw-alias-markdown-tag); color: var(--dsw-alias-label-secondary); padding: 6px 8px; font-size: 10px; line-height: 14px; }
+.x-variant-group { display: flex; flex-direction: column; gap: 6px; }
+.x-variant-label { font-size: 11px; line-height: 16px; font-weight: 600; color: var(--dsw-alias-label-primary); }
+.x-aside-btn { border: 0; border-radius: var(--dsw-radius-xs); background: var(--dsw-alias-markdown-tag); color: var(--dsw-alias-label-secondary); padding: 8px 10px; text-align: left; font-size: 10px; line-height: 14px; }
+.x-aside-btn.warn { background: var(--dsw-alias-state-warn-tertiary); color: var(--dsw-alias-label-primary); }
+.x-aside-btn.fail { background: var(--dsw-alias-state-error-secondary); color: var(--dsw-alias-label-on-color); }
+.x-aside-btn.info { background: var(--dsw-alias-state-business-tertiary); color: var(--dsw-alias-label-primary); }
+
+/* P3 — sidebar occupies the full phone in the default frame */
+.p3-root { position: relative; height: 100%; display: flex; flex-direction: column; background: var(--dsw-specific-sidebar-fill); }
+.p3-brand { height: 60px; flex: none; display: flex; align-items: center; gap: 9px; padding: 0 12px; }
+.p3-brand-mark { width: 24px; height: 24px; flex: none; display: flex; align-items: center; justify-content: center; border-radius: var(--dsw-radius-sm); background: var(--dsw-alias-button-primary-fill); color: var(--dsw-alias-label-on-color); font-size: 12px; line-height: 16px; font-weight: 700; }
+.p3-brand-name { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 14px; line-height: 20px; font-weight: 600; color: var(--dsw-alias-label-primary); }
+.p3-new-wrap { height: 52px; flex: none; display: flex; align-items: center; padding: 0 14px 6px; }
+.p3-new-btn { width: 100%; height: 38px; display: flex; align-items: center; gap: 6px; padding: 8px 12px; border: var(--dsh-hairline-width, 0.5px) solid var(--dsw-alias-border-l3); border-radius: var(--dsw-radius-md); background: var(--dsw-alias-button-elevated-fill); color: var(--dsw-alias-label-primary); font-size: 14px; line-height: 22px; font-weight: 500; }
+.p3-new-icon { width: 14px; height: 14px; display: inline-flex; align-items: center; justify-content: center; color: var(--dsw-alias-label-primary); font-size: 14px; line-height: 14px; }
+.p3-new-key { margin-left: auto; color: var(--dsw-alias-label-tertiary); font-size: 11px; line-height: 16px; font-family: var(--ds-font-family-code); }
+.p3-panels { height: 108px; flex: none; display: flex; flex-direction: column; gap: 2px; padding: 0 8px; }
+.p3-section-label { height: 18px; display: flex; align-items: center; padding: 0 8px; color: var(--dsw-alias-label-tertiary); font-size: 10px; line-height: 14px; }
+.p3-panel-row { height: 30px; display: flex; align-items: center; gap: 8px; padding: 0 8px; border-radius: var(--dsw-radius-sm); color: var(--dsw-alias-label-secondary); font-size: 13px; line-height: 18px; }
+.p3-panel-row.active { background: var(--dsw-alias-interactive-bg-hover); color: var(--dsw-alias-label-primary); }
+.p3-panel-icon { width: 16px; text-align: center; color: var(--dsw-alias-label-tertiary); font-size: 13px; line-height: 18px; }
+.p3-list-head { height: 40px; flex: none; display: flex; align-items: center; gap: 6px; padding: 0 12px; }
+.p3-list-head-title { flex: 1; min-width: 0; font-size: 13px; line-height: 18px; font-weight: 600; color: var(--dsw-alias-label-secondary); }
+.p3-mini-search { height: 24px; width: 86px; display: flex; align-items: center; gap: 4px; padding: 0 7px; border-radius: var(--dsw-radius-sm); background: var(--dsw-alias-markdown-tag); color: var(--dsw-alias-label-tertiary); font-size: 10px; line-height: 14px; }
+.p3-mini-search input { width: 100%; border: 0; outline: 0; background: var(--dsw-alias-border-inverted); color: var(--dsw-alias-label-primary); font-size: 10px; line-height: 14px; }
+.p3-list { flex: 1; min-height: 0; overflow-y: auto; padding: 0 8px 6px; }
+.p3-folder { height: 32px; display: flex; align-items: center; gap: 6px; padding: 0 8px; color: var(--dsw-alias-label-secondary); font-size: 14px; line-height: 20px; }
+.p3-folder-count { margin-left: auto; color: var(--dsw-alias-label-caption); font-size: 11px; line-height: 16px; }
+.srow { width: 100%; height: 32px; display: flex; align-items: center; gap: 0; padding: 0 8px; border: 0; border-radius: var(--dsw-radius-md); background: var(--dsw-alias-border-inverted); color: var(--dsw-alias-label-primary); text-align: left; font-size: 14px; line-height: 20px; }
+.srow.selected { background: var(--dsw-alias-interactive-bg-hover); }
+.srow.archived .srow-title { color: var(--dsw-alias-label-caption); }
+.srow-dot-slot { width: 16px; height: 20px; flex: none; display: flex; align-items: center; justify-content: center; }
+.state-dot { width: 8px; height: 8px; border-radius: var(--dsw-radius-xl); }
+.state-ongoing { width: 14px; height: 14px; border: 2px solid var(--dsw-alias-label-tertiary); border-right-color: var(--dsw-alias-state-business-primary); border-radius: var(--dsw-radius-xl); animation: spin 1.5s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.state-warning { background: var(--dsw-alias-state-warn-primary); }
+.state-success { background: var(--dsw-alias-state-success-primary); }
+.state-error { background: var(--dsw-alias-state-error-primary); }
+.srow-title { flex: 1; min-width: 0; margin-right: 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 14px; line-height: 20px; }
+.srow-time { flex: none; color: var(--dsw-alias-label-tertiary); font-size: 10px; line-height: 16px; }
+.srow-trailing { flex: none; color: var(--dsw-alias-label-tertiary); font-size: 10px; line-height: 16px; }
+.srow-pin { width: 14px; flex: none; margin-left: 6px; color: var(--dsw-alias-label-caption); font-size: 12px; line-height: 16px; text-align: center; }
+.srow-more { display: none; width: 20px; flex: none; margin-left: 6px; color: var(--dsw-alias-label-tertiary); text-align: center; font-size: 14px; line-height: 16px; }
+.srow:hover .srow-time, .srow:hover .srow-trailing, .srow:hover .srow-pin, .srow:focus-visible .srow-time, .srow:focus-visible .srow-trailing, .srow:focus-visible .srow-pin { display: none; }
+.srow:hover .srow-more, .srow:focus-visible .srow-more { display: block; }
+.p3-empty { margin: 46px auto; text-align: center; color: var(--dsw-alias-label-tertiary); }
+.p3-empty strong { display: block; margin-bottom: 4px; color: var(--dsw-alias-label-secondary); font-size: 13px; line-height: 19px; }
+.p3-empty span { font-size: 11px; line-height: 16px; }
+.p3-foot { height: 64px; flex: none; display: flex; align-items: center; gap: 9px; padding: 0 14px 20px; border-top: var(--dsh-hairline-width, 0.5px) solid var(--dsw-alias-border-l1); }
+.p3-foot-label { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--dsw-alias-label-secondary); font-size: 11px; line-height: 16px; }
+.p3-conn { width: 8px; height: 8px; border-radius: var(--dsw-radius-xl); background: var(--dsw-alias-state-success-primary); }
+.p3-gear { width: 30px; height: 30px; border: 0; border-radius: var(--dsw-radius-sm); background: var(--dsw-alias-markdown-tag); color: var(--dsw-alias-label-secondary); font-size: 15px; line-height: 1; }
+.p3-chat-preview { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; background: var(--dsw-alias-bg-base); color: var(--dsw-alias-label-tertiary); font-size: 12px; line-height: 18px; }
+.p3-mask { position: absolute; left: 320px; right: 0; top: 0; bottom: 0; z-index: 8; background: var(--dsw-alias-bg-mask-2); }
+.p3-root.drawer-mode { position: absolute; left: 0; top: 0; bottom: 0; width: 320px; z-index: 9; box-shadow: var(--dsw-elevation-panel); }
+
+.settings-modal { position: absolute; inset: 0; z-index: 30; display: flex; flex-direction: column; background: var(--dsw-alias-bg-base); }
+.settings-head { height: 56px; flex: none; display: flex; align-items: center; gap: 8px; padding: 0 14px; border-bottom: var(--dsh-hairline-width, 0.5px) solid var(--dsw-alias-border-l1); }
+.settings-head-title { flex: 1; font-size: 15px; line-height: 20px; font-weight: 600; }
+.settings-rail { display: flex; gap: 5px; overflow-x: auto; padding: 10px 12px; border-bottom: var(--dsh-hairline-width, 0.5px) solid var(--dsw-alias-border-l1); }
+.settings-rail button { flex: none; border: 0; border-radius: var(--dsw-radius-sm); background: var(--dsw-alias-markdown-tag); color: var(--dsw-alias-label-secondary); padding: 7px 9px; font-size: 10px; line-height: 14px; }
+.settings-rail button.active { background: var(--dsw-alias-interactive-bg-hover); color: var(--dsw-alias-label-primary); }
+.settings-body { flex: 1; min-height: 0; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; padding: 12px; }
+.settings-item { padding: 12px; border-radius: var(--dsw-radius-md); background: var(--dsw-alias-settings-card-fill); border: var(--dsh-hairline-width, 0.5px) solid var(--dsw-alias-settings-card-stroke); }
+.settings-item h4 { margin: 0 0 6px; font-size: 13px; line-height: 18px; color: var(--dsw-alias-label-primary); }
+.settings-item p { margin: 0; font-size: 11px; line-height: 17px; color: var(--dsw-alias-label-secondary); }
+
+/* P4 — chat, composer stack, takeover and right drawer */
+.p4-root { position: relative; height: 100%; display: flex; flex-direction: column; background: var(--dsw-alias-bg-base); }
+.chat-head { height: 56px; flex: none; display: flex; align-items: center; gap: 8px; padding: 2px 16px 2px 12px; border-bottom: var(--dsh-hairline-width, 0.5px) solid var(--dsw-alias-border-l1); }
+.chat-head-title { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 14px; line-height: 20px; color: var(--dsw-alias-label-primary); }
+.chat-head-sub { font-size: 11px; line-height: 16px; color: var(--dsw-alias-label-tertiary); }
+.chat-scroll { flex: 1; min-height: 0; overflow-y: auto; padding: 8px 16px 16px; }
+.user-turn { display: flex; flex-direction: column; align-items: flex-end; margin-bottom: 16px; }
+.user-bubble { max-width: 82%; padding: 10px 16px; border-radius: var(--dsw-radius-xl); background: var(--dsw-specific-bubble); color: var(--dsw-alias-label-primary); font-size: 14px; line-height: 22px; white-space: pre-wrap; word-break: break-word; }
+.msg-actions { height: 28px; display: flex; align-items: center; gap: 8px; margin-top: 6px; color: var(--dsw-alias-label-tertiary); font-size: 11px; line-height: 16px; }
+.msg-actions span { min-width: 28px; text-align: center; }
+.assistant-turn { width: 100%; margin-bottom: 16px; }
+.assistant-md { color: var(--dsw-alias-label-primary); font-size: 14px; line-height: 24px; }
+.assistant-md p { margin: 0 0 16px; }
+.assistant-md p:last-child { margin-bottom: 0; }
+.assistant-md strong { font-weight: 600; }
+.assistant-md ul { margin: 0 0 16px; padding-left: 20px; }
+.assistant-md li { margin: 0 0 4px; }
+.turn-tail { height: 28px; display: flex; align-items: center; gap: 8px; margin-top: 16px; margin-left: -6px; color: var(--dsw-alias-label-tertiary); font-size: 11px; line-height: 16px; }
+.turn-tail span { min-width: 28px; text-align: center; }
+.disclosure { position: relative; margin-bottom: 4px; }
+.disclosure > summary { height: 24px; display: flex; align-items: center; gap: 6px; list-style: none; color: var(--dsw-alias-label-tertiary); font-size: 13px; line-height: 24px; }
+.disclosure > summary::-webkit-details-marker { display: none; }
+.disclosure-icon { width: 16px; flex: none; text-align: center; color: var(--dsw-alias-label-tertiary); font-size: 12px; line-height: 16px; }
+.disclosure-title { flex: none; color: var(--dsw-alias-label-tertiary); font-size: 13px; line-height: 24px; }
+.disclosure-dots { flex: none; color: var(--dsw-alias-label-caption); letter-spacing: 2px; }
+.disclosure-desc { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--dsw-alias-label-tertiary); font-size: 13px; line-height: 24px; }
+.think-body { margin: 4px 0 4px 22px; color: var(--dsw-alias-label-tertiary); font-size: 13px; line-height: 20px; }
+.tool-expanded { margin: 2px 0 4px 4px; padding: 10px 12px; border-radius: var(--dsw-radius-lg); border: var(--dsh-hairline-width, 0.5px) solid var(--dsw-alias-border-l1); background: var(--dsw-alias-markdown-code-block); }
+.tool-banner { display: flex; align-items: center; gap: 6px; padding: 6px 8px; border-radius: var(--dsw-radius-sm); background: var(--dsw-alias-markdown-code-block-banner); color: var(--dsw-alias-label-secondary); font-size: 12px; line-height: 18px; }
+.tool-output { margin: 8px 0 0; white-space: pre-wrap; font: 400 12px/18px var(--ds-font-family-code); color: var(--dsw-alias-label-secondary); }
+.tool-add { margin: 10px 0 0; color: var(--dsw-alias-label-tertiary); font-size: 13px; line-height: 20px; }
+.exit-badge { display: inline-flex; align-items: center; gap: 5px; padding: 2px 7px; border-radius: var(--dsw-radius-sm); background: var(--dsw-alias-markdown-tag); color: var(--dsw-alias-label-secondary); font-size: 11px; line-height: 16px; font-family: var(--ds-font-family-code); }
+.exit-badge::before { content: ''; width: 6px; height: 6px; border-radius: var(--dsw-radius-xl); background: var(--dsw-alias-state-error-primary); }
+.diff-del { color: var(--dsw-alias-state-error-primary); }
+.diff-add { color: var(--dsw-alias-state-success-primary); }
+.running-row { height: 28px; display: flex; align-items: center; gap: 6px; margin-top: 4px; border-top: var(--dsh-hairline-width, 0.5px) solid var(--dsw-alias-border-l2); color: var(--dsw-alias-label-deep-diving); font-size: 12px; line-height: 22px; }
+.stopped-pill { display: inline-flex; align-items: center; height: 18px; margin-top: 4px; padding: 0 7px; border-radius: var(--dsw-radius-sm); background: var(--dsw-alias-state-warn-tertiary); color: var(--dsw-alias-state-warn-label); font-size: 11px; line-height: 16px; }
+
+.result-card { display: flex; align-items: center; gap: 10px; min-height: 60px; margin: 10px 0 0; padding: 8px 10px; border-radius: var(--dsw-radius-lg); border: var(--dsh-hairline-width, 0.5px) solid var(--dsw-alias-border-l1); background: var(--dsw-alias-card-fill); }
+.result-tile { width: 40px; height: 40px; flex: none; display: flex; align-items: center; justify-content: center; border-radius: 10px; background: var(--dsw-alias-card-tile-fill); color: var(--dsw-alias-link); font-size: 17px; line-height: 20px; }
+.result-main { flex: 1; min-width: 0; }
+.result-title { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--dsw-alias-label-primary); font-size: 13px; line-height: 20px; font-weight: 500; }
+.result-sub { color: var(--dsw-alias-label-tertiary); font-size: 10px; line-height: 16px; }
+.result-btn { flex: none; height: 28px; border: var(--dsh-hairline-width, 0.5px) solid var(--dsw-alias-border-l3); border-radius: var(--dsw-radius-sm); background: var(--dsw-alias-button-floating-fill); color: var(--dsw-alias-label-secondary); padding: 0 9px; font-size: 11px; line-height: 16px; }
+.changed-card { margin-top: 10px; border-radius: var(--dsw-radius-lg); border: var(--dsh-hairline-width, 0.5px) solid var(--dsw-alias-border-l2); overflow: hidden; background: var(--dsw-alias-bg-layer-1); }
+.changed-head { min-height: 60px; display: flex; align-items: center; gap: 10px; padding: 8px 10px; background: var(--dsw-alias-card-fill); }
+.changed-stats { margin-left: auto; display: flex; gap: 6px; font: 400 11px/16px var(--ds-font-family-code); }
+.changed-add { color: var(--dsw-alias-state-success-primary); }
+.changed-del { color: var(--dsw-alias-state-error-primary); }
+.changed-row { min-height: 24px; display: flex; align-items: center; gap: 8px; padding: 7px 14px 7px 18px; border-top: var(--dsh-hairline-width, 0.5px) solid var(--dsw-alias-border-l1); color: var(--dsw-alias-label-secondary); font-size: 12px; line-height: 18px; }
+.changed-path { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-family: var(--ds-font-family-code); }
+.changed-count { font-family: var(--ds-font-family-code); font-size: 11px; line-height: 16px; }
+.changed-more { min-height: 28px; display: flex; align-items: center; padding: 0 14px; border-top: var(--dsh-hairline-width, 0.5px) solid var(--dsw-alias-border-l1); color: var(--dsw-alias-label-tertiary); font-size: 12px; line-height: 18px; }
+.deliverables { margin-top: 10px; }
+.deliver-title { margin-bottom: 6px; color: var(--dsw-alias-label-secondary); font-size: 12px; line-height: 18px; }
+.deliver-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+.deliver-card { min-height: 60px; display: flex; align-items: center; gap: 8px; padding: 8px 10px; border-radius: var(--dsw-radius-lg); background: var(--dsw-alias-card-fill); border: var(--dsh-hairline-width, 0.5px) solid var(--dsw-alias-border-l1); }
+.deliver-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--dsw-alias-label-primary); font-size: 13px; line-height: 20px; font-weight: 500; }
+.deliver-sub { color: var(--dsw-alias-label-tertiary); font-size: 10px; line-height: 16px; }
+
+.composer-stack { flex: none; display: flex; flex-direction: column; gap: 6px; padding: 8px 16px 20px; background: var(--dsw-alias-bg-base); }
+.todo-bar { min-height: 36px; display: flex; align-items: center; gap: 8px; padding: 8px 12px; border-radius: var(--dsw-radius-lg); background: var(--dsw-specific-menu); box-shadow: var(--dsw-elevation-panel); }
+.todo-bar summary { display: flex; align-items: center; gap: 8px; list-style: none; font-size: 13px; line-height: 24px; }
+.todo-bar summary::-webkit-details-marker { display: none; }
+.todo-count { color: var(--dsw-alias-label-tertiary); font-size: 13px; line-height: 20px; }
+.todo-list { margin-top: 6px; max-height: 180px; overflow-y: auto; }
+.todo-item { min-height: 26px; display: flex; align-items: center; gap: 8px; color: var(--dsw-alias-label-secondary); font-size: 13px; line-height: 20px; }
+.todo-state { width: 8px; height: 8px; flex: none; border-radius: var(--dsw-radius-xl); background: var(--dsw-alias-state-idle-primary); }
+.todo-state.done { background: var(--dsw-alias-state-success-primary); }
+.todo-state.doing { background: var(--dsw-alias-state-warn-primary); }
+.goal-bar { height: 36px; display: flex; align-items: center; gap: 7px; padding: 4px 5px 4px 12px; border-radius: var(--dsw-radius-md); border: var(--dsh-hairline-width, 0.5px) solid var(--dsw-alias-border-l1); background: var(--dsw-specific-menu); box-shadow: var(--dsw-elevation-panel); }
+.goal-icon { width: 14px; flex: none; text-align: center; color: var(--dsw-alias-state-business-primary); font-size: 14px; line-height: 20px; }
+.goal-label { flex: none; color: var(--dsw-alias-label-primary); font-size: 13px; line-height: 24px; font-weight: 500; }
+.goal-obj { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--dsw-alias-label-tertiary); font-size: 13px; line-height: 20px; }
+.goal-actions { display: flex; gap: 2px; }
+.goal-actions button { width: 24px; height: 24px; border: 0; border-radius: var(--dsw-radius-xs); background: var(--dsw-alias-border-inverted); color: var(--dsw-alias-label-tertiary); font-size: 12px; line-height: 1; }
+.queue-dock { position: relative; z-index: 2; margin-bottom: -3px; border: var(--dsh-hairline-width, 0.5px) solid var(--dsw-alias-border-l1); border-bottom: 0; border-radius: var(--dsw-radius-lg) var(--dsw-radius-lg) 0 0; background: var(--dsw-specific-menu); }
+.queue-dock > summary { height: 36px; display: flex; align-items: center; gap: 6px; padding: 0 12px; list-style: none; color: var(--dsw-alias-label-secondary); font-size: 13px; line-height: 20px; }
+.queue-dock > summary::-webkit-details-marker { display: none; }
+.queue-sending { margin-left: auto; color: var(--dsw-alias-label-tertiary); font-size: 11px; line-height: 16px; }
+.queue-list { max-height: 180px; overflow-y: auto; }
+.queue-row { height: 36px; display: flex; align-items: center; gap: 8px; padding: 0 10px; border-top: var(--dsh-hairline-width, 0.5px) solid var(--dsw-alias-border-l1); }
+.queue-tile { width: 24px; height: 24px; flex: none; display: flex; align-items: center; justify-content: center; border-radius: var(--dsw-radius-xs); background: var(--dsw-alias-illustration-background); color: var(--dsw-alias-label-tertiary); font-size: 11px; line-height: 14px; }
+.queue-preview { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--dsw-alias-label-secondary); font-size: 13px; line-height: 20px; }
+.qbtn { width: 28px; height: 28px; flex: none; border: 0; border-radius: var(--dsw-radius-xl); background: var(--dsw-alias-markdown-tag); color: var(--dsw-alias-label-tertiary); font-size: 12px; line-height: 1; }
+.qbtn.dim { opacity: 0.45; }
+.input-card { display: flex; flex-direction: column; gap: 6px; padding: 8px; border-radius: var(--dsw-radius-lg); border: var(--dsh-hairline-width, 0.5px) solid var(--dsw-alias-border-l2); background: var(--dsw-specific-input-major); }
+.input-row { display: flex; align-items: flex-end; gap: 6px; }
+.chat-input { flex: 1; min-width: 0; height: 48px; resize: none; border: 0; outline: 0; background: var(--dsw-alias-border-inverted); color: var(--dsw-alias-label-primary); font-size: 14px; line-height: 22px; padding: 8px 6px; }
+.chat-input::placeholder { color: var(--dsw-alias-label-tertiary); }
+.send-btn { height: 32px; flex: none; border: 0; border-radius: var(--dsw-radius-sm); background: var(--dsw-alias-button-primary-fill); color: var(--dsw-alias-label-on-color); padding: 0 11px; font-size: 12px; line-height: 16px; font-weight: 600; }
+.send-btn.stop { background: var(--dsw-alias-markdown-tag); color: var(--dsw-alias-label-primary); }
+.mode-row { display: flex; align-items: center; gap: 6px; min-height: 28px; }
+.plan-chip { height: 28px; min-width: 34px; display: inline-flex; align-items: center; justify-content: center; gap: 4px; padding: 0 8px; border: 0; border-radius: var(--dsw-radius-sm); background: var(--dsw-alias-state-business-tertiary); color: var(--dsw-alias-state-business-primary); font-size: 13px; line-height: 20px; font-weight: 500; }
+.mode-hint { color: var(--dsw-alias-label-tertiary); font-size: 11px; line-height: 16px; }
+
+.takeover { flex: none; padding: 8px 16px; background: var(--dsw-alias-bg-base); }
+.takeover-card { border: 1px solid var(--dsw-alias-state-warn-secondary); border-radius: var(--dsw-radius-xl); background: var(--dsw-specific-input-major); box-shadow: var(--dsw-shadow-lv2); overflow: hidden; }
+.takeover-top { display: flex; align-items: center; gap: 6px; padding: 10px 16px; background: var(--dsw-alias-state-warn-tertiary); color: var(--dsw-alias-state-warn-primary); font-size: 13px; line-height: 18px; }
+.takeover-link { margin-left: auto; color: var(--dsw-alias-link); font-size: 12px; line-height: 18px; }
+.takeover-main { display: flex; flex-direction: column; gap: 6px; padding: 12px 16px 0; max-height: 336px; overflow-y: auto; }
+.takeover-main h3 { margin: 0; color: var(--dsw-alias-label-primary); font-size: 15px; line-height: 24px; font-weight: 500; }
+.takeover-main p { margin: 0; color: var(--dsw-alias-label-secondary); font-size: 14px; line-height: 24px; }
+.takeover-code { margin: 0; white-space: pre-wrap; word-break: break-all; color: var(--dsw-alias-label-tertiary); font: 400 13px/20px var(--ds-font-family-code); }
+.takeover-actions { display: flex; justify-content: flex-end; gap: 8px; padding: 14px 16px; }
+
+.drawer-mask { position: absolute; left: 0; right: 320px; top: 0; bottom: 0; z-index: 18; background: var(--dsw-alias-bg-mask-1); }
+.right-drawer { position: absolute; right: 0; top: 0; bottom: 0; z-index: 19; width: 320px; display: flex; flex-direction: column; background: var(--dsw-specific-menu); box-shadow: var(--dsw-elevation-panel); }
+.drawer-head { height: 48px; flex: none; display: flex; align-items: center; gap: 8px; padding: 0 14px; border-bottom: var(--dsh-hairline-width, 0.5px) solid var(--dsw-alias-border-l1); }
+.drawer-title { flex: 1; color: var(--dsw-alias-label-primary); font-size: 14px; line-height: 20px; font-weight: 600; }
+.drawer-body { flex: 1; min-height: 0; overflow-y: auto; padding: 20px 24px 40px; color: var(--dsw-alias-label-primary); font-size: 14px; line-height: 1.75; }
+.drawer-body h3 { margin: 0 0 12px; font-size: 16px; line-height: 24px; }
+.drawer-body h4 { margin: 18px 0 8px; font-size: 14px; line-height: 22px; }
+.drawer-body p { margin: 0 0 12px; }
+.drawer-body ul { margin: 0 0 12px; padding-left: 20px; }
+.diff-block { padding: 8px 10px; border-radius: var(--dsw-radius-sm); background: var(--dsw-alias-markdown-code-block); font: 400 12px/18px var(--ds-font-family-code); }
+</style>
+</head>
+<body>
+<div class="x-shell">
+  <div class="x-top">
+    <div class="x-col">
+      <div class="x-title">DSH App 高保真 Mockup · P1–P9</div>
+      <div class="x-sub">按 04/05 源码级 UI 规格绘制 · 单文件 · 零外部资源 · 全部为示意假值</div>
+    </div>
+    <button id="themeToggle" class="x-btn primary" type="button">切换明暗主题（toggle data-ds-dark-theme）</button>
+  </div>
+
+  <div class="x-main">
+    <div class="x-left">
+      <nav class="x-nav" id="pageNav" aria-label="P1 到 P9 页面导航"></nav>
+      <div class="x-phone">
+        <div class="x-island"></div>
+        <div class="x-status">
+          <span>9:41</span>
+          <div class="x-row x-signal-row">
+            <span class="signal-bar one"></span>
+            <span class="signal-bar two"></span>
+            <span class="signal-bar three"></span>
+            <span class="battery"><span class="battery-fill"></span></span>
+          </div>
+        </div>
+        <div class="x-home"></div>
+        <div class="x-screen" id="screen">
+
+          <!-- P1 -->
+          <section class="x-page" id="p1" aria-label="P1 启动设备选择" hidden>
+            <div class="x-row-top">
+              <div class="x-col">
+                <div class="x-title">DeepSeek Harness</div>
+                <div class="x-sub">启动 / 设备选择 · P1</div>
+              </div>
+              <span class="chip ok">本地已保存</span>
+            </div>
+            <div class="x-block x-col">
+              <div class="x-row"><span class="state-dot state-success"></span><span class="x-strong-sm">网关状态正常</span></div>
+              <div class="x-kv x-micro"><span>网关</span><span>默认网关 · 已连接</span><span>安全校验</span><span>证书指纹可信</span><span>最近在线</span><span>刚刚</span></div>
+            </div>
+            <button class="x-btn primary" type="button" data-go="p3">使用已保存的网关 → P3 会话列表</button>
+            <button class="x-btn ghost" type="button" data-go="p2">配对新设备 → P2 扫码</button>
+            <div class="x-product-card">
+              <h3>版本信息</h3>
+              <div class="x-kv x-micro"><span>当前版本</span><span>1.4.2</span><span>最新版本</span><span>1.5.0</span><span>升级提示</span><span>可稍后升级</span></div>
+              <p>下载与安装走发布页，不影响当前会话。</p>
+            </div>
+            <div class="x-note">本步骤只做本地检查，不读取会话列表。</div>
+            <div class="x-wrap">
+              <button class="x-btn mini" type="button" data-variant="p2" data-target="pair-ready">变体 · 无凭据 → P2</button>
+              <button class="x-btn mini" type="button" data-variant="p8" data-target="p8-card">变体 · 必须升级 → P8</button>
+            </div>
+          </section>
+
+          <!-- P2 -->
+          <section class="x-page" id="p2" aria-label="P2 配对扫码" hidden>
+            <div class="x-row-top">
+              <div class="x-col"><div class="x-title">配对新设备</div><div class="x-sub">扫码 · 临时配对码 · P2</div></div>
+              <span class="x-chip">等待确认</span>
+            </div>
+            <div class="x-product-card center" id="pair-ready">
+              <div class="x-qr" aria-label="配对二维码示意">
+                <span class="x-qron"></span><span class="x-qron"></span><span class="x-qron"></span><span class="x-qron"></span><span></span><span class="x-qron"></span><span class="x-qron"></span><span class="x-qron"></span><span></span><span class="x-qron"></span><span></span><span></span><span></span><span class="x-qron"></span><span></span><span class="x-qron"></span><span class="x-qron"></span><span></span><span class="x-qron"></span><span></span><span class="x-qron"></span>
+                <span class="x-qron"></span><span></span><span></span><span></span><span class="x-qron"></span><span></span><span class="x-qron"></span><span></span><span class="x-qron"></span><span class="x-qron"></span><span></span><span class="x-qron"></span><span></span><span></span><span class="x-qron"></span><span></span><span class="x-qron"></span><span class="x-qron"></span><span></span><span class="x-qron"></span><span></span>
+                <span class="x-qron"></span><span></span><span class="x-qron"></span><span class="x-qron"></span><span class="x-qron"></span><span></span><span class="x-qron"></span><span></span><span></span><span></span><span class="x-qron"></span><span></span><span class="x-qron"></span><span class="x-qron"></span><span class="x-qron"></span><span></span><span></span><span class="x-qron"></span><span></span><span></span><span class="x-qron"></span>
+                <span class="x-qron"></span><span></span><span class="x-qron"></span><span></span><span></span><span></span><span class="x-qron"></span><span></span><span class="x-qron"></span><span class="x-qron"></span><span></span><span></span><span class="x-qron"></span><span></span><span class="x-qron"></span><span></span><span class="x-qron"></span><span></span><span class="x-qron"></span><span class="x-qron"></span><span class="x-qron"></span>
+                <span class="x-qron"></span><span></span><span class="x-qron"></span><span class="x-qron"></span><span class="x-qron"></span><span></span><span class="x-qron"></span><span></span><span></span><span class="x-qron"></span><span></span><span class="x-qron"></span><span></span><span class="x-qron"></span><span class="x-qron"></span><span></span><span></span><span></span><span class="x-qron"></span><span></span><span class="x-qron"></span><span></span>
+                <span class="x-qron"></span><span></span><span></span><span></span><span class="x-qron"></span><span></span><span class="x-qron"></span><span></span><span class="x-qron"></span><span></span><span></span><span></span><span class="x-qron"></span><span></span><span class="x-qron"></span><span></span><span class="x-qron"></span><span></span><span></span><span class="x-qron"></span><span></span><span class="x-qron"></span>
+                <span class="x-qron"></span><span class="x-qron"></span><span class="x-qron"></span><span class="x-qron"></span><span class="x-qron"></span><span class="x-qron"></span><span class="x-qron"></span><span></span><span class="x-qron"></span><span></span><span class="x-qron"></span><span></span><span class="x-qron"></span><span class="x-qron"></span><span class="x-qron"></span><span class="x-qron"></span><span class="x-qron"></span><span></span><span class="x-qron"></span><span class="x-qron"></span><span class="x-qron"></span>
+                <span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span class="x-qron"></span><span></span><span></span><span></span><span></span><span class="x-qron"></span><span></span><span></span><span></span><span></span><span class="x-qron"></span><span></span><span></span>
+                <span class="x-qron"></span><span></span><span class="x-qron"></span><span></span><span class="x-qron"></span><span></span><span class="x-qron"></span><span></span><span></span><span></span><span class="x-qron"></span><span></span><span class="x-qron"></span><span></span><span class="x-qron"></span><span></span><span class="x-qron"></span><span></span><span class="x-qron"></span><span></span><span class="x-qron"></span><span></span>
+                <span class="x-qron"></span><span></span><span class="x-qron"></span><span></span><span></span><span></span><span class="x-qron"></span><span></span><span></span><span class="x-qron"></span><span></span><span></span><span class="x-qron"></span><span></span><span class="x-qron"></span><span></span><span></span><span></span><span class="x-qron"></span><span></span><span class="x-qron"></span><span></span>
+                <span></span><span></span><span></span><span></span><span class="x-qron"></span><span></span><span></span><span></span><span></span><span></span><span class="x-qron"></span><span></span><span></span><span></span><span></span><span></span><span class="x-qron"></span><span></span><span></span><span></span><span></span><span></span>
+                <span class="x-qron"></span><span></span><span class="x-qron"></span><span></span><span></span><span class="x-qron"></span><span></span><span class="x-qron"></span><span></span><span></span><span></span><span class="x-qron"></span><span></span><span></span><span></span><span class="x-qron"></span><span></span><span class="x-qron"></span><span></span><span></span><span></span><span class="x-qron"></span>
+                <span class="x-qron"></span><span></span><span></span><span></span><span class="x-qron"></span><span></span><span class="x-qron"></span><span></span><span></span><span></span><span></span><span></span><span></span><span class="x-qron"></span><span></span><span></span><span></span><span class="x-qron"></span><span></span><span class="x-qron"></span><span></span><span></span>
+                <span class="x-qron"></span><span class="x-qron"></span><span class="x-qron"></span><span></span><span></span><span class="x-qron"></span><span></span><span class="x-qron"></span><span></span><span class="x-qron"></span><span class="x-qron"></span><span></span><span class="x-qron"></span><span></span><span class="x-qron"></span><span class="x-qron"></span><span></span><span class="x-qron"></span><span></span><span class="x-qron"></span><span></span><span class="x-qron"></span>
+                <span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span class="x-qron"></span><span></span><span class="x-qron"></span>
+                <span class="x-qron"></span><span></span><span class="x-qron"></span><span></span><span class="x-qron"></span><span></span><span class="x-qron"></span><span class="x-qron"></span><span></span><span class="x-qron"></span><span></span><span></span><span class="x-qron"></span><span></span><span class="x-qron"></span><span></span><span class="x-qron"></span><span class="x-qron"></span><span></span><span></span><span class="x-qron"></span><span></span><span></span>
+                <span class="x-qron"></span><span class="x-qron"></span><span></span><span></span><span class="x-qron"></span><span></span><span class="x-qron"></span><span></span><span></span><span class="x-qron"></span><span></span><span></span><span></span><span></span><span class="x-qron"></span><span class="x-qron"></span><span></span><span></span><span class="x-qron"></span><span></span><span></span><span class="x-qron"></span>
+                <span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span>
+                <span class="x-qron"></span><span></span><span class="x-qron"></span><span class="x-qron"></span><span></span><span></span><span class="x-qron"></span><span></span><span class="x-qron"></span><span class="x-qron"></span><span></span><span class="x-qron"></span><span></span><span class="x-qron"></span><span></span><span class="x-qron"></span><span></span><span class="x-qron"></span><span class="x-qron"></span><span></span><span></span><span class="x-qron"></span><span></span>
+                <span class="x-qron"></span><span class="x-qron"></span><span class="x-qron"></span><span></span><span class="x-qron"></span><span></span><span class="x-qron"></span><span></span><span class="x-qron"></span><span></span><span class="x-qron"></span><span></span><span class="x-qron"></span><span></span><span class="x-qron"></span><span></span><span class="x-qron"></span><span></span><span class="x-qron"></span><span></span><span class="x-qron"></span><span class="x-qron"></span><span></span>
+              </div>
+              <div class="x-sub">等待电脑端确认 · 临时配对码有效期 5 分钟</div>
+            </div>
+            <div class="x-product-card">
+              <h3>配对结果</h3>
+              <div class="x-kv x-micro"><span>网关</span><span>已保存</span><span>凭据</span><span>已写入安全存储</span><span>有效期</span><span>24 小时</span></div>
+              <p>配对完成后才获得会话访问权限。</p>
+            </div>
+            <div class="x-wrap">
+              <span class="x-chip">扫码待确认</span><span class="x-chip err">指纹不符</span><span class="x-chip warn">已使用</span><span class="x-chip warn">不在白名单</span><span class="x-chip warn">请求过多</span>
+              <button class="x-btn mini" type="button" data-go="p3">成功写入安全存储 → P3</button>
+            </div>
+          </section>
+
+          <!-- P3 -->
+          <section class="x-page x-app" id="p3" aria-label="P3 会话列表与导航" hidden>
+            <div class="p3-chat-preview" id="p3ChatPreview" hidden>
+              <span>聊天主区（抽屉变体）</span>
+              <span>侧栏从左侧覆盖，右侧显示遮罩</span>
+            </div>
+            <div class="p3-root" id="p3Root">
+              <div class="p3-brand">
+                <span class="p3-brand-mark">D</span>
+                <span class="p3-brand-name">DeepSeek Harness</span>
+                <button class="x-icon-btn" type="button" id="p3PanelToggle" aria-label="打开或收起侧栏">▤</button>
+              </div>
+              <div class="p3-new-wrap">
+                <button class="p3-new-btn" type="button" id="newSessionBtn">
+                  <span class="p3-new-icon" aria-hidden="true">✎</span>
+                  <span>新会话 / New Session</span>
+                  <span class="p3-new-key" id="newSessionKey">⌘ N</span>
+                </button>
+              </div>
+              <div class="p3-panels">
+                <div class="p3-section-label">全局面板 / Global panels</div>
+                <button class="p3-panel-row active" type="button" data-panel="plugins"><span class="p3-panel-icon">⌗</span>Plugins / 插件</button>
+                <button class="p3-panel-row" type="button" data-panel="archived"><span class="p3-panel-icon">▣</span>归档会话</button>
+                <button class="p3-panel-row" type="button" data-panel="more"><span class="p3-panel-icon">⋯</span>更多 / More</button>
+              </div>
+              <div class="p3-list-head">
+                <span class="p3-list-head-title">会话</span>
+                <label class="p3-mini-search"><span>⌕</span><input id="sessionSearch" type="search" placeholder="搜索会话" aria-label="搜索会话"></label>
+                <button class="x-icon-btn" type="button" aria-label="视图选项">▾</button>
+                <button class="x-icon-btn" type="button" aria-label="添加工作区">＋</button>
+              </div>
+              <div class="p3-list" id="sessionList" aria-live="polite"></div>
+              <div class="p3-foot">
+                <button class="p3-gear" type="button" id="settingsGear" aria-label="打开设置">⚙</button>
+                <span class="p3-foot-label">已连接 · 远程连接可用</span>
+                <span class="p3-conn" role="img" aria-label="连接状态正常"></span>
+              </div>
+            </div>
+            <div class="p3-mask" id="p3Mask" hidden></div>
+            <div class="settings-modal" id="settingsModal" hidden role="dialog" aria-label="设置面板">
+              <div class="settings-head">
+                <strong class="drawer-title">设置</strong>
+                <button class="x-icon-btn" type="button" id="settingsClose" aria-label="关闭设置">×</button>
+              </div>
+              <div class="settings-rail" id="settingsRail">
+                <button type="button" data-section="plugins">插件</button>
+                <button type="button" data-section="remote-connection">远程连接</button>
+                <button type="button" data-section="models">模型</button>
+                <button type="button" data-section="archived">归档</button>
+              </div>
+              <div class="settings-body" id="settingsBody"></div>
+            </div>
+          </section>
+
+          <!-- P4 -->
+          <section class="x-page x-app" id="p4" aria-label="P4 聊天与 composer" hidden>
+            <div class="p4-root" id="p4Root">
+              <div class="chat-head">
+                <button class="x-icon-btn" type="button" data-go="p3" aria-label="返回会话列表">←</button>
+                <div class="x-grow">
+                  <div class="chat-head-title" id="chatTitle">重构登录态刷新逻辑</div>
+                  <div class="chat-head-sub" id="chatStatus">计划待审</div>
+                </div>
+                <button class="x-icon-btn" type="button" id="chatPanelBtn" aria-label="打开右侧栏">▥</button>
+                <button class="x-icon-btn" type="button" id="chatMoreBtn" aria-label="更多选项">⋯</button>
+              </div>
+              <div class="chat-scroll" id="chatBody" aria-live="polite"></div>
+              <div class="composer-stack" id="composerStack"></div>
+              <div class="takeover" id="takeover" hidden></div>
+              <div class="drawer-mask" id="drawerMask" hidden></div>
+              <aside class="right-drawer" id="rightDrawer" hidden aria-label="右侧栏抽屉">
+                <div class="drawer-head">
+                  <strong class="drawer-title" id="drawerTitle">计划 · Markdown</strong>
+                  <button class="x-icon-btn" type="button" id="drawerClose" aria-label="关闭右侧栏">×</button>
+                </div>
+                <div class="drawer-body" id="drawerBody"></div>
+              </aside>
+            </div>
+          </section>
+
+          <!-- P5 -->
+          <section class="x-page" id="p5" aria-label="P5 工具详情" hidden>
+            <div class="x-row-top">
+              <div class="x-col"><div class="x-title">工具详情</div><div class="x-sub">来自会话中的工具调用</div></div>
+              <button class="x-icon-btn" type="button" data-go="p4" aria-label="返回聊天">←</button>
+            </div>
+            <div class="x-product-card">
+              <div class="x-row"><span class="x-chip ok">成功</span><strong>读取文件</strong></div>
+              <p>已读取目标文件的前 40 行，共 86 行。</p>
+              <div class="x-kv x-micro"><span>目标文件</span><span>/fake/demo.txt</span><span>起始行</span><span>1</span><span>语言</span><span>TypeScript</span></div>
+            </div>
+            <div class="x-product-card">
+              <div class="x-row"><span class="x-chip err">失败</span><strong>运行命令</strong><span class="exit-badge">退出码 1</span></div>
+              <p>执行失败：目标文件不存在。</p>
+              <div class="x-kv x-micro"><span>命令</span><span>npm test -- --runInBand</span><span>输出</span><span>空</span></div>
+            </div>
+            <div class="x-details"><summary>开发者核对入口</summary><p>完整原始事件只在页面底部「字段溯源」折叠面板中显示。</p></div>
+            <button class="x-btn ghost" type="button" data-go="p4">返回聊天</button>
+          </section>
+
+          <!-- P6 -->
+          <section class="x-page" id="p6" aria-label="P6 设置" hidden>
+            <div class="x-row-top">
+              <div class="x-col"><div class="x-title">设置</div><div class="x-sub">网关连接与模型偏好</div></div>
+              <button class="x-btn mini" type="button" data-go="p9">远程连接 → P9</button>
+            </div>
+            <div class="x-block x-col">
+              <div class="x-strong-sm">网关 / 本机</div>
+              <div class="x-kv x-micro"><span>网关地址</span><span>默认网关 · 已连接</span><span>设备名称</span><span>本机</span><span>通知</span><span>开启</span><span>登录状态</span><span>有效</span><span>安全校验</span><span>可信</span></div>
+            </div>
+            <div class="x-block x-col">
+              <div class="x-strong-sm">模型偏好</div>
+              <div class="x-kv x-micro"><span>默认模型</span><span>默认推理模型</span><span>推理强度</span><span>高</span><span>可用供应商</span><span>已配置</span><span>异常</span><span>无</span></div>
+              <div class="x-micro">保留供应商、模型与推理强度三个独立选项。</div>
+            </div>
+            <button class="x-btn ghost" type="button" data-variant="p8" data-target="p8-card">手动检查版本 → P8</button>
+            <div class="x-micro">凭据刷新由本机安全存储处理。</div>
+          </section>
+
+          <!-- P7 -->
+          <section class="x-page" id="p7" aria-label="P7 连接诊断" hidden>
+            <div class="x-row-top">
+              <div class="x-col"><div class="x-title">连接诊断</div><div class="x-sub">网关代理层与 DSH 传输层分开看</div></div>
+              <button class="x-btn mini" type="button" data-go="p3">← P3</button>
+            </div>
+            <div class="x-block x-col">
+              <div class="x-strong-sm">分层关系</div>
+              <div class="x-kv x-micro"><span>会话请求</span><span>经安全代理转发</span><span>流式通道</span><span>多路复用连接</span><span>兼容事件</span><span>合成会话更新与消息增量</span></div>
+            </div>
+            <div class="x-block x-col">
+              <div class="x-strong-sm">网关连接</div>
+              <div class="x-kv x-micro"><span>地址</span><span>默认网关</span><span>安全校验</span><span>可信</span><span>往返时延</span><span>42 毫秒</span><span>实时通道</span><span>已连接</span></div>
+            </div>
+            <div class="x-block x-col">
+              <div class="x-strong-sm">错误来源分类</div>
+              <div class="x-wrap"><span class="x-chip err">网关不可达</span><span class="x-chip err">网关超时</span><span class="x-chip warn">会话繁忙</span><span class="x-chip warn">迁移需要</span></div>
+              <div class="x-micro">不要把网关生成的错误伪装成上游服务错误。</div>
+            </div>
+          </section>
+
+          <!-- P8 -->
+          <section class="x-page" id="p8" aria-label="P8 版本升级" hidden>
+            <div class="x-row-top"><div class="x-col"><div class="x-title">发现新版本</div><div class="x-sub">由发布检查触发，与会话无关</div></div></div>
+            <div class="x-product-card" id="p8-card">
+              <div class="x-chip warn">可稍后升级</div>
+              <div class="x-strong-md">1.4.2 → 1.5.0</div>
+              <div class="x-kv x-micro"><span>当前版本</span><span>1.4.2</span><span>最新版本</span><span>1.5.0</span><span>升级提示</span><span>可稍后升级</span></div>
+              <div class="x-progress"><div class="x-progress-fill"></div></div>
+              <div class="x-micro">下载中 38% · 等待安全校验 · 等待安装</div>
+              <div class="x-row"><button class="x-btn primary" type="button">稍后提醒</button><button class="x-btn ghost" type="button">下载更新</button></div>
+            </div>
+            <div class="x-product-card">
+              <div class="x-chip err">必须升级</div>
+              <div class="x-strong-sm">2.0.0 为强制升级版本</div>
+              <p>必须先完成升级，再进入会话列表。</p>
+            </div>
+            <button class="x-btn mini" type="button" data-go="p3">返回 P3</button>
+          </section>
+
+          <!-- P9 -->
+          <section class="x-page" id="p9" aria-label="P9 已配对设备" hidden>
+            <div class="x-row-top">
+              <div class="x-col"><div class="x-title">已配对网关</div><div class="x-sub">本机安全存储 · 无服务端列表端点</div></div>
+              <button class="x-btn mini" type="button" data-go="p6">设置</button>
+            </div>
+            <div class="x-product-card">
+              <div class="x-row"><strong>本机默认网关</strong><span class="x-chip ok">默认</span></div>
+              <div class="x-kv x-micro"><span>地址</span><span>默认网关</span><span>安全校验</span><span>可信</span><span>最近在线</span><span>刚刚</span></div>
+              <button class="x-btn mini" type="button" data-go="p7">查看诊断 → P7</button>
+            </div>
+            <div class="x-product-card">
+              <div class="x-row"><strong>备用网关</strong><span class="x-chip err">不可达</span></div>
+              <div class="x-kv x-micro"><span>地址</span><span>备用地址</span><span>安全校验</span><span>待确认</span><span>最近在线</span><span>10月1日</span></div>
+              <div class="x-wrap"><button class="x-btn mini" type="button">设为默认</button><button class="x-btn ghost" type="button">忘记此网关（待确认）</button></div>
+            </div>
+            <div class="x-micro">删除操作只清理本机凭据。</div>
+          </section>
+
+        </div>
+      </div>
+      <div class="x-micro">390 × 844 · CSS 绘制外壳 · 页面内容可滚动</div>
+    </div>
+
+    <aside class="x-right" aria-label="状态演示入口">
+      <div class="x-col"><div class="x-variant-label">状态演示入口</div><div class="x-micro">点击后左侧手机直接呈现对应状态</div></div>
+      <div class="x-thin"></div>
+      <div class="x-variant-group">
+        <div class="x-variant-label">P3 · 会话与导航（8）</div>
+        <button class="x-aside-btn" type="button" data-variant="p3" data-target="p3-default">01 · 默认侧栏</button>
+        <button class="x-aside-btn info" type="button" data-variant="p3" data-target="p3-draft">02 · 新会话草稿</button>
+        <button class="x-aside-btn" type="button" data-variant="p3" data-target="p3-running">03 · 正在回答</button>
+        <button class="x-aside-btn warn" type="button" data-variant="p3" data-target="p3-warning">04 · 待审批</button>
+        <button class="x-aside-btn" type="button" data-variant="p3" data-target="p3-unread-fail">05 · 未读与失败</button>
+        <button class="x-aside-btn" type="button" data-variant="p3" data-target="p3-empty">06 · 空白列表</button>
+        <button class="x-aside-btn" type="button" data-variant="p3" data-target="p3-archived">07 · 归档筛选</button>
+        <button class="x-aside-btn info" type="button" data-variant="p3" data-target="p3-drawer">08 · 窄屏抽屉</button>
+      </div>
+      <div class="x-thin"></div>
+      <div class="x-variant-group">
+        <div class="x-variant-label">P4 · 聊天与 composer（10）</div>
+        <button class="x-aside-btn" type="button" data-variant="p4" data-target="p4-normal">01 · 正常对话</button>
+        <button class="x-aside-btn" type="button" data-variant="p4" data-target="p4-stream">02 · 流式运行</button>
+        <button class="x-aside-btn info" type="button" data-variant="p4" data-target="p4-queue">03 · 多条排队展开</button>
+        <button class="x-aside-btn info" type="button" data-variant="p4" data-target="p4-goal">04 · 进行中的目标</button>
+        <button class="x-aside-btn" type="button" data-variant="p4" data-target="p4-todo">05 · 任务清单展开</button>
+        <button class="x-aside-btn info" type="button" data-variant="p4" data-target="p4-plan">06 · 计划模式与右侧栏</button>
+        <button class="x-aside-btn warn" type="button" data-variant="p4" data-target="p4-approval">07 · 审批覆盖卡</button>
+        <button class="x-aside-btn warn" type="button" data-variant="p4" data-target="p4-planreview">08 · 计划待审覆盖卡</button>
+        <button class="x-aside-btn fail" type="button" data-variant="p4" data-target="p4-toolfail">09 · 工具失败</button>
+        <button class="x-aside-btn" type="button" data-variant="p4" data-target="p4-stopped">10 · 已停止</button>
+      </div>
+      <div class="x-thin"></div>
+      <div class="x-micro">全部为示意假值；原始字段只在「字段溯源」折叠面板中可见。</div>
+    </aside>
+  </div>
+
+  <details class="x-trace" id="tracePanel">
+    <summary>字段溯源（默认关闭 · 供核对 DSH 真字段与示意假值）</summary>
+    <pre id="traceJson"></pre>
+  </details>
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  const source = {
+    sessionList: { items: [
+      { sessionId: 'sess_fake_001', blank: false, running: true, agentAvailable: true, formatStatus: 'current', completionUnread: false, updatedAt: 1760000000000, display: { title: '重构登录态刷新逻辑', time: '刚刚', state: 'ongoing' } },
+      { sessionId: 'sess_fake_002', blank: false, running: false, agentAvailable: true, formatStatus: 'current', completionUnread: true, updatedAt: 1759916400000, display: { title: '分析失败用例', time: '5分钟', state: 'success' } },
+      { sessionId: 'sess_fake_003', blank: false, running: false, agentAvailable: true, formatStatus: 'current', completionUnread: false, pending: 'approval', updatedAt: 1759833600000, display: { title: '生成发布前检查清单', time: '待审批', state: 'warning' } },
+      { sessionId: 'sess_fake_004', blank: false, running: false, agentAvailable: true, formatStatus: 'current', completionUnread: false, updatedAt: 1759747200000, display: { title: '整理图片附件展示规则', time: '星期二', state: 'idle' } },
+      { sessionId: 'sess_fake_005', blank: false, running: false, agentAvailable: true, formatStatus: 'current', completionUnread: false, updatedAt: 1759267200000, display: { title: '旧版迁移记录', time: '10月1日', state: 'idle', pinned: true } },
+      { sessionId: 'sess_fake_006', blank: false, running: false, agentAvailable: true, formatStatus: 'current', failed: true, updatedAt: 1759173600000, display: { title: '命令执行失败复盘', time: '昨天', state: 'error' } },
+      { sessionId: 'sess_fake_007', blank: false, running: false, agentAvailable: true, formatStatus: 'current', archived: true, updatedAt: 1758902400000, display: { title: '归档 · 早期方案探索', time: '10月1日', state: 'idle' } },
+      { sessionId: 'sess_fake_008', blank: true, running: false, agentAvailable: true, formatStatus: 'current', updatedAt: 1759974000000, display: { title: '新会话 / New Session', time: '', state: 'idle', blank: true } }
+    ] },
+    timeline: [
+      { type: 'user/message', seq: 11, role: 'user', text: '帮我看一下 /fake/demo.txt 的读取逻辑，顺便检查图片附件的展示。' },
+      { type: 'assistant/message', seq: 12, role: 'assistant', text: '我先读取文件内容，然后把关键片段整理给你。' },
+      { type: 'assistant/message', seq: 17, role: 'assistant', text: '读到了 **86 行**；其中凭据刷新在第 41 行。\n- 图片附件使用不透明存储引用\n- 命令失败是因为测试文件路径不存在' }
+    ],
+    state: { cursor: 42, active: true, running: true, pendingInput: [], queue: [{ placement: 'queued' }, { placement: 'queued' }] },
+    modelSelection: { provider: '<MOCK_PROVIDER>', model: '<MOCK_MODEL>', reasoningEffort: 'high' },
+    assistantStream: { text: '我已经收到，正在把图片附件和工具结果的展示方式整理成清单。' }
+  };
+
+  const ui = {
+    page: 'p1',
+    p3: { draft: false, focus: '', mode: 'default', settingsOpen: false, settingsSection: 'remote-connection', drawer: false },
+    p4: { variant: 'plan', drawer: false, drawerMode: 'plan' }
+  };
+
+  const $ = id => document.getElementById(id);
+  const pages = Array.from(document.querySelectorAll('.x-page'));
+  const nav = $('pageNav');
+  const escapeHtml = value => String(value == null ? '' : value).replace(/[&<>"']/g, ch => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[ch]));
+
+  function renderNav() {
+    ['P1 启动', 'P2 配对', 'P3 会话', 'P4 聊天', 'P5 工具', 'P6 设置', 'P7 诊断', 'P8 升级', 'P9 设备'].forEach((label, i) => {
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.textContent = label;
+      button.dataset.go = 'p' + (i + 1);
+      nav.appendChild(button);
+    });
+    if (navigator.platform && /Mac/i.test(navigator.platform)) $('newSessionKey').textContent = '⌘ N';
+    else $('newSessionKey').textContent = 'Ctrl N';
+  }
+
+  function show(id) {
+    pages.forEach(page => { page.hidden = page.id !== id; });
+    ui.page = id;
+    $('screen').scrollTop = 0;
+    if (id === 'p3') renderSessions();
+    if (id === 'p4') renderChat();
+  }
+
+  function sessionDot(state) {
+    if (!state || state === 'idle') return '';
+    if (state === 'ongoing') return '<span class="state-ongoing" role="img" aria-label="正在回答"></span>';
+    return '<span class="state-dot state-' + state + '" role="img" aria-label="会话状态"></span>';
+  }
+
+  function renderSessions() {
+    const query = ($('sessionSearch').value || '').trim().toLowerCase();
+    let items = source.sessionList.items.slice();
+    if (ui.p3.mode === 'empty') items = [];
+    else if (ui.p3.mode === 'archived') items = items.filter(s => s.display.archived || s.archived);
+    if (ui.p3.mode === 'unread-fail') items = items.filter(s => s.completionUnread || s.failed);
+    if (ui.p3.draft || ui.p3.mode === 'draft') {
+      const draft = source.sessionList.items.find(s => s.display.blank);
+      items = [draft].concat(items.filter(s => s !== draft));
+    } else {
+      items = items.filter(s => !s.display.blank);
+    }
+    if (query) items = items.filter(s => s.display.title.toLowerCase().includes(query));
+    let html = '';
+    if (items.length && ui.p3.mode !== 'archived') html += '<div class="p3-folder">▸ ▣ 默认工作区 <span class="p3-folder-count">' + items.length + ' 个会话</span></div>';
+    html += items.map(s => {
+      const d = s.display;
+      const selected = (ui.p3.draft || ui.p3.mode === 'draft') && d.blank ? ' selected' : (ui.p3.focus === s.sessionId ? ' selected' : '');
+      const trailing = d.state === 'warning' ? '<span class="srow-trailing">待审批</span>' : '<span class="srow-time">' + escapeHtml(d.time) + '</span>';
+      return '<button type="button" class="srow' + selected + (s.archived ? ' archived' : '') + '" data-session="' + escapeHtml(s.sessionId) + '" data-focus="' + escapeHtml(ui.p3.focus) + '">' +
+        '<span class="srow-dot-slot">' + (d.blank || s.archived ? '' : sessionDot(d.state)) + '</span>' +
+        '<span class="srow-title">' + escapeHtml(d.title) + '</span>' +
+        (d.blank ? '' : trailing) +
+        (d.pinned && !s.archived ? '<span class="srow-pin" aria-label="已置顶">⌁</span>' : '') +
+        (d.blank ? '' : '<span class="srow-more" aria-label="更多操作">⋯</span>') +
+      '</button>';
+    }).join('');
+    $('sessionList').innerHTML = html || '<div class="p3-empty"><strong>没有可显示的会话</strong><span>换个筛选条件试试</span></div>';
+  }
+
+  const sectionCopy = {
+    plugins: [['插件面板', '与全局面板共用同一组插件入口。'], ['可用插件', '按当前网关配置展示。']],
+    'remote-connection': [['网关地址', '默认网关 · 当前已连接。'], ['连接状态', '实时通道可用，凭据有效。'], ['配对请求', '暂未收到新的配对请求。']],
+    models: [['默认模型', '默认推理模型 · 强度高。'], ['可用供应商', '已配置，可在会话中切换。']],
+    archived: [['归档筛选', '仅显示已归档会话，标题使用弱化色。']]
+  };
+
+  function renderSettings() {
+    $('settingsRail').querySelectorAll('button').forEach(b => b.classList.toggle('active', b.dataset.section === ui.p3.settingsSection));
+    $('settingsBody').innerHTML = sectionCopy[ui.p3.settingsSection].map(([title, body]) =>
+      '<div class="settings-item"><h4>' + escapeHtml(title) + '</h4><p>' + escapeHtml(body) + '</p></div>').join('');
+  }
+
+  function setP3Drawer(open) {
+    ui.p3.drawer = open;
+    $('p3Root').classList.toggle('drawer-mode', open);
+    $('p3Mask').hidden = !open;
+    $('p3ChatPreview').hidden = !open;
+  }
+
+  function applyP3Variant(target) {
+    ui.p3 = { draft: false, focus: '', mode: 'default', settingsOpen: false, settingsSection: 'remote-connection', drawer: false };
+    $('sessionSearch').value = '';
+    $('settingsModal').hidden = true;
+    if (target === 'p3-draft') { ui.p3.draft = true; ui.p3.focus = 'sess_fake_008'; }
+    if (target === 'p3-running') ui.p3.focus = 'sess_fake_001';
+    if (target === 'p3-warning') ui.p3.focus = 'sess_fake_003';
+    if (target === 'p3-unread-fail') ui.p3.mode = 'unread-fail';
+    if (target === 'p3-empty') ui.p3.mode = 'empty';
+    if (target === 'p3-archived') ui.p3.mode = 'archived';
+    if (target === 'p3-drawer') ui.p3.drawer = true;
+    setP3Drawer(ui.p3.drawer);
+    renderSessions();
+    show('p3');
+    if (ui.p3.focus) {
+      requestAnimationFrame(() => {
+        const row = document.querySelector('.srow[data-session="' + ui.p3.focus + '"]');
+        if (row) row.scrollIntoView({ block: 'center' });
+      });
+    }
+  }
+
+  function markdown(raw) {
+    return escapeHtml(raw).split('\n').map(line => {
+      if (/^- /.test(line)) return '<li>' + line.slice(2).replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>') + '</li>';
+      return '<p>' + line.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>') + '</p>';
+    }).join('').replace(/(<li>.*?<\/li>)+/gs, m => '<ul>' + m + '</ul>');
+  }
+
+  function disclosure(icon, title, desc, open, body) {
+    return '<details class="disclosure"' + (open ? ' open' : '') + '><summary><span class="disclosure-icon">' + icon + '</span><span class="disclosure-title">' + title + '</span><span class="disclosure-dots">··</span><span class="disclosure-desc">' + escapeHtml(desc) + '</span></summary>' + body + '</details>';
+  }
+
+  function toolRows(variant) {
+    const terminalOpen = variant === 'plan' || variant === 'normal' || variant === 'stream' || variant === 'stopped';
+    const failOpen = variant === 'toolfail';
+    return [
+      disclosure('›', 'Bash', '运行测试命令', terminalOpen, '<div class="tool-expanded"><div class="tool-banner"><span class="state-dot state-success"></span><span>$ npm test -- --runInBand</span></div><pre class="tool-output">PASS  src/goal.test.ts\nPASS  src/queue.test.ts\nTests  18 passed, 0 failed</pre></div>'),
+      disclosure('›', 'Read', '读取 /fake/demo.txt 的前 40 行', false, "<div class=\"tool-expanded\"><pre class=\"tool-output\">001  import { refreshCredential } from './auth'\n002  ...\n041  export async function refreshCredential() {}</pre></div>"),
+      disclosure('›', 'Edit', '修改 2 个文件', false, '<div class="tool-expanded"><div class="diff-block"><div class="diff-del">- const next = credential.value</div><div class="diff-add">+ const next = await refreshCredential()</div></div></div>'),
+      disclosure('›', 'Search', '搜索凭据刷新调用点', false, '<div class="tool-expanded"><pre class="tool-output">src/auth.ts:41  refreshCredential\nsrc/session.ts:88  await refreshCredential()</pre><p class="tool-add">结果已截断，可在右侧栏恢复定位。</p></div>'),
+      disclosure('›', 'Web', '查询附件展示规则', false, '<div class="tool-expanded"><pre class="tool-output">答案摘要：单图长边 240px，多图 64px 方砖。</pre></div>'),
+      disclosure('›', 'Image', '读取 2 张界面截图', false, '<div class="tool-expanded"><pre class="tool-output">screenshot-a.png · 1200×800 · 20 KB\nscreenshot-b.png · 900×600 · 16 KB</pre></div>'),
+      disclosure('!', 'Bash', failOpen ? '执行失败 · 目标文件不存在' : '运行失败命令', failOpen, '<div class="tool-expanded"><div class="tool-banner"><span class="state-dot state-error"></span><span>$ npm test -- --missing</span><span class="exit-badge">退出码 1</span></div><pre class="tool-output">ENOENT: 目标文件不存在</pre></div>')
+    ].join('');
+  }
+
+  function messageHtml(variant) {
+    const userText = source.timeline[0].text;
+    const firstAssistant = source.timeline[1].text;
+    const finalAssistant = source.timeline[2].text;
+    let html = '<div class="user-turn"><div class="user-bubble">' + escapeHtml(userText) + '</div><div class="msg-actions"><span>10:42</span><span aria-label="复制">⧉</span><span aria-label="重试">↻</span></div></div>';
+    html += '<div class="assistant-turn">' + disclosure('▸', '思考', '先定位读取入口，再确认是否存在偏移量', false, '<div class="think-body">需要先定位读取入口，再确认是否存在 offset；这一步只使用只读工具。</div>') + toolRows(variant) + '<div class="assistant-md">' + markdown(firstAssistant) + '</div></div>';
+    html += '<div class="assistant-turn"><div class="assistant-md">' + markdown(finalAssistant) + '</div><div class="turn-tail"><span>10:43</span><span aria-label="复制">⧉</span><span aria-label="重新生成">↻</span><span aria-label="分支">⑂</span></div></div>';
+    if (variant === 'plan' || variant === 'planreview') {
+      html += '<div class="result-card"><div class="result-tile">▤</div><div class="result-main"><div class="result-title">完善图片附件展示</div><div class="result-sub">计划 · Markdown</div></div><button class="result-btn" type="button" data-drawer="plan">打开</button></div>';
+      html += '<div class="changed-card"><div class="changed-head"><div class="result-tile">⌁</div><div class="result-main"><div class="result-title">已编辑 3 个文件</div><div class="result-sub">变更评审</div></div><div class="changed-stats"><span class="changed-add">+42</span><span class="changed-del">-11</span></div></div>' +
+        '<div class="changed-row"><span class="changed-path">src/chat/AttachmentGrid.tsx</span><span class="changed-count changed-add">+24</span><span class="changed-count changed-del">-6</span></div>' +
+        '<div class="changed-row"><span class="changed-path">src/chat/MessageImage.tsx</span><span class="changed-count changed-add">+12</span><span class="changed-count changed-del">-3</span></div>' +
+        '<div class="changed-row"><span class="changed-path">src/styles/attachment.css</span><span class="changed-count changed-add">+6</span><span class="changed-count changed-del">-2</span></div>' +
+        '<div class="changed-more">查看全部 3 个文件 ▾</div></div>';
+      html += '<div class="deliverables"><div class="deliver-title">交付文件</div><div class="deliver-grid"><div class="deliver-card"><div class="result-tile">▦</div><div><div class="deliver-name">附件预览</div><div class="deliver-sub">在侧边栏预览</div></div></div><div class="deliver-card"><div class="result-tile">▤</div><div><div class="deliver-name">变更说明</div><div class="deliver-sub">在侧边栏预览</div></div></div></div></div>';
+    }
+    if (variant === 'stream') html += '<div class="running-row"><span>〰</span><span>深度求索中，用时 3 秒 ···</span></div>';
+    if (variant === 'stopped') html += '<div class="stopped-pill">已停止</div>';
+    return html;
+  }
+
+  function composerHtml(variant) {
+    const showStack = !['approval', 'planreview'].includes(variant);
+    if (!showStack) return '';
+    const showGoal = ['goal', 'todo', 'plan', 'queue', 'stream', 'stopped', 'toolfail'].includes(variant);
+    const showTodo = ['todo', 'plan', 'queue', 'stream', 'stopped', 'toolfail'].includes(variant);
+    const showQueue = ['queue', 'plan', 'stream', 'stopped', 'toolfail'].includes(variant);
+    const queueOpen = variant === 'queue';
+    const todoOpen = variant === 'todo';
+    const planActive = ['plan', 'planreview', 'stream', 'stopped', 'toolfail'].includes(variant);
+    let html = '';
+    if (showTodo) html += '<details class="todo-bar"' + (todoOpen ? ' open' : '') + '><summary><span class="disclosure-icon">☑</span><span class="todo-count">任务 · 2 已完成 · 1 进行中 · 3 待处理 ▴</span></summary><div class="todo-list">' +
+      '<div class="todo-item"><span class="todo-state done"></span><span>梳理读取入口</span></div>' +
+      '<div class="todo-item"><span class="todo-state done"></span><span>确认附件尺寸</span></div>' +
+      '<div class="todo-item"><span class="todo-state doing"></span><span>整理变更说明</span></div>' +
+      '<div class="todo-item"><span class="todo-state"></span><span>补充回归检查</span></div></div></details>';
+    if (showGoal) html += '<div class="goal-bar"><span class="goal-icon">◎</span><span class="goal-label">进行中的目标</span><span class="goal-obj">objective · 完成附件展示规范</span><span class="goal-actions"><button type="button" aria-label="编辑目标">✎</button><button type="button" aria-label="清除目标">×</button><button type="button" aria-label="暂停目标">Ⅱ</button></span></div>';
+    if (showQueue) html += '<details class="queue-dock"' + (queueOpen ? ' open' : '') + '><summary><span class="queue-tile">⇤</span><span>2 条排队消息 ▴</span><span class="queue-sending">发送中…</span></summary><div class="queue-list">' +
+      '<div class="queue-row"><span class="queue-tile">▧</span><span class="queue-preview">继续说明多图方砖的间距规则</span><button class="qbtn" type="button" aria-label="编辑">✎</button><button class="qbtn" type="button" aria-label="删除">×</button><button class="qbtn" type="button" aria-label="插话发送">↗</button></div>' +
+      '<div class="queue-row"><span class="queue-tile">▤</span><span class="queue-preview">把变更评审整理成三条摘要</span><span class="queue-sending">发送中…</span><button class="qbtn dim" type="button" aria-label="编辑">✎</button><button class="qbtn dim" type="button" aria-label="删除">×</button><button class="qbtn dim" type="button" aria-label="插话发送">↗</button></div></div></details>';
+    html += '<div class="input-card"><div class="input-row"><button class="x-icon-btn" type="button" aria-label="添加附件">＋</button><textarea class="chat-input" id="chatInput" rows="1" placeholder="给 DeepSeek Harness 发消息…" aria-label="消息输入框"></textarea><button class="send-btn' + (variant === 'stream' ? ' stop' : '') + '" type="button" id="sendBtn">' + (variant === 'stream' ? '停止' : '发送') + '</button></div>' +
+      '<div class="mode-row"><button class="plan-chip' + (planActive ? '' : '') + '" type="button" id="planChip">▦ 计划</button><span class="mode-hint">' + (planActive ? '计划模式已开启 · 右侧栏可查看 Markdown' : '输入消息后可切换计划模式') + '</span></div></div>';
+    return html;
+  }
+
+  function takeoverHtml(variant) {
+    if (variant === 'approval') return '<div class="takeover-card"><div class="takeover-top"><span>● 等待审批</span></div><div class="takeover-main"><h3>工具 Bash 请求越权执行</h3><p>需要确认是否允许在当前工作区执行这条命令。</p><pre class="takeover-code">npm test -- --runInBand</pre></div><div class="takeover-actions"><button class="x-btn ghost" type="button" data-approval="reject">拒绝</button><button class="x-btn primary" type="button" data-approval="allow">允许一次</button></div></div>';
+    if (variant === 'planreview') return '<div class="takeover-card"><div class="takeover-top"><span>● 计划待审</span><span class="takeover-link">查看全文</span></div><div class="takeover-main"><h3>完善图片附件展示</h3><p>整理单图、多图与失败重试三类展示规则，并在消息尾保留计划与变更评审入口。</p></div><div class="takeover-actions"><button class="x-btn ghost" type="button" data-planreview="revise">要求修改</button><button class="x-btn primary" type="button" data-planreview="approve">同意执行</button></div></div>';
+    return '';
+  }
+
+  const drawerCopy = {
+    plan: '<h3>完善图片附件展示</h3><p>目标：统一用户消息附件的视觉规格，避免把工具结果与用户附件混画。</p><h4>实施步骤</h4><ul><li>单图长边 240px，多图使用 64px 方砖。</li><li>图片圆角使用 --dsw-radius-xl。</li><li>失败砖提供重试提示。</li></ul><h4>验收</h4><p>用户图片右对齐，工具图片左对齐；两种尺寸不互换。</p>',
+    review: '<h3>变更评审</h3><p>共 3 个文件，新增 42 行，删除 11 行。</p><div class="diff-block"><div class="diff-del">- width: 78px</div><div class="diff-add">+ width: 64px</div><div class="diff-del">- border-radius: 4px</div><div class="diff-add">+ border-radius: var(--dsw-radius-xl)</div></div><h4>检查点</h4><ul><li>多图网格 gap 10px。</li><li>失败态底色使用语义设计变量。</li></ul>'
+  };
+
+  function setDrawer(open, mode) {
+    ui.p4.drawer = open;
+    if (mode) ui.p4.drawerMode = mode;
+    $('rightDrawer').hidden = !open;
+    $('drawerMask').hidden = !open;
+    $('drawerTitle').textContent = ui.p4.drawerMode === 'review' ? '变更评审' : '计划 · Markdown';
+    $('drawerBody').innerHTML = drawerCopy[ui.p4.drawerMode];
+  }
+
+  function renderChat() {
+    const variant = ui.p4.variant;
+    const statusMap = { normal: '空闲', stream: '深度求索中', queue: '2 条排队中', goal: '目标进行中', todo: '任务进行中', plan: '计划待审', approval: '等待审批', planreview: '计划待审', toolfail: '运行出错', stopped: '已停止' };
+    $('chatStatus').textContent = statusMap[variant] || '空闲';
+    $('chatBody').innerHTML = messageHtml(variant);
+    $('composerStack').innerHTML = composerHtml(variant);
+    $('composerStack').hidden = ['approval', 'planreview'].includes(variant);
+    $('takeover').hidden = !['approval', 'planreview'].includes(variant);
+    $('takeover').innerHTML = takeoverHtml(variant);
+    setDrawer(ui.p4.drawer, ui.p4.drawerMode);
+    requestAnimationFrame(() => { $('chatBody').scrollTop = 0; });
+  }
+
+  function applyP4Variant(target) {
+    const map = {
+      'p4-normal': 'normal', 'p4-stream': 'stream', 'p4-queue': 'queue', 'p4-goal': 'goal', 'p4-todo': 'todo',
+      'p4-plan': 'plan', 'p4-approval': 'approval', 'p4-planreview': 'planreview', 'p4-toolfail': 'toolfail', 'p4-stopped': 'stopped'
+    };
+    ui.p4.variant = map[target] || 'plan';
+    ui.p4.drawer = ui.p4.variant === 'plan';
+    ui.p4.drawerMode = 'plan';
+    renderChat();
+    show('p4');
+  }
+
+  renderNav();
+  renderSettings();
+  renderSessions();
+  renderChat();
+  show('p1');
+  $('traceJson').textContent = JSON.stringify(source, null, 2);
+
+  $('themeToggle').addEventListener('click', () => document.body.toggleAttribute('data-ds-dark-theme'));
+  $('sessionSearch').addEventListener('input', renderSessions);
+  $('newSessionBtn').addEventListener('click', () => {
+    ui.p3.draft = true;
+    renderSessions();
+    $('sessionList').scrollTop = 0;
+  });
+  $('p3PanelToggle').addEventListener('click', () => setP3Drawer(!ui.p3.drawer));
+  $('p3Mask').addEventListener('click', () => setP3Drawer(false));
+  $('settingsGear').addEventListener('click', () => { ui.p3.settingsOpen = true; $('settingsModal').hidden = false; renderSettings(); });
+  $('settingsClose').addEventListener('click', () => { ui.p3.settingsOpen = false; $('settingsModal').hidden = true; });
+  $('settingsRail').addEventListener('click', event => {
+    const button = event.target.closest('[data-section]');
+    if (!button) return;
+    ui.p3.settingsSection = button.dataset.section;
+    renderSettings();
+  });
+  $('chatPanelBtn').addEventListener('click', () => setDrawer(!ui.p4.drawer, ui.p4.drawerMode));
+  $('drawerClose').addEventListener('click', () => setDrawer(false));
+  $('drawerMask').addEventListener('click', () => setDrawer(false));
+
+  document.addEventListener('click', event => {
+    const target = event.target;
+    const go = target.closest('[data-go]');
+    if (go) { show(go.dataset.go); return; }
+    const variant = target.closest('[data-variant]');
+    if (variant) {
+      if (variant.dataset.variant === 'p3') applyP3Variant(variant.dataset.target);
+      else if (variant.dataset.variant === 'p4') applyP4Variant(variant.dataset.target);
+      else show(variant.dataset.variant);
+      return;
+    }
+    const session = target.closest('[data-session]');
+    if (session) { show('p4'); return; }
+    const drawerOpen = target.closest('[data-drawer]');
+    if (drawerOpen) { setDrawer(true, drawerOpen.dataset.drawer); return; }
+    const approval = target.closest('[data-approval]');
+    if (approval) { ui.p4.variant = 'normal'; renderChat(); return; }
+    const planReview = target.closest('[data-planreview]');
+    if (planReview) { ui.p4.variant = 'plan'; renderChat(); return; }
+    const planChip = target.closest('#planChip');
+    if (planChip) { ui.p4.variant = ui.p4.variant === 'plan' ? 'normal' : 'plan'; renderChat(); }
+  });
+}());
+</script>
+</body>
+</html>
