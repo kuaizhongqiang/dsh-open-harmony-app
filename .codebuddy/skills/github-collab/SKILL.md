@@ -26,6 +26,14 @@ description: >-
 4. PR 前跑门禁：5 道 `node tools/check-*.mjs`；确认跨端字段同批改完两侧；提交信息 conventional commits。
 5. 版本发布（仅显式）：变更经 PR merge → 更新根 `CHANGELOG.md`（经 PR）→ 手动打 semver tag → `publish.yml` 自动发 Release；**merge 不触发发布**。
 
+## 工具降级（重要）
+
+- **GitHub MCP 工具可能认证失败**（`Authentication Failed: Bad credentials`）。遇到时**直接用 `gh` CLI**，不要停下来等人工：
+  - `gh issue list|view|close|comment`、`gh pr create|checks|merge|view`、`gh api repos/<owner>/<repo>/...`
+  - 认证状态：`gh auth status`（本机已认证为 `kuaizhongqiang`，含 repo/workflow 权限）。
+- 中文标题/正文在 PowerShell 下先设 `chcp 65001 | Out-Null; $OutputEncoding = [Console]::OutputEncoding = [System.Text.Encoding]::UTF8`。
+- jq 表达式里的引号在 PowerShell 下易被拆参；复杂查询用 `--json` 简单表格或写临时 JSON 文件配 `gh api --input`。
+
 ## 参考（按需读）
 
 - SOP：`.workflows/issue-lifecycle.md`、`.workflows/release-tag.md`
