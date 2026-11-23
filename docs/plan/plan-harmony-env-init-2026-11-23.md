@@ -95,6 +95,13 @@
 ## 7 决策与未决
 
 - 已定：工程落在 `app/`（与 `app/AGENT.md` 归属一致）；最小骨架，不写业务代码。
-- 未决（进 `docs/open-questions.md` 由 Owner 拍板）：
+- 未决（Owner 拍板；已登记 `docs/open-questions.md` Q10 + GitHub issue #21）：
   - **双平台下限（ADR-0007 变更）**：网络核查确认 DevEco 26 不提供 API 9 SDK 且旧 SDK 与新工具链相差 3 年。选项：(A) 把下限放宽到 API 18+（本机可用），走 issue+PR 改 ADR-0007；(B) 另装 DevEco 3.1 + API 9 SDK，按原下限验证；(C) 本期只验 HarmonyOS 目标，OpenHarmony 后置。**需 Owner 拍板，AI 不自行决定**。
-  - 是否 now 进入 M3.4 业务代码。
+  - 是否现在进入 M3.4 业务代码。
+
+## 8 跟进记录（2026-11-23，Docs/Architect）
+
+- 本计划 V1–V6 已由 Docs/Architect 复核属实：`entry-default-unsigned.hap`（120631 B）真实存在，SDK `sdk-pkg.json` = apiVersion 26 / 26.0.0.105，根 `AGENT.md` §7 环境事实已更正。
+- 本计划产物经 PR #20（`fa843fd`）合入 main，工作区干净。
+- Q10 已建 GitHub issue #21（m4 / priority:p0 / scope:app / type:decision），并在 `open-questions.md` 登记；未定前 `compatibleSdkVersion` 保持 `5.0.0(12)`。
+- 主计划 `plan-project-init-2026-11-23.md` 已同步 M3/M4 状态与环境事实更正。
