@@ -78,7 +78,7 @@
 | `ISSUE_TEMPLATE/bug.md` | 缺陷 issue 模板 |
 | `PULL_REQUEST_TEMPLATE.md` | PR 模板（关联 issue + 验收 + 契约同批勾选） |
 | `CODEOWNERS` | 路径 → 人类 owner（AI owner 边界仍以 04 为准） |
-| `workflows/ci.yml` | **merge CI**（仅验证）：PR + push main 触发，跑 5 道门禁；不打 tag、不打包、不发 release |
+| `workflows/ci.yml` | **merge CI**（仅验证）：PR + push main 触发，跑 6 道门禁（含 check-licenses）；不打 tag、不打包、不发 release |
 | `workflows/publish.yml` | **publish 流水线**：仅 tag（`v*`/`plugin-v*`/`app-v*`）+ 手动触发；校验版本一致性后发 Release |
 
 ### 5.2 `.agent/`（agent 运行与交接）
