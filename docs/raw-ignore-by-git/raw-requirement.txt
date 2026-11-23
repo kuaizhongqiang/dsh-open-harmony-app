@@ -1,0 +1,20 @@
+原始需求
+
+一 基本介绍
+1 dsh = deepseek harness，原始仓库：https://github.com/deepseek-ai/deepseek-harness
+2 openharmony 华为鸿蒙手机系统
+
+二 功能
+3 本仓库分为两个部分，第一个是手机app；第二个是dsh plugin。用来当做app的中转代理工具
+4 需要有基本的运营功能 比如github tag版本监控升级
+5 有快速的链接交互方式，可以参考微信ai接口的扫码方式，为了安全也要加入openclaw的server端白名单方式
+6 dsh中需要加入一个恒定的移动端工作区，用来单独管理session
+7 dsh中需要加入一个管理app的页面
+8 app需要符合手机的使用习惯，比如通知，比如权限，比如通讯等
+
+三 纪律
+9 要有明确的仓库纪律，比如issue pr 
+10 要有明确的agent纪律，比如每个关键路径下应有AGENT.md来控制该路径下的agent纪律
+11 要有明确的workflows，要通过skill给agent注册，避免出现sop不统一的问题
+12 需要文档先行，plan<{name}-{date}>.md格式来执行，可回溯
+
