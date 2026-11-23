@@ -41,7 +41,7 @@
 - [x] `design/05-github-collaboration.md` — GitHub 协作机制（替代 TODO/RECORD/DECISION）
 - [x] `plan/plan-project-init-2026-11-23.md` — 项目初始化主计划（含 2026-11-23 app 初始化跟进）
 - [x] `plan/plan-harmony-env-init-2026-11-23.md` — 鸿蒙环境初始化计划（V1–V6 实测 PASS，Q10 待拍板）
-- [x] `decisions/ADR-0001..0008` — 决策（经 issue+PR 流程；ADR-0006 = 禁直推 + CI/publish 分离；ADR-0007 = Q1/Q7/Q8/Q9；ADR-0008 = CA 生命周期）
+- [x] `decisions/ADR-0001..0009` — 决策（经 issue+PR 流程；ADR-0006 = 禁直推 + CI/publish 分离；ADR-0007 = Q1/Q7/Q8/Q9；ADR-0008 = CA 生命周期；ADR-0009 = API 9 机会性适配，取代 0007 硬承诺）
 - [x] `open-questions.md` — 未决问题（Q1 目标平台等）
 - [x] `docs/AGENT.md` / `app/AGENT.md` / `plugin/AGENT.md` — 路径纪律（需求 #10）
 - [x] `design/03-contracts.md` — App↔Plugin 字段级契约（v0.4，含 CA 管理端点）
