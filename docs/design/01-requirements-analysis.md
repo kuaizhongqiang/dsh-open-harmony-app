@@ -141,12 +141,13 @@
 
 | # | 问题 | 决策 |
 |---|---|---|
-| Q1 | 目标平台（HarmonyOS NEXT vs 纯 OpenHarmony，API 版本） | **待定**（不锁；架构按 HarmonyOS NEXT 12+ 假设，纯 OpenHarmony 待确认） |
+| Q1 | 目标平台（HarmonyOS NEXT vs 纯 OpenHarmony，API 版本） | **已定：两个都支持**（ADR-0007，PlatformAdapter 抽象） |
 | Q2 | app 形态（Web 薄壳 vs 纯原生 ArkUI） | **已定：纯原生 ArkUI 重写** |
 | Q3 | 是否拉 `deepseek-harness` 为只读 submodule | **已定：已拉** `vendor/deepseek-harness`（`--depth 1`，`dsh-v0.2.3-alpha.2`） |
 | Q4 | plugin npm 包名 | **已定：`dsh-harmony`**（对标 `dsh-mobile`；冲突时退 `@kuaizhongqiang/dsh-harmony`） |
 | Q5 | 远程通道本期是否做 | **已定：做**。鸿蒙有原生 Tailscale 类客户端（TailMesh / HarmoTail / Tailscale-OHOS），远程优先走 tailnet；公网隧道（cloudflared/frp）兜底 |
 | Q6 | 版本监控范围 | **已定：plugin + app 都监控**。App 不上架 AppGallery，但允许远程更新（In-house 定向发布 + 自更新：比对版本→下载 hap→校验→交系统安装） |
+| Q7-Q9 | 版本通道 / 配对 payload / 二进制上传 | **已定（ADR-0007）**：App 直查 GitHub Release；配对 `dshpair://v1/...` + CA 指纹绑定；本期无二进制上传端点 |
 
 ## 8 交付口径
 

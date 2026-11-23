@@ -15,10 +15,10 @@
 4. 不上架 AppGallery，走 **In-house 定向发布 + 自更新**；升级必须校验签名 + SHA-256，禁静默自更新。
 5. 权限最小化：相机（扫码）/麦克风（录音）/通知 按需申请，不预授权。
 
-## 3 未决 / 环境
+## 3 平台 / 环境
 
-- **Q1 目标平台待定**（HarmonyOS NEXT API12+ vs 纯 OpenHarmony API9+）：影响 `@ohos.*` 可用面、HUKS/通知/后台任务 API。
-- 本机无 DevEco：先设计/契约，后构建；出包（M4）需装环境。
+- **Q1 已定：双平台都支持**（HarmonyOS NEXT API12+ + 纯 OpenHarmony API9+，ADR-0007）。平台相关能力一律走 `PlatformAdapter`（能力探测 + 条件编译），禁止在业务层散落平台判断；适配清单见 `docs/design/06-app-ui-architecture.md` §7。
+- 本机无 DevEco：先设计/契约，后构建；出包（M4）需装环境，两个目标各验一次。
 
 ## 4 去哪查
 
