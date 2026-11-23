@@ -1,0 +1,39 @@
+{
+  "workflow": "m3-vertical-slice (plugin + app)",
+  "date": "2026-11-23",
+  "from": "Plugin Agent + App Agent (isolated worktrees), integrated by Docs/Architect",
+  "to": "next agent / owner",
+  "done": [
+    "PR #25 (05fff5d): plugin M3 - dsh-harmony package, ctx.plugin() + ctx.webServer gateway :3443, GET /mobile/health + /version, loopback proxy /mobile/api/**, /pair (5min key + CA two-way check), /token/refresh, /whitelist, /devices, /ca endpoints (stub), WS /mobile/ws first-frame auth + 4 mapped events (stub). 24/24 tests PASS.",
+    "PR #26 (dca8ad4): app M3 - HttpClient (@ohos.net.http), WsClient (@ohos.net.webSocket first-frame auth + backoff), dshpair://v1 decode + validation, SecureStore interface + in-memory impl (HUKS stub), PlatformAdapter tls.capability() probe stub. hvigor assembleHap BUILD SUCCESSFUL.",
+    "PR #24 (d8336bd): contract v0.5 (pair auth carve-out, 400, wire v0.1, TTL, error schema) + gh CLI fallback rule in AGENT/skill.",
+    "Contract is single source of truth at docs/design/03-contracts.md v0.5; both implementations aligned (pair exempt from auth, wire v0.1).",
+    "All GitHub issues #1-#15 closed (no open items)."
+  ],
+  "todo": [
+    "Real CA cert operations (issue/distribute/rotate/revoke) - plugin /ca endpoints are stubs (ADR-0008)",
+    "Real HUKS secure store - app currently in-memory (token/pin lost on restart)",
+    "Real TLS pin verification - StubTlsAdapter returns 'pin' hardcoded, setPins/verify not implemented (SECURITY: must fix before real device)",
+    "Camera QR scan - paste box used instead; NEXT Scan Kit / OpenHarmony camera+XComponent via PlatformAdapter",
+    "DSH real event subscription - only 1 synthetic session.updated emitted",
+    "In-memory state persistence (plugin) - restart loses devices/tokens/pairing keys/whitelist",
+    "12 MiB reply cap enforcement on proxy",
+    "pairingKey issuance HTTP endpoint (currently PC-side process API only)",
+    "M4: signed hap requires Owner-provided In-house certificate"
+  ],
+  "blocked_by": [
+    "In-house signing certificate from Owner (M4 signed hap)",
+    "Real device for HUKS/TLS pin/camera verification (no emulator used so far)"
+  ],
+  "contracts_touched": [
+    "03-contracts.md v0.5: pair auth carve-out (§3.2), 400 INVALID_REQUEST (§5), wire v0.1 independent (header), token TTL 24h single-active (§2), error body {error:{code,message?}}, reachable=logical, retired CA item schema, pairingKey via PC process API"
+  ],
+  "acceptance": [
+    "cd plugin && npm test -> 24/24 PASS",
+    "cd plugin && npm run typecheck -> PASS",
+    "cd app && hvigorw assembleHap -> BUILD SUCCESSFUL (9.5s, 33 tasks)",
+    "node tools/check-{docs,sync,data,contracts,plugin-version}.mjs -> all PASS",
+    "PR #24/#25/#26 CI gates pass and merged to main"
+  ],
+  "notes": "Subagents used isolated git worktrees (using-git-worktrees skill) to avoid conflicts; rebased onto contract v0.5 before PR. One worktree dir (app-m3) could not be removed due to Windows long path - harmless, branch deleted. GitHub MCP auth failures in subagent resolved by gh CLI fallback rule (now in AGENT.md + skill)."
+}

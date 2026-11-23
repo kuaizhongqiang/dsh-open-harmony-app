@@ -44,7 +44,7 @@
 - [x] `decisions/ADR-0001..0009` — 决策（经 issue+PR 流程；ADR-0006 = 禁直推 + CI/publish 分离；ADR-0007 = Q1/Q7/Q8/Q9；ADR-0008 = CA 生命周期；ADR-0009 = API 9 机会性适配，取代 0007 硬承诺）
 - [x] `open-questions.md` — 未决问题（Q1 目标平台等）
 - [x] `docs/AGENT.md` / `app/AGENT.md` / `plugin/AGENT.md` — 路径纪律（需求 #10）
-- [x] `design/03-contracts.md` — App↔Plugin 字段级契约（v0.4，含 CA 管理端点）
+- [x] `design/03-contracts.md` — App↔Plugin 字段级契约（v0.5，M3 实现反馈修订）
 - [x] `design/06-app-ui-architecture.md` — App 原生 UI 信息架构（9 页面 + 导航 + 状态）
 - [x] `review/01-doc-review.md` / `review/02-contracts-review.md` — 两轮评审
 - [x] `handoffs/README.md` — 结构化交接落点
