@@ -21,7 +21,7 @@ jobs:
           node-version: 22
       - name: Run all doc/contract gates
         run: |
-          for gate in check-docs check-sync check-data check-contracts check-plugin-version; do
+          for gate in check-docs check-sync check-data check-contracts check-plugin-version check-licenses; do
             echo "=== $gate ==="
             node "tools/$gate.mjs"
           done

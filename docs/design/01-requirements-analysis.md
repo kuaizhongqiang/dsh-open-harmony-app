@@ -133,9 +133,9 @@
 4. 一条消息往返：App 输入 → 网关代理 → DSH 响应 → 回显。
 5. 配对二维码生成 → App 扫码 → 建立 token → 自动续期。
 
-## 6 门禁（第 1 批，5 道）
+## 6 门禁（6 道）
 
-沿用 repo-init 通用门禁：`check-sync` / `check-data` / `check-contracts` / `check-docs`，另加本项目的 `check-plugin-version`（tag 与 package.json 一致性）。退出码 `0/1/2`。
+沿用 repo-init 通用门禁：`check-sync` / `check-data` / `check-contracts` / `check-docs`，另加本项目的 `check-plugin-version`（tag 与 package.json 一致性）与 `check-licenses`（版权声明）。退出码 `0 通过 / 1 违例`，全部接入 CI。
 
 ## 7 开放问题与决策（截至 2026-11-23）
 

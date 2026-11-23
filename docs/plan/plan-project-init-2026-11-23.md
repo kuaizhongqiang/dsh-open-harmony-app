@@ -64,9 +64,9 @@
 4. WS 打通：App 订阅 `/mobile/ws` 收到一条事件 —— 验：事件回调触发。
 5. 配对二维码生成 → 扫码 → token → 续期 —— 验：二次连接免重复配对。
 
-## 6 门禁（第 1 批，5 道）
+## 6 门禁（6 道）
 
-`check-sync` / `check-data` / `check-contracts` / `check-docs` / `check-plugin-version`。退出码 `0 通过 / 1 违例 / 2 前置不满足`；每条错误给 `规则号/文件/路径/期望 vs 实际` + 可粘贴修法。上线前必须做一次"人为违规会红 / 干净会绿"验证。
+`check-sync` / `check-data` / `check-contracts` / `check-docs` / `check-plugin-version` / `check-licenses`（版权声明，issue #29）。退出码 `0 通过 / 1 违例`；每条错误给 `规则号/文件/路径/期望 vs 实际` + 可粘贴修法。全部已接入 CI（`.github/workflows/ci.yml`）。
 
 ## 7 决策状态（详见 `docs/decisions/`）
 

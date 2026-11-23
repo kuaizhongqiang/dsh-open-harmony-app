@@ -27,4 +27,10 @@ OpenHarmony（鸿蒙）版的 DeepSeek Harness 移动端。对标社区参考实
 
 ## 当前状态
 
-文档先行阶段。鸿蒙环境未装、代码脚手架未建，本期先定架构与切片。
+M3 垂直切片已完成（`app/` 与 `plugin/` 代码已合入 main，hap 可编译、plugin 24/24 单测通过）；M4 签名出包待 Owner 提供 In-house 证书。详见 `docs/plan/plan-project-init-2026-11-23.md`。
+
+## License / 版权与第三方声明
+
+- 本项目本体：[LICENSE](LICENSE)（MIT，© 2026 kuaizhongqiang）。
+- 第三方组件（dsh 本体、dsh 内嵌依赖、ohpm / npm 依赖）：见 [THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md)。
+- `vendor/deepseek-harness/` 为只读 submodule，其许可与声明以该目录内文件为准（本仓库不复制、不修改）。
