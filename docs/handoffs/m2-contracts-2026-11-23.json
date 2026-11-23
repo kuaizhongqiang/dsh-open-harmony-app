@@ -1,0 +1,39 @@
+{
+  "workflow": "m2-contracts + m3 design",
+  "date": "2026-11-23",
+  "from": "Docs/Architect (codebuddy) + 4 subagents",
+  "to": "next agent / owner",
+  "done": [
+    "4 subagents dispatched in parallel (code-explorer, code-reviewer, javascript-pro, typescript-pro)",
+    "#3: 4 gate scripts added, all 5 gates PASS (check-docs/sync/data/contracts/plugin-version)",
+    "#4: docs/design/06-app-ui-architecture.md (9 pages, navigation, state, Q1 impact)",
+    "#5: 03-contracts reviewed -> review/02-contracts-review.md; R1 auth fixed in v0.2",
+    "#6: event vocabulary verified against dsh-v0.2.3-alpha.2: 4 events are MAPPED, not passthrough; mapping table in 03 §4",
+    "#15: docs/handoffs/ created",
+    "#7: API surface matrix delivered (06 §7)",
+    "03-contracts bumped to v0.2 (413/502/504, auth unified, WS first-frame deviceId, verification matrix §8)",
+    "commits pushed: 19a3dd1"
+  ],
+  "todo": [
+    "#2 CA lifecycle decision (decision issue, Plugin Agent draft ADR after Q1)",
+    "#8-#13 plugin gateway + app runtime slice (needs environment)",
+    "#14 install DevEco + build hap (needs environment)"
+  ],
+  "blocked_by": [
+    "Q1 (#1) target platform undecided - owner decision",
+    "Q7 app version tag channel (GitHub direct vs gateway) - owner decision",
+    "No local HarmonyOS/DevEco environment and no running DSH gateway"
+  ],
+  "contracts_touched": [
+    "03-contracts.md v0.2: write-endpoint auth unified (R1), ws first-frame +deviceId, event mapping table, errors 413/502/504, §8 verification matrix",
+    "02-architecture.md: Q7 annotation on version channel"
+  ],
+  "acceptance": [
+    "node tools/check-docs.mjs -> PASS",
+    "node tools/check-sync.mjs -> PASS",
+    "node tools/check-data.mjs -> PASS",
+    "node tools/check-contracts.mjs -> PASS",
+    "node tools/check-plugin-version.mjs -> PASS"
+  ],
+  "notes": "5 issues closed (#3/#4/#5/#6/#7/#15 -> actually 6 closed: 3,4,5,6,7,15). m2 4/5 closed (#2 open); m3 2/8 closed; m4 0/2. No fake completion - blockers documented in milestone bodies."
+}
