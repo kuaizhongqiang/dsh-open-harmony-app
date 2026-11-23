@@ -55,3 +55,4 @@ node tools/check-docs.mjs
 - 本机已装 DevEco Studio `26.0.0.851`（hvigor `6.26.8`，SDK `default` = HarmonyOS 26.0.0 / API 26，ohpm registry 已配）。实测记录见 `docs/plan/plan-harmony-env-init-2026-11-23.md` §1。
 - SDK 仅有 HarmonyOS API 26，**未装独立 OpenHarmony API 9 / HarmonyOS API 12 SDK**：双平台构建验证受限，见该计划 §5；出包（M4）仍需 Owner 提供 In-house 签名。
 - Windows/中文环境：`.ps1` 脚本一律 ASCII（PowerShell 5.1 解码）；提交信息英文。
+- **GitHub MCP 工具不可用时用 `gh` CLI 降级**（`gh auth status` 本机已认证）；中文输出先 `chcp 65001` + 设 UTF-8 OutputEncoding。详见 skill `github-collab`。
