@@ -39,8 +39,8 @@
 | M0 | 文档方案 + 纪律层 | AGENT 三件套 + 五行头齐全 | 完成 |
 | M1 | 架构定稿 | `02-architecture.md` 纯原生 ArkUI + 安全矩阵（v0.3 双平台） | 完成 |
 | M2 | 契约先行 | `03-contracts.md` v0.4（配对/端口/CA 端点/版本通道/事件映射） | 完成（PR #18） |
-| M3 | 垂直切片 | 设计态验收矩阵齐全；门禁 5 道全绿；**app 骨架已建 + hap 编译通过**（fa843fd） | 部分完成（运行验证 #8–#13 待做） |
-| M4 | 出包 | DevEco 26 已装、未签名 hap 已产出（`entry-default-unsigned.hap`）；**签名出包需 Owner 提供 In-house 证书**。API 9 按 ADR-0009 机会性，不阻塞 | 阻塞（仅签名证书） |
+| M3 | 垂直切片 | **已完成**：plugin 侧（网关/回环代理/配对，PR #25）+ app 侧（health/WS/扫码，PR #26）代码已合入 main；24/24 单测 PASS、hap 构建 PASS、门禁全绿。契约 v0.5。桩项（真 CA/HUKS/TLS pin/相机/事件订阅/持久化）另开 follow-up | **完成**（切片级） |
+| M4 | 出包 | DevEco 26 已装、未签名 hap 已产出；**签名出包需 Owner 提供 In-house 证书**。API 9 按 ADR-0009 机会性，不阻塞 | 阻塞（仅签名证书） |
 
 > **环境事实更正（2026-11-23）**：本机**已装 DevEco Studio 26.0.0.851**（旧版计划"无鸿蒙环境"表述作废），SDK = HarmonyOS 26 / API 26；未装独立 API 9 / API 12 SDK。详见 `docs/plan/plan-harmony-env-init-2026-11-23.md`（另一 agent 的 app 初始化计划，V1–V6 实测 PASS）。
 
