@@ -36,7 +36,7 @@
 ## 文档清单
 
 - [x] `design/01-requirements-analysis.md` — 需求分析 + 参考实现调研（草案）
-- [x] `design/02-architecture.md` — 架构定稿（纯原生 ArkUI，Q1 待定）
+- [x] `design/02-architecture.md` — 架构定稿（纯原生 ArkUI）
 - [x] `design/04-agent-collaboration.md` — Agent 分工与协作协议
 - [x] `design/05-github-collaboration.md` — GitHub 协作机制（替代 TODO/RECORD/DECISION）
 - [x] `plan/plan-project-init-2026-11-23.md` — 项目初始化主计划（含 2026-11-23 app 初始化跟进）
@@ -47,4 +47,9 @@
 - [x] `design/03-contracts.md` — App↔Plugin 字段级契约（v0.5，M3 实现反馈修订）
 - [x] `design/06-app-ui-architecture.md` — App 原生 UI 信息架构（9 页面 + 导航 + 状态）
 - [x] `review/01-doc-review.md` / `review/02-contracts-review.md` — 两轮评审
+- [x] `plan/plan-e2e-device-2026-11-23.md` — PC 网关 + 开发证书 + 真机联调环境
+- [x] `plan/plan-debug-sign-device-2026-11-23.md` — DevEco 自动签名与真机安装（含本地配置不进仓）
+- [x] `plan/plan-app-health-ondevice-2026-11-23.md` — 真机 health 验证与 dev CA 请求级信任
+- [x] `plan/plan-m3-followups-2026-11-23.md` — M3 遗留桩收口计划（安全/持久化/事件/扫码/版本）
 - [x] `handoffs/README.md` — 结构化交接落点
+- [x] `handoffs/m3-followups-2026-11-23.json` — 调试签名与 M3 收口交接

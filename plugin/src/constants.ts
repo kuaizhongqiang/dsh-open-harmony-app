@@ -1,4 +1,4 @@
-/** Transport constants from docs/design/03-contracts.md v0.4 section 1. */
+/** Transport constants from docs/design/03-contracts.md v0.5 section 1. */
 
 export const CONTRACT_VERSION = 'v0.1';
 export const DEFAULT_GATEWAY_PORT = 3443;
@@ -17,8 +17,9 @@ export const PAIRING_TTL_MS = 5 * 60 * 1000;
 export const DEFAULT_TOKEN_TTL_MS = 24 * 60 * 60 * 1000;
 export const DEFAULT_UPSTREAM_TIMEOUT_MS = 10_000;
 
-/** Machine subcodes from docs/design/03-contracts.md v0.4 section 5. */
+/** Machine subcodes from docs/design/03-contracts.md v0.5 section 5. */
 export const ERROR_CODES = {
+  INVALID_REQUEST: 'INVALID_REQUEST',
   UNAUTHORIZED: 'UNAUTHORIZED',
   WHITELIST_DENIED: 'WHITELIST_DENIED',
   NOT_LOOPBACK: 'NOT_LOOPBACK',
@@ -34,8 +35,9 @@ export const ERROR_CODES = {
 
 export type ErrorCode = (typeof ERROR_CODES)[keyof typeof ERROR_CODES];
 
-/** HTTP status codes mapped from section 5. There is no 400 in the contract. */
+/** HTTP status codes mapped from section 5. */
 export const ERROR_STATUS: Record<ErrorCode, number> = {
+  INVALID_REQUEST: 400,
   UNAUTHORIZED: 401,
   WHITELIST_DENIED: 403,
   NOT_LOOPBACK: 403,

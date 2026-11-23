@@ -1,0 +1,43 @@
+{
+  "workflow": "m3-followups + debug-device-verification",
+  "date": "2026-11-23",
+  "from": "CodeBuddy agent (this session)",
+  "to": "next agent / owner",
+  "done": [
+    "Initialized vendor/deepseek-harness submodule at dsh-v0.2.3-alpha.2 (read-only); built DSH artifacts with temporary safe-delete bypass.",
+    "Prepared PC gateway on 127.0.0.1:3443 with dev CA/server certs outside repo; USB reverse forwarding hdc rport tcp:3443 -> tcp:3443 active for phone.",
+    "Enabled DevEco automatic debug signing; app/build-profile.json5 ignored and untracked; template app/build-profile.example.json5 added. Debug hap installed and launched on device 7HD9K26127014659.",
+    "Fixed dev TLS chain: regenerated server cert with correct IP SAN; App writes public dev CA to sandbox and uses HttpRequestOptions.caPath. health OK rtt=71ms from real device.",
+    "Plugin: added 400 INVALID_REQUEST for malformed JSON, array body and bad whitelist field types; 12 MiB reply ceiling via configurable maxReplyBytes; tests added.",
+    "Plugin: added persistent state store (mobile-access/state.json, 0600 atomic write). Tokens and pairing keys stored only as SHA-256 hashes; devices, tokens, whitelist, pairing records and rate-limit windows restored after restart.",
+    "App: added VersionInfo/VersionResponse, HttpClient.version(), HttpClient.refreshToken(), and a version check button. App build successful and new hap installed.",
+    "Docs/gates: updated contract version drift v0.4 -> v0.5, architecture CA endpoint table, check-contracts status codes, check-sync CA endpoints. All six gates PASS.",
+    "Plugin tests: 29/29 PASS."
+  ],
+  "todo": [
+    "Real CA lifecycle: generate/rotate/revoke/purge CA and leaf certs per ADR-0008; current /mobile/ca endpoints remain stubs.",
+    "Real DSH event subscription: replace stubSessionUpdated with ctx event bus subscription, event cursors and dedupe.",
+    "App HUKS secure store: implement envelope encryption for token/pin; current SecureStore still in-memory stub.",
+    "Real TLS pin verification: replace StubTlsAdapter capability/verify and assert pinned anchor before HTTP/WS and before sending pairingKey.",
+    "Camera QR scanner: implement Scan Kit / camera path and request ohos.permission.CAMERA; current paste field is debug fallback.",
+    "Version monitoring: add GitHub Release source, SHA-256 verification, signature verification and UPGRADE_REQUIRED UI behavior.",
+    "App token persistence/refresh orchestration: persist token via HUKS and use HttpClient.refreshToken on 401.",
+    "Formal In-house release still blocked by missing enterprise real-name account; debug signing is verification-only."
+  ],
+  "blocked_by": [
+    "Owner-provided enterprise real-name account + In-house certificate/profile for formal signed hap; not needed for current debug-device verification.",
+    "Real Signature verification needs final distribution certificate decision."
+  ],
+  "contracts_touched": [
+    "No cross-end field changes in this batch. Implementation now covers existing v0.5 400 INVALID_REQUEST, 413 PAYLOAD_TOO_LARGE and VersionInfo semantics.",
+    "Future CA/version/event changes must update docs/design/03-contracts.md v0.6+ and ship app+plugin in the same batch."
+  ],
+  "acceptance": [
+    "cd plugin && npm test -> 29/29 PASS",
+    "node tools/check-docs.mjs && check-sync.mjs && check-data.mjs && check-contracts.mjs && check-plugin-version.mjs && check-licenses.mjs -> all PASS",
+    "App hvigor assembleHap -> BUILD SUCCESSFUL; hdc install -r entry-default-signed.hap -> success",
+    "On-device health: health OK rtt=71ms via hilog -x -t app | Select-String DshHarmony",
+    "curl -k https://127.0.0.1:3443/mobile/version -> 200 with plugin/app VersionInfo"
+  ],
+  "notes": "Work done on main working tree before branch-out; staged deletion of app/build-profile.json5 is intentional and keeps debug signing passwords out of git. app/build-profile.json5 local file remains on disk for builds; do not commit it. Debug CA public cert is in app/entry/src/main/ets/security/DevCa.ets; no private key in repo."
+}

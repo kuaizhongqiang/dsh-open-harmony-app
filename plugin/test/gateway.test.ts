@@ -14,7 +14,7 @@ function fakeFetch(status: number, body: string, headers: Record<string, string>
   return (async () => new Response(nullBody ? null : body, { status, headers })) as typeof fetch;
 }
 
-test('GET /mobile/health returns the v0.4 shape without auth', async () => {
+test('GET /mobile/health returns the v0.5 shape without auth', async () => {
   const { gateway } = makeHarness();
   const response = await gateway.handle(makeRequest('GET', '/mobile/health', undefined, { peerIp: '192.0.2.1' }));
   assert.equal(response.status, 200);
@@ -45,6 +45,32 @@ test('writes require Bearer token and X-Device-Id', async () => {
   const response = await gateway.handle(makeRequest('POST', '/mobile/token/refresh', {}));
   assert.equal(response.status, 401);
   assert.equal(decode(response).error.code, ERROR_CODES.UNAUTHORIZED);
+});
+
+test('malformed JSON body is 400 INVALID_REQUEST', async () => {
+  const { gateway } = makeHarness();
+  const response = await gateway.handle({
+    method: 'POST',
+    path: '/mobile/pair',
+    headers: { 'content-type': 'application/json' },
+    body: Buffer.from('{not json'),
+    peerIp: '127.0.0.1',
+  });
+  assert.equal(response.status, 400);
+  assert.equal(decode(response).error.code, ERROR_CODES.INVALID_REQUEST);
+});
+
+test('JSON array body is 400 INVALID_REQUEST', async () => {
+  const { gateway } = makeHarness();
+  const response = await gateway.handle({
+    method: 'POST',
+    path: '/mobile/pair',
+    headers: { 'content-type': 'application/json' },
+    body: Buffer.from('[]'),
+    peerIp: '127.0.0.1',
+  });
+  assert.equal(response.status, 400);
+  assert.equal(decode(response).error.code, ERROR_CODES.INVALID_REQUEST);
 });
 
 test('management reads accept loopback only', async () => {
@@ -109,6 +135,18 @@ test('proxy passes upstream status, body and contract header through', async () 
   assert.equal(response.headers['x-contract-version'], 'v0.1-upstream');
   assert.equal(seenUrl, 'http://127.0.0.1:3080/mobile/api/sessions?limit=1');
   assert.equal(seenAuth, `Bearer ${body.token}`);
+});
+
+test('upstream reply over maxReplyBytes is 413 PAYLOAD_TOO_LARGE', async () => {
+  const harness = makeHarness({ maxReplyBytes: 16 }, {
+    fetchImpl: fakeFetch(200, 'x'.repeat(17)),
+  });
+  const { body } = await pair(harness);
+  const response = await harness.gateway.handle(makeRequest('GET', '/mobile/api/large', undefined, {
+    headers: authHeaders(body.token, body.deviceId),
+  }));
+  assert.equal(response.status, 413);
+  assert.equal(decode(response).error.code, ERROR_CODES.PAYLOAD_TOO_LARGE);
 });
 
 test('proxy maps unreachable host and timeout to 502/504', async () => {

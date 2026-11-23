@@ -2,7 +2,7 @@
 
 import type { ContractEventType } from './constants.js';
 
-/** Docs/design/03-contracts.md v0.4 section 2. */
+/** Docs/design/03-contracts.md v0.5 section 2. */
 export interface Device {
   deviceId: string;
   name: string;
@@ -76,6 +76,7 @@ export interface HarmonyConfig {
   pluginUpdate?: Partial<VersionInfo>;
   appUpdate?: Partial<VersionInfo>;
   maxRequestBytes?: number;
+  maxReplyBytes?: number;
   wsMaxPayloadBytes?: number;
   upstreamTimeoutMs?: number;
   pairingTtlMs?: number;
@@ -96,6 +97,7 @@ export interface ResolvedConfig {
   pluginUpdate: VersionInfo;
   appUpdate: VersionInfo;
   maxRequestBytes: number;
+  maxReplyBytes: number;
   wsMaxPayloadBytes: number;
   upstreamTimeoutMs: number;
   pairingTtlMs: number;

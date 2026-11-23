@@ -1,6 +1,6 @@
 // Gate: the field-level contract doc is complete.
 // - C1: headings ## 1 through ## 7 are all present.
-// - C2: error codes 401/403/404/409/429 are all present in section 5.
+// - C2: error codes 400/401/403/404/409/413/429/502/504 are all present in section 5.
 // - C3: the WS first-frame auth annotation is present in section 4.
 // Exit code: 0 pass / 1 fail. ASCII-only source (PowerShell 5.1 safe).
 import fs from 'node:fs';
@@ -11,7 +11,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const root = path.resolve(__dirname, '..');
 
 const CONTRACT = 'docs/design/03-contracts.md';
-const CODES = ['401', '403', '404', '409', '429'];
+const CODES = ['400', '401', '403', '404', '409', '413', '429', '502', '504'];
 // Chinese annotation kept as unicode escapes so the source file stays ASCII-only.
 const FIRST_FRAME_AUTH = '\u9996\u5e27\u9274\u6743';
 

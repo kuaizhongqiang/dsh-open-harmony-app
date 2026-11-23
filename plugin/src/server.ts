@@ -9,6 +9,7 @@ import { authErrorFrame, eventFrame, pongFrame, stubSessionUpdated } from './eve
 import { GatewayError, errorResponse } from './errors.js';
 import { MobileGateway } from './gateway.js';
 import { GatewayState } from './state.js';
+import { JsonFileStore } from './store.js';
 import type { HarmonyConfig, PluginContext, RequestLike } from './types.js';
 
 const WS_AUTH_TIMEOUT_MS = 10_000;
@@ -26,7 +27,7 @@ export async function startGateway(ctx: PluginContext, input: HarmonyConfig): Pr
   const cert = readFileSync(config.tls.certFile);
   const key = readFileSync(config.tls.keyFile);
 
-  const state = new GatewayState(config);
+  const state = new GatewayState(config, undefined, new JsonFileStore(config.dshHome));
   const gateway = new MobileGateway({
     config,
     state,

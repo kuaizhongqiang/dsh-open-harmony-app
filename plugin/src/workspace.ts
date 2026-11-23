@@ -21,6 +21,7 @@ export const SENSITIVE_KEY_PATHS = {
 
 /** M3 keeps these stores in memory; paths are reserved for a later slice. */
 export const RESERVED_STORE_FILES = {
+  state: 'state.json',
   devices: 'devices.json',
   tokens: 'tokens.json',
   pairingKeys: 'pairing-keys.json',
