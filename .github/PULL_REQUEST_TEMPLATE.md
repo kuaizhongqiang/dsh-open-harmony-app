@@ -12,5 +12,9 @@ Closes #<issue>
 
 ## 门禁
 
-- [ ] `node tools/check-docs.mjs` 通过
+- [ ] CI 全绿（5 道门禁：`tools/check-*.mjs`）
 - [ ] 提交信息符合 conventional commits
+
+## 发布（ADR-0006）
+
+- [ ] 本 PR **不打 tag / 不发版**（release 仅由 tag 触发的 publish 流水线负责）

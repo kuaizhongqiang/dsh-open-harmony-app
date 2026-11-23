@@ -12,6 +12,7 @@
 
 ## 2 红线（不能做什么）
 
+0. **禁止直接 push / 提交到 main**（含 agent）：所有变更走 feature 分支 → PR → CI 绿 → merge（ADR-0006）。merge 不发布，发版仅由显式 tag 触发 publish 流水线。
 1. **不改 deepseek-harness 源码**。插件通过 dsh 插件机制安装/卸载，不写入 DSH 安装目录；`vendor/deepseek-harness/` 是只读 submodule，禁止修改其内容。
 2. **文档先行**：任何执行（含写代码）先落 `docs/plan/plan-<name>-<date>.md`，未写计划不动代码。
 3. **契约同批改**：跨端字段/接口改动，同一批改完所有侧，只改一侧视为未完成。
@@ -21,9 +22,10 @@
 
 ## 3 提交纪律
 
-- git 主仓库 + 分支保护：feature 分支 → PR → 评审 → 合并；bug/需求先开 issue。
+- git 主仓库 + 分支保护：feature 分支 → PR → CI 绿 → 合并；bug/需求先开 issue。**禁止直接 push main**。
 - 提交信息用英文 conventional commits（`feat/fix/docs/chore/refactor`），PowerShell 下避免全角括号。
-- 提交顺序：`git add <具体路径>`（不用 `-A`）→ commit → push。
+- 提交顺序：`git switch -c <type>/<slug>` → `git add <具体路径>`（不用 `-A`）→ commit → push **分支** → 开 PR → merge。
+- CI（`.github/workflows/ci.yml`）只验证；发布（`.github/workflows/publish.yml`）仅 tag 触发，merge 不发包（ADR-0006）。
 
 ## 4 路径职责（AGENT.md per key path）
 
