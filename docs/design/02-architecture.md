@@ -43,12 +43,13 @@
 | 更新层 | 查 GitHub Release tag → 下载 hap → 校验 → 拉起安装（Q7 定稿：直查 GitHub） | `@ohos.net.http` + 文件 + 系统安装入口 |
 | **平台适配层（Q1 新增）** | 屏蔽 HarmonyOS NEXT(API 12+) 与纯 OpenHarmony(API 9+) 的 `@ohos.*` 差异；能力探测 + 条件编译 | 自建 `PlatformAdapter`（网络/HUKS/通知/后台/扫码/安装统一接口） |
 
-### 2.1.1 双平台支持（Q1 决策）
+### 2.1.1 平台策略（Q1 决策 + ADR-0009 修订）
 
-- **两个都支持**：HarmonyOS NEXT（商用/API 12+）与纯 OpenHarmony（开源/API 9+）。
-- 所有平台相关能力经 `PlatformAdapter` 抽象：上层只调统一接口，底层按平台选择 `@ohos.*` 实现或降级。
-- 差异清单与回退策略见 `docs/design/06-app-ui-architecture.md` §7（原 `【Q1】` 项改为双平台适配清单）。
-- 远程通道：NEXT 上 TailMesh/HarmoTail 走 tailnet；纯 OpenHarmony 无原生客户端时用公网隧道兜底，App 侧 base URL 抽象屏蔽差异。
+- **优先目标**：HarmonyOS / API 12+（`build-profile.json5` 当前 `compatibleSdkVersion = 5.0.0(12)` 即此下限）。
+- **API 9 = 机会性适配**（ADR-0009 取代 ADR-0007 的"两个都支持"硬承诺）：能低成本覆盖就支持，工具链不兼容就明确后置，**不阻塞交付、不算未完成**。本机 DevEco 26 无 API 9 SDK 的现状可接受。
+- 所有平台相关能力经 `PlatformAdapter` 抽象：上层只调统一接口，底层按平台选择 `@ohos.*` 实现或降级；API 9 的实现项标为"机会性"。
+- 差异清单与回退策略见 `docs/design/06-app-ui-architecture.md` §7。
+- 远程通道：NEXT 上 TailMesh/HarmoTail 走 tailnet；无原生客户端的平台用公网隧道兜底，App 侧 base URL 抽象屏蔽差异。
 
 ### 2.2 关键约束（因放弃 WebView 而新增）
 

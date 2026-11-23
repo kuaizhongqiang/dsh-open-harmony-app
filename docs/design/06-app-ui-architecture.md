@@ -209,9 +209,9 @@ EntryAbility.onWindowStageCreate()
 
 ---
 
-## 7 双平台适配清单（Q1 已定：两个都支持）
+## 7 平台适配清单（优先 API 12+，API 9 机会性）
 
-> Q1 已定 **HarmonyOS NEXT(API 12+) 与纯 OpenHarmony(API 9+) 双目标**（ADR-0007）。下表逐项给出两平台实现与回退策略；上层经 `PlatformAdapter` 统一接口，实现按平台能力探测 + 条件编译选择。这份表是适配层的工作清单。
+> 优先目标 HarmonyOS / API 12+；**API 9 机会性适配、不强求**（ADR-0009 取代 ADR-0007 的硬承诺）。下表逐项给出各平台实现与回退策略；上层经 `PlatformAdapter` 统一接口，实现按平台能力探测 + 条件编译选择。API 9 项成本过高/工具链不兼容时标注"后置"，不算未完成、不阻塞交付。这份表是适配层的工作清单。
 
 | 项 | 受影响 API / 组件 | HarmonyOS NEXT（API 12+） | 纯 OpenHarmony（API 9+） | 影响页面 | 应对 |
 |---|---|---|---|---|---|

@@ -40,7 +40,7 @@
 | M1 | 架构定稿 | `02-architecture.md` 纯原生 ArkUI + 安全矩阵（v0.3 双平台） | 完成 |
 | M2 | 契约先行 | `03-contracts.md` v0.4（配对/端口/CA 端点/版本通道/事件映射） | 完成（PR #18） |
 | M3 | 垂直切片 | 设计态验收矩阵齐全；门禁 5 道全绿；**app 骨架已建 + hap 编译通过**（fa843fd） | 部分完成（运行验证 #8–#13 待做） |
-| M4 | 出包 | DevEco 26 已装、未签名 hap 已产出（`entry-default-unsigned.hap`）；**签名出包需 Owner 提供 In-house 证书**；双平台下限未决 Q10 | 阻塞（证书 + Q10） |
+| M4 | 出包 | DevEco 26 已装、未签名 hap 已产出（`entry-default-unsigned.hap`）；**签名出包需 Owner 提供 In-house 证书**。API 9 按 ADR-0009 机会性，不阻塞 | 阻塞（仅签名证书） |
 
 > **环境事实更正（2026-11-23）**：本机**已装 DevEco Studio 26.0.0.851**（旧版计划"无鸿蒙环境"表述作废），SDK = HarmonyOS 26 / API 26；未装独立 API 9 / API 12 SDK。详见 `docs/plan/plan-harmony-env-init-2026-11-23.md`（另一 agent 的 app 初始化计划，V1–V6 实测 PASS）。
 
@@ -101,4 +101,4 @@
 | **M3.4** App 骨架：空 ArkUI 工程 + `@ohos.net.http` 打通 health | App | App 内发起请求收到 200 + 版本 |
 | **M3.5** App 订阅 `WS /mobile/ws` 收到事件 | App | 触发一次 `session.updated` 回调 |
 | **M3.6** 配对二维码：生成 → App 扫码 → token → 二次免配对 | App+Plugin | 二次连接免重复配对 |
-| **M4.1** 出可安装 hap（DevEco 已装，未签名 hap 已编译通过） | App | 未签名 hap exit 0（已验）；**签名 hap 需 Owner 提供 In-house 证书**；双平台下限未决 Q10 |
+| **M4.1** 出可安装 hap（DevEco 已装，未签名 hap 已编译通过） | App | 未签名 hap exit 0（已验）；**签名 hap 需 Owner 提供 In-house 证书**；API 9 机会性（ADR-0009），不阻塞 |
