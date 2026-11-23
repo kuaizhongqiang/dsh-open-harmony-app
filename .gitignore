@@ -1,0 +1,32 @@
+# IDE / editor (generated, per-user)
+.idea/
+*.iml
+.vscode/
+*.swp
+
+# Node (plugin build)
+node_modules/
+dist/
+*.tsbuildinfo
+
+# Python (dsh local tooling, if any)
+__pycache__/
+*.pyc
+.venv/
+
+# Local secrets - exact entries only (no *.env* wildcard)
+.env
+.env.local
+*.key
+*.pem
+*.p12
+*.crt.local
+# NOTE: generated CA/keystore lives under $DSH_HOME (outside repo); never commit.
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Temp / scratch
+.plan/
+*.log
