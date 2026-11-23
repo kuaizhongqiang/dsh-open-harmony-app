@@ -2,7 +2,7 @@
 读者: 全体 Agent / 负责人
 类型: design
 权威: 高
-状态: v0.2（Q1/Q7 已定：双平台 + App 直查 GitHub，ADR-0007）
+状态: v0.3（Q1/Q7 + CA 生命周期已定，ADR-0007/0008）
 依赖: docs/design/01-requirements-analysis.md
 ---
 
@@ -84,17 +84,18 @@ dsh 是 Cordis 微内核、"Everything is a plugin"。本插件为**进程内插
 
 - Gateway 以"本机操作者身份"把 App 请求代理到 Host；**管理 API 只接受 TCP 对端为回环**（对端 IP = 127.0.0.1/::1），不暴露公网。
 - 第三方 WebSocket 路径默认拦截，按**精确路径**放行，不接受查询串/模糊前缀。
-- 所有写请求校验：配对 token + `X-Device-Id`（+ 可选 CA 指纹固定）。纯原生 App 无浏览器 Origin、无 CSRF 概念，不沿用 Web 那套信任锚。
+- 所有写请求校验：配对 token + `X-Device-Id`。信任锚 = 精确 Origin + CA 指纹固定（ADR-0008 已定稿为强制，见 §5）。纯原生 App 无浏览器 Origin、无 CSRF 概念，不沿用 Web 那套信任锚。
 
 ### 3.3 移动工作区（需求 #6）
 
 - 固定目录 `$DSH_HOME/mobile-access/`：证书、配对记录、白名单、自定义文件、移动端 session 索引。
+- **CA 生命周期目录**（ADR-0008）：`certs/ca/`（LAN+tailnet 私有 CA）、`certs/remote-ca/`（自签 FRP 专用，物理隔离）、`certs/server/`（叶子证书）。CA 私钥 `0600`，不进仓/不进任何制品。
 - 与桌面 session 隔离管理，但共享同一 DSH 工作区/事件流。
 - `purge` 可整体清除（含防火墙规则）。
 
 ## 4 App ↔ Plugin 契约（HTTP + WS）
 
-> 字段级契约见 `docs/design/03-contracts.md`（v0.1 草案）。此处只定形状。
+> 字段级契约见 `docs/design/03-contracts.md`（v0.4）。此处只定形状。
 
 | 类别 | 端点 | 说明 |
 |---|---|---|
@@ -112,7 +113,7 @@ dsh 是 Cordis 微内核、"Everything is a plugin"。本插件为**进程内插
 | 控制项 | 落点 | 做法 |
 |---|---|---|
 | 传输 | App↔Gateway | 仅 HTTPS；App 侧禁明文（networkSecurity 等价配置） |
-| 身份 | App↔Gateway | 设备配对 token + `X-Device-Id`（+ 可选 CA 指纹固定） |
+| 身份 | App↔Gateway | **强制**：设备配对 token + `X-Device-Id` + 精确 Origin + 锚证书指纹固定（HUKS），不装系统信任库；平台不支持固定则拒连不降级（ADR-0008） |
 | 准入 | Gateway | OpenClaw 式白名单（IP/用户/身份头），独立于配对 |
 | 管理面 | Gateway | 仅回环可访问 `/mobile/*` 管理路由 |
 | WS | Gateway | 精确路径白名单，默认拦截第三方 |
@@ -131,6 +132,7 @@ dsh 是 Cordis 微内核、"Everything is a plugin"。本插件为**进程内插
 | 自建 VPN 扩展（VpnExtAbility） | 把 WireGuard 做进 App | 重，暂不做 |
 
 > App 只需一个 base URL（LAN IP / tailnet IP / 公网域名），三种入口同一套 HTTPS 契约。
+> **信任域（ADR-0008）**：LAN / tailnet / 自签 FRP 入口用私有 CA + 配对固定；自签 FRP 用独立 `remote-ca`（不复用 LAN CA）；公开域名（cloudflared 等公共可信证书）用系统信任证书并 pin 其链根锚。各入口按精确 Origin 分别存 pin。
 
 ## 7 版本与更新（Q4/Q6）
 
@@ -153,4 +155,4 @@ dsh 是 Cordis 微内核、"Everything is a plugin"。本插件为**进程内插
 
 - Q1/Q7/Q8/Q9 已定（ADR-0007）：双平台支持、App 直查 GitHub、配对 CA 指纹绑定、本期无二进制上传端点。
 - 字段级契约 `03-contracts.md` 已出 v0.3（R1/R2 已关闭）。
-- 证书/CA **生命周期**（签发/分发/轮换/吊销）仍需方案定稿 → issue #2（Q8 只定了"配对时固定指纹"，未覆盖轮换/吊销）。
+- 证书/CA **生命周期已定稿**（ADR-0008，issue #2）：签发/分发/轮换/吊销闭环；仅剩 9 项真机/环境验证（§9 ADR），不阻塞设计。

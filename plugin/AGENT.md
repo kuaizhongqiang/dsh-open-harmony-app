@@ -17,9 +17,11 @@
 6. 契约真源是 `docs/design/03-contracts.md`：改字段先改契约、再改实现，**同批改完 app 侧**。
 7. 发布：npm 包名 `dsh-harmony`；版本监控 + 升级校验（SHA-256），禁静默自更新。
 8. Q7 定稿：App 升级直查 GitHub Release，`/mobile/version` 的 `app` 段仅为缓存；Q8 定稿：配对 payload 固定 CA 指纹（`dshpair://v1/...`）。见 ADR-0007。
+9. **CA 生命周期（ADR-0008）**：CA 私钥只存 `mobile-access/certs/{ca,remote-ca}/`（0600），不进仓/制品；自签 FRP 用独立 remote-ca；叶子 90 天/剩 30 天续期（锚不变免重配对）；换 CA 必作废旧 token 强制全员重配 + 双 Origin 重叠窗口；轮换/撤销仅回环管理端点；旧 CA 只读保留 90 天后清理，私钥安全擦除。
 
 ## 3 去哪查
 
 - 插件 API / 内核契约 → `vendor/deepseek-harness/packages/`（`core`、`web`、`host/webserver`、`sdk`）
 - 架构分层 → `docs/design/02-architecture.md` §3
-- 字段级契约 → `docs/design/03-contracts.md`（v0.1 草案）
+- CA 生命周期 → `docs/decisions/ADR-0008-ca-lifecycle.md`
+- 字段级契约 → `docs/design/03-contracts.md`（v0.4）

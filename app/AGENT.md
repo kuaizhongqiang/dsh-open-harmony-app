@@ -14,6 +14,7 @@
 3. 契约真源是 `docs/design/03-contracts.md`：改字段先改契约、再改实现，**同批改完 plugin 侧**。
 4. 不上架 AppGallery，走 **In-house 定向发布 + 自更新**；升级必须校验签名 + SHA-256，禁静默自更新。
 5. 权限最小化：相机（扫码）/麦克风（录音）/通知 按需申请，不预授权。
+6. **CA 固定（ADR-0008）**：pin 按精确 Origin 存 HUKS；禁静默改 pin（唯一入口=重新扫码）；禁装系统信任库；平台不支持固定时**拒连不降级**；HTTP/WS 共用同一 pin。
 
 ## 3 平台 / 环境
 
@@ -24,4 +25,5 @@
 
 - 架构分层 → `docs/design/02-architecture.md` §2
 - 字段级契约 → `docs/design/03-contracts.md`（v0.1 草案）
+- CA 生命周期 / pin 能力探测 → `docs/decisions/ADR-0008-ca-lifecycle.md`
 - 垂直切片 → `docs/plan/plan-project-init-2026-11-23.md` §5
