@@ -2,14 +2,14 @@
 读者: App Agent / Plugin Agent / Docs/Architect
 类型: design（契约真源）
 权威: 高（App↔Plugin 接口域真源；需求域最高见 raw）
-状态: v0.4（CA 生命周期定稿，ADR-0008；前序 v0.3 = ADR-0007）
+状态: v0.5（M3 实现反馈修订：配对鉴权 carve-out、400、wire 版本/TTL 明确；前序 v0.4 = ADR-0008）
 依赖: docs/design/02-architecture.md
 ---
 
 # 03 App ↔ Plugin 契约（字段级）
 
 > 本文件是 App 与 Plugin 的**唯一接口真源**。规则：先改本文、再改实现；跨端字段改动同批改完两侧，只改一侧视为未完成；遇歧义登记 `docs/open-questions.md`，不自行决定。
-> 契约版本号 `v0.4`；所有 JSON 字段用 camelCase；时间戳 ISO8601 UTC。
+> 契约文档版本 `v0.5`；**wire 版本 `X-Contract-Version` 独立编号为 `v0.1`**（端点实现按 wire 版本返回，文档版本升级不强制改 wire 版本）。所有 JSON 字段用 camelCase；时间戳 ISO8601 UTC。
 > 评审见 `docs/review/02-contracts-review.md`（R1/R2 已关闭）；Q7/Q8/Q9 见 ADR-0007，CA 生命周期见 ADR-0008。
 
 ## 1 传输与常量
@@ -30,11 +30,13 @@
 { "deviceId": "uuid", "name": "我的手机", "platform": "harmony",
   "origin": "https://192.168.1.5:3443", "reachable": true, "lastSeenAt": "..." }
 ```
+> `reachable`（v0.5 明确）= **逻辑在线状态**（按设备 token 是否有效/已撤销推导），非实时网络探测；真心跳不做。
 
 ### Token
 ```json
 { "token": "opaque", "deviceId": "uuid", "issuedAt": "...", "expiresAt": "..." }
 ```
+> **TTL（v0.5 明确）**：默认 24h，可配；`refresh` 签发新 token 时**旧 token 立即作废**（单设备单有效 token）。
 
 ### PairingKey（一次性、短时效，PC 端生成）
 ```json
@@ -55,14 +57,15 @@
 `GET /mobile/health`
 → `200 { "status":"ok", "pluginVersion":"0.1.0", "dshVersion":"0.2.3-alpha.2", "time":"..." }`
 
-### 3.2 配对（无鉴权，一次性密钥）
+### 3.2 配对（无鉴权 carve-out，一次性密钥）
 `POST /mobile/pair`
+> 配对密钥由 **PC 端进程内 API / 管理页面**生成并编码成 `dshpair://v1/...`（M3 不起独立的签发 HTTP 端点；若未来需要远程签发，另开 issue 加仅回环端点）。
 请求：`{ "pairingKey":"...", "deviceName":"...", "platform":"harmony" }`
 成功：`201 { "deviceId":"...", "token":"...", "issuedAt":"...", "expiresAt":"...", "caFingerprint":"sha256" }`
 > `caFingerprint` 为绑定凭据（ADR-0008）：建连前按扫码 payload 指纹校验对端锚（不符即断连 `CA_FINGERPRINT_MISMATCH`、不发 pairingKey、不落盘）；收到 `201` 后**再次比对响应指纹与扫码 payload**，不符则丢弃 token 并清理本地记录。
 失败：`409` 密钥已用/过期｜`403` 来源不在白名单｜`429` 限流
 
-> **统一鉴权规则（R1 已修）**：所有**写请求**（POST/PUT/PATCH/DELETE）必须带 `Authorization: Bearer` + `X-Device-Id`，与 02 §3.2 一致。管理端点（devices/whitelist）另要求 TCP 对端为回环。读端点（GET）仅需回环或已配对 token，见各端点标注。
+> **统一鉴权规则（R1 已修，v0.5 carve-out）**：所有**写请求**（POST/PUT/PATCH/DELETE）必须带 `Authorization: Bearer` + `X-Device-Id`。**唯一例外：`POST /mobile/pair`**——配对时设备尚无 token/deviceId，凭一次性 pairingKey 免鉴权（否则鸡生蛋）；这是 §3.2 标注"无鉴权"的合法 carve-out，两侧实现按此。管理端点（devices/whitelist/CA）另要求 TCP 对端为回环。读端点（GET）仅需回环或已配对 token。
 
 ### 3.3 令牌续期（同 Origin 自动续期）
 `POST /mobile/token/refresh`（鉴权：`Authorization` + `X-Device-Id`）
@@ -88,7 +91,7 @@
 > **Q7 定稿**：App 升级检查的**主通道是 App 直查 GitHub Release**（版本真源统一在仓库 tag，不受网关可达性影响）；本端点的 `app` 段降级为"已配对电脑缓存的最近已知版本"，仅作参考展示，不作为升级判据。
 
 ### 3.8 CA 管理端点（仅回环，ADR-0008）
-`GET /mobile/ca`（回环读）→ `200 { "active":{ "caFingerprint":"hex", "notBefore":"...", "notAfter":"...", "status":"active" }, "retired":[...] }`
+`GET /mobile/ca`（回环读）→ `200 { "active":{ "caFingerprint":"hex", "notBefore":"...", "notAfter":"...", "status":"active" }, "retired":[{ "caFingerprint":"hex", "notBefore":"...", "notAfter":"...", "status":"retired", "retiredAt":"..." }] }`
 > **禁返私钥 / CSR / CA 证书本体**，只返回指纹与元数据。
 `POST /mobile/ca/leaf/rotate`（回环 + `Authorization` + `X-Device-Id`）→ `200 { "caFingerprint":"hex", "rotatedAt":"..." }`
 > 同一 CA 重签叶子：锚指纹不变 → token 不失效、App 免重配对。
@@ -115,8 +118,11 @@
 
 ## 5 错误码
 
+> **错误响应体结构（v0.5 明确）**：`{ "error": { "code":"<机器子码>", "message":"<人可读，可选>" } }`；client 只依赖 `code`，`message` 仅用于展示。
+
 | 码 | 含义 | 机器子码（响应体 `error.code`） |
 |---|---|---|
+| `400` | malformed JSON / 字段类型错误 | `INVALID_REQUEST` |
 | `401` | 未配对 / token 过期或撤销 | `UNAUTHORIZED` |
 | `403` | 白名单拒绝 / 非回环对端 / 设备未授权 / 指纹不符 | `WHITELIST_DENIED` / `NOT_LOOPBACK` / `DEVICE_UNAUTHORIZED` / `CA_FINGERPRINT_MISMATCH` |
 | `404` | 未知端点 | `NOT_FOUND` |
