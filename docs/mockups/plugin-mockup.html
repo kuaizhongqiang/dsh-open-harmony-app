@@ -1,0 +1,1275 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Plugins · dsh-harmony 配置 — DSH Web UI</title>
+<style>
+/* Base variables referenced by the token sheets and component CSS but defined
+ * upstream (deepsuite theme/global.css) — supplied here so the composite
+ * --dsw-font-* variables resolve and motion rides the upstream curve. Code
+ * font stack deliberately omits a bare `monospace` tail (Windows CJK falls
+ * back to SimSun otherwise). */
+:root {
+  --dsh-font-family-text-default: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC',
+    'Hiragino Sans GB', 'Microsoft YaHei', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  --dsw-font-family: var(--dsh-font-family-text-default);
+  --dsw-font-family-brand: 'Montserrat', var(--dsh-font-family-text-default);
+  --dsh-font-family-code-default: 'SF Mono', 'JetBrains Mono', 'Fira Code', Consolas,
+    'Liberation Mono', Menlo, Courier, 'PingFang SC', 'Microsoft YaHei';
+  --ds-font-family-code: var(--dsh-font-family-code-default);
+  --ds-ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+  --ds-transition-duration: 0.2s;
+  --ds-transition-duration-fast: 0.1s;
+  --ds-transition-duration-slow: 0.3s;
+  --dsw-radius-xs: 4px;
+  --dsw-radius-sm: 8px;
+  --dsw-radius-md: 12px;
+  --dsw-radius-lg: 16px;
+  --dsw-radius-xl: 20px;
+  --dsw-radius-panel: 28px;
+}
+
+/* User font lists (--dsh-font-family-text/-code, written on body by the theme
+ * boot script and ThemePresenter) lead the built-in stacks. An unset list
+ * falls back to the built-in stack itself; the repeated families are inert. */
+body {
+  --dsw-font-family: var(--dsh-font-family-text, var(--dsh-font-family-text-default)), var(--dsh-font-family-text-default);
+  --ds-font-family-code: var(--dsh-font-family-code, var(--dsh-font-family-code-default)), var(--dsh-font-family-code-default);
+  --dsw-alias-settings-card-fill: var(--dsw-alias-bg-layer-2);
+  --dsw-alias-settings-card-stroke: var(--dsw-alias-border-l4);
+}
+
+[data-dsh-automatic-focus]:focus,
+[data-dsh-automatic-focus]:focus:focus-visible {
+  outline: none;
+}
+/* === end of base.css === */
+/* Figma font-weight 510 (an SF Pro variable-font weight) always renders as
+   font-weight: 500 in this UI — non-variable webfonts snap intermediate
+   weights unpredictably across platforms. */
+body {
+  --dsw-static-amber-100: rgb(254, 245, 231);
+  --dsw-static-amber-400: rgb(247, 173, 49);
+  --dsw-static-amber-500: rgb(245, 158, 11);
+  --dsw-static-amber-600: rgb(221, 134, 41);
+  --dsw-static-amber-900: rgb(39, 36, 31);
+  --dsw-static-blue-100: rgb(219, 234, 254);
+  --dsw-static-blue-300: rgb(147, 197, 253);
+  --dsw-static-blue-400: rgb(96, 165, 250);
+  --dsw-static-blue-450: rgb(77, 147, 248);
+  --dsw-static-blue-500: rgb(59, 130, 246);
+  --dsw-static-blue-50: rgb(239, 246, 255);
+  --dsw-static-blue-50p: rgb(234, 243, 255);
+  --dsw-static-blue-600: rgb(37, 99, 235);
+  --dsw-static-blue-75: rgb(229, 240, 255);
+  --dsw-static-blue-800: rgb(30, 64, 175);
+  --dsw-static-blue-900: rgb(14, 48, 116);
+  --dsw-static-blue-950: rgb(23, 37, 84);
+  --dsw-static-deepseek-100: rgb(228, 237, 253);
+  --dsw-static-deepseek-200: rgb(211, 226, 255);
+  --dsw-static-deepseek-300: rgb(183, 200, 254);
+  /* Brightened from the platform rgb(103, 158, 254) at the designer's request: legibility on the dark toast surface. */
+  --dsw-static-deepseek-400: rgb(122, 170, 255);
+  --dsw-static-deepseek-450: rgb(86, 134, 254);
+  --dsw-static-deepseek-500: rgb(65, 118, 230);
+  --dsw-static-deepseek-50: rgb(237, 243, 254);
+  --dsw-static-deepseek-600: rgb(72, 104, 178);
+  --dsw-static-deepseek-700-delete: rgb(47, 76, 143);
+  --dsw-static-deepseek-800: rgb(52, 65, 91);
+  --dsw-static-deepseek-900: rgb(40, 49, 66);
+  --dsw-static-green-100: rgb(230, 250, 237);
+  --dsw-static-green-400: rgb(78, 209, 126);
+  --dsw-static-green-500: rgb(34, 197, 94);
+  --dsw-static-green-500-a08: rgb(34 197 94 / 8%);
+  --dsw-static-green-500-a12: rgb(34 197 94 / 12%);
+  --dsw-static-green-900: rgb(35, 60, 44);
+  --dsw-static-neutral-00: rgb(255, 255, 255);
+  --dsw-static-neutral-1000: rgb(0, 0, 0);
+  --dsw-static-neutral-100: rgb(245, 245, 245);
+  --dsw-static-neutral-150: rgb(237, 237, 237);
+  --dsw-static-neutral-200: rgb(229, 229, 229);
+  --dsw-static-neutral-250: rgb(220, 220, 220);
+  --dsw-static-neutral-300: rgb(212, 212, 212);
+  --dsw-static-neutral-400: rgb(162, 164, 166);
+  --dsw-static-neutral-500: rgb(127, 130, 135);
+  --dsw-static-neutral-50: rgb(250, 250, 250);
+  --dsw-static-neutral-550: rgb(101, 103, 107);
+  --dsw-static-neutral-600: rgb(84, 85, 87);
+  --dsw-static-neutral-700: rgb(60, 60, 61);
+  --dsw-static-neutral-800: rgb(41, 41, 41);
+  --dsw-static-neutral-850: rgb(33, 33, 35);
+  --dsw-static-neutral-900: rgb(15, 15, 15);
+  --dsw-static-neutral-bluish-00: rgb(255, 255, 255);
+  --dsw-static-neutral-bluish-1000: rgb(15, 17, 21);
+  --dsw-static-neutral-bluish-100: rgb(235, 238, 242);
+  --dsw-static-neutral-bluish-150: rgb(233, 236, 242);
+  --dsw-static-neutral-bluish-200: rgb(225, 229, 238);
+  --dsw-static-neutral-bluish-300: rgb(207, 211, 214);
+  --dsw-static-neutral-bluish-310: rgb(202, 210, 219);
+  --dsw-static-neutral-bluish-400: rgb(173, 178, 184);
+  --dsw-static-neutral-bluish-500: rgb(151, 157, 166);
+  --dsw-static-neutral-bluish-50: rgb(249, 250, 251);
+  --dsw-static-neutral-bluish-55: rgb(245, 247, 250);
+  --dsw-static-neutral-bluish-600: rgb(129, 133, 140);
+  --dsw-static-neutral-bluish-60: rgb(245, 246, 247);
+  --dsw-static-neutral-bluish-700: rgb(97, 102, 107);
+  --dsw-static-neutral-bluish-750: rgb(67, 69, 74);
+  --dsw-static-neutral-bluish-75: rgb(241, 243, 245);
+  --dsw-static-neutral-bluish-800: rgb(53, 54, 56);
+  --dsw-static-neutral-bluish-850: rgb(44, 44, 46);
+  --dsw-static-neutral-bluish-875: rgb(35, 35, 36);
+  --dsw-static-neutral-bluish-900: rgb(27, 27, 28);
+  --dsw-static-neutral-bluish-90: rgb(237, 240, 244);
+  --dsw-static-neutral-bluish-950: rgb(21, 21, 23);
+  --dsw-static-red-100: rgb(254, 226, 226);
+  --dsw-static-red-400: rgb(242, 90, 90);
+  --dsw-static-red-400-a12: rgb(242 90 90 / 12%);
+  --dsw-static-red-500: rgb(239, 68, 68);
+  --dsw-static-red-50: rgb(254, 242, 242);
+  --dsw-static-red-600: rgb(236, 19, 19);
+  --dsw-static-red-600-a08: rgb(236 19 19 / 8%);
+  --dsw-static-red-900: rgb(87, 12, 12);
+  --dsw-static-violet-400: rgb(167, 139, 250);
+  --dsw-static-violet-600: rgb(124, 58, 237);
+}
+
+body[data-ds-dark-theme] {
+  --dsw-static-amber-100: rgb(254, 245, 231);
+  --dsw-static-amber-400: rgb(247, 173, 49);
+  --dsw-static-amber-500: rgb(245, 158, 11);
+  --dsw-static-amber-600: rgb(221, 134, 41);
+  --dsw-static-amber-900: rgb(39, 36, 31);
+  --dsw-static-blue-100: rgb(219, 234, 254);
+  --dsw-static-blue-300: rgb(147, 197, 253);
+  --dsw-static-blue-400: rgb(96, 165, 250);
+  --dsw-static-blue-450: rgb(77, 147, 248);
+  --dsw-static-blue-500: rgb(59, 130, 246);
+  --dsw-static-blue-50: rgb(239, 246, 255);
+  --dsw-static-blue-50p: rgb(234, 243, 255);
+  --dsw-static-blue-600: rgb(37, 99, 235);
+  --dsw-static-blue-75: rgb(229, 240, 255);
+  --dsw-static-blue-800: rgb(30, 64, 175);
+  --dsw-static-blue-900: rgb(14, 48, 116);
+  --dsw-static-blue-950: rgb(23, 37, 84);
+  --dsw-static-deepseek-100: rgb(228, 237, 253);
+  --dsw-static-deepseek-200: rgb(211, 226, 255);
+  --dsw-static-deepseek-300: rgb(183, 200, 254);
+  /* Brightened from the platform rgb(103, 158, 254) at the designer's request: legibility on the dark toast surface. */
+  --dsw-static-deepseek-400: rgb(122, 170, 255);
+  --dsw-static-deepseek-450: rgb(86, 134, 254);
+  --dsw-static-deepseek-500: rgb(65, 118, 230);
+  --dsw-static-deepseek-50: rgb(237, 243, 254);
+  --dsw-static-deepseek-600: rgb(72, 104, 178);
+  --dsw-static-deepseek-700-delete: rgb(47, 76, 143);
+  --dsw-static-deepseek-800: rgb(52, 65, 91);
+  --dsw-static-deepseek-900: rgb(40, 49, 66);
+  --dsw-static-green-100: rgb(230, 250, 237);
+  --dsw-static-green-400: rgb(78, 209, 126);
+  --dsw-static-green-500: rgb(34, 197, 94);
+  --dsw-static-green-500-a08: rgb(34 197 94 / 8%);
+  --dsw-static-green-500-a12: rgb(34 197 94 / 12%);
+  --dsw-static-green-900: rgb(35, 60, 44);
+  --dsw-static-neutral-00: rgb(255, 255, 255);
+  --dsw-static-neutral-1000: rgb(0, 0, 0);
+  --dsw-static-neutral-100: rgb(245, 245, 245);
+  --dsw-static-neutral-150: rgb(237, 237, 237);
+  --dsw-static-neutral-200: rgb(229, 229, 229);
+  --dsw-static-neutral-250: rgb(220, 220, 220);
+  --dsw-static-neutral-300: rgb(212, 212, 212);
+  --dsw-static-neutral-400: rgb(162, 164, 166);
+  --dsw-static-neutral-500: rgb(127, 130, 135);
+  --dsw-static-neutral-50: rgb(250, 250, 250);
+  --dsw-static-neutral-550: rgb(101, 103, 107);
+  --dsw-static-neutral-600: rgb(84, 85, 87);
+  --dsw-static-neutral-700: rgb(60, 60, 61);
+  --dsw-static-neutral-800: rgb(41, 41, 41);
+  --dsw-static-neutral-850: rgb(33, 33, 35);
+  --dsw-static-neutral-900: rgb(15, 15, 15);
+  --dsw-static-neutral-bluish-00: rgb(255, 255, 255);
+  --dsw-static-neutral-bluish-1000: rgb(15, 17, 21);
+  --dsw-static-neutral-bluish-100: rgb(235, 238, 242);
+  --dsw-static-neutral-bluish-150: rgb(233, 236, 242);
+  --dsw-static-neutral-bluish-200: rgb(225, 229, 238);
+  --dsw-static-neutral-bluish-300: rgb(207, 211, 214);
+  --dsw-static-neutral-bluish-310: rgb(202, 210, 219);
+  --dsw-static-neutral-bluish-400: rgb(173, 178, 184);
+  --dsw-static-neutral-bluish-500: rgb(151, 157, 166);
+  --dsw-static-neutral-bluish-50: rgb(249, 250, 251);
+  --dsw-static-neutral-bluish-55: rgb(245, 247, 250);
+  --dsw-static-neutral-bluish-600: rgb(129, 133, 140);
+  --dsw-static-neutral-bluish-60: rgb(249, 250, 251);
+  --dsw-static-neutral-bluish-700: rgb(97, 102, 107);
+  --dsw-static-neutral-bluish-750: rgb(67, 69, 74);
+  --dsw-static-neutral-bluish-75: rgb(241, 243, 245);
+  --dsw-static-neutral-bluish-800: rgb(53, 54, 56);
+  --dsw-static-neutral-bluish-850: rgb(44, 44, 46);
+  --dsw-static-neutral-bluish-875: rgb(35, 35, 36);
+  --dsw-static-neutral-bluish-900: rgb(27, 27, 28);
+  --dsw-static-neutral-bluish-90: rgb(237, 240, 244);
+  --dsw-static-neutral-bluish-950: rgb(21, 21, 23);
+  --dsw-static-red-100: rgb(254, 226, 226);
+  --dsw-static-red-400: rgb(242, 90, 90);
+  --dsw-static-red-400-a12: rgb(242 90 90 / 12%);
+  --dsw-static-red-500: rgb(239, 68, 68);
+  --dsw-static-red-50: rgb(254, 242, 242);
+  --dsw-static-red-600: rgb(236, 19, 19);
+  --dsw-static-red-600-a08: rgb(236 19 19 / 8%);
+  --dsw-static-red-900: rgb(87, 12, 12);
+  --dsw-static-violet-400: rgb(167, 139, 250);
+  --dsw-static-violet-600: rgb(124, 58, 237);
+}
+
+body {
+  --dsw-alias-bg-base: var(--dsw-static-neutral-bluish-00);
+  --dsw-alias-bg-document-preview: var(--dsw-static-neutral-bluish-100);
+  --dsw-alias-bg-document-selection: color-mix(in srgb, var(--dsw-static-blue-500) 40%, transparent);
+  --dsw-alias-label-document-preview: var(--dsw-static-neutral-bluish-700);
+  --dsw-alias-bg-layer-1: var(--dsw-static-neutral-bluish-00);
+  --dsw-alias-bg-layer-2: var(--dsw-static-neutral-bluish-00);
+  --dsw-alias-bg-layer-3: var(--dsw-static-neutral-bluish-00);
+  --dsw-alias-bg-mask-1: rgba(0, 0, 0, 0.24);
+  --dsw-alias-bg-mask-2: rgba(0, 0, 0, 0.12);
+  --dsw-alias-bg-mask-3: rgba(0, 0, 0, 0.48);
+  --dsw-alias-bg-mask-photo: rgba(0, 0, 0, 0.88);
+  --dsw-alias-bg-mask-drop: rgba(255, 255, 255, 0.7);
+  --dsw-alias-bg-module-platform: var(--dsw-static-neutral-bluish-60);
+  --dsw-alias-bg-multi-select: var(--dsw-static-neutral-bluish-60);
+  --dsw-alias-bg-overlay: var(--dsw-static-neutral-bluish-150);
+  --dsw-alias-bg-skeleton: rgba(0, 0, 0, 0.04);
+  --dsw-alias-border-inverted2: rgba(0, 0, 0, 0);
+  --dsw-alias-border-inverted: rgba(0, 0, 0, 0);
+  --dsw-alias-border-l1: rgba(0, 0, 0, 0.04);
+  --dsw-alias-border-l2-darkmode-thin: rgba(0, 0, 0, 0.1);
+  --dsw-alias-border-l2: rgba(0, 0, 0, 0.1);
+  --dsw-alias-border-l3: rgba(0, 0, 0, 0.12);
+  --dsw-alias-border-l4: rgba(0, 0, 0, 0.16);
+  --dsw-alias-border-selected: var(--dsw-static-neutral-bluish-400);
+  --dsw-alias-brand-primary-invert: var(--dsw-static-neutral-bluish-1000);
+  --dsw-alias-brand-primary-new-colorprimary-new-color: rgb(65, 118, 230);
+  --dsw-alias-brand-primary: var(--dsw-static-neutral-bluish-1000);
+  --dsw-alias-brand-text: var(--dsw-static-neutral-bluish-1000);
+  --dsw-alias-button-contrast-fill: var(--dsw-static-neutral-bluish-700);
+  --dsw-alias-button-elevated-fill: var(--dsw-static-neutral-bluish-00);
+  --dsw-alias-button-floating-fill: var(--dsw-static-neutral-bluish-00);
+  --dsw-alias-button-floating-hover: var(--dsw-static-neutral-bluish-75);
+  --dsw-alias-button-ghost-active-border: var(--dsw-static-neutral-bluish-500);
+  --dsw-alias-button-ghost-active-fill: var(--dsw-static-neutral-bluish-100);
+  --dsw-alias-button-ghost-active-hover: var(--dsw-static-neutral-bluish-150);
+  --dsw-alias-button-info-fill: var(--dsw-static-deepseek-500);
+  --dsw-alias-button-info-hover: var(--dsw-static-deepseek-400);
+  --dsw-alias-button-primary-dimmed: var(--dsw-static-neutral-bluish-100);
+  --dsw-alias-button-primary-fill: var(--dsw-alias-brand-primary);
+  --dsw-alias-button-primary-hover: var(--dsw-static-neutral-bluish-750);
+  --dsw-alias-button-tool-bar-fill-invisible: rgba(31, 31, 31, 0.36);
+  --dsw-alias-button-tool-bar-fill: rgba(84, 85, 87, 0.5);
+  --dsw-alias-button-tool-bar-hover: rgba(84, 85, 87, 0.6);
+  --dsw-alias-card-fill: var(--dsw-static-neutral-50);
+  --dsw-alias-card-fill-hover: var(--dsw-static-neutral-100);
+  --dsw-alias-card-tile-fill: color-mix(in srgb, var(--dsw-static-neutral-00) 50%, transparent);
+  --dsw-alias-chart-messages: var(--dsw-static-blue-450);
+  --dsw-alias-chart-system: var(--dsw-static-neutral-bluish-400);
+  --dsw-alias-chart-tools: var(--dsw-static-violet-400);
+  --dsw-alias-hovercard-bg: var(--dsw-static-neutral-bluish-850);
+  --dsw-alias-hovercard-label-primary: var(--dsw-static-neutral-bluish-00);
+  --dsw-alias-hovercard-label-secondary: var(--dsw-static-neutral-bluish-300);
+  --dsw-alias-hovercard-label-tertiary: var(--dsw-static-neutral-bluish-400);
+  --dsw-alias-hovercard-state-done: var(--dsw-static-violet-400);
+  --dsw-alias-hovercard-state-error: var(--dsw-static-red-400);
+  --dsw-alias-illustration-background: var(--dsw-static-neutral-bluish-55);
+  --dsw-alias-illustration-backing: var(--dsw-static-neutral-bluish-310);
+  --dsw-alias-illustration-detail: var(--dsw-static-neutral-bluish-310);
+  --dsw-alias-illustration-inset: var(--dsw-alias-illustration-surface);
+  --dsw-alias-illustration-shadow: var(--dsw-alias-illustration-surface);
+  --dsw-alias-illustration-surface: var(--dsw-static-neutral-bluish-90);
+  --dsw-alias-interactive-bg-active: rgba(38, 49, 72, 0.1);
+  --dsw-alias-interactive-bg-hover-accent: rgba(38, 49, 72, 0.14);
+  --dsw-alias-interactive-bg-hover-danger: rgba(236, 19, 19, 0.05);
+  --dsw-alias-interactive-bg-hover-solid: var(--dsw-static-neutral-bluish-75);
+  --dsw-alias-interactive-bg-hover: rgba(38, 49, 72, 0.06);
+  --dsw-alias-json-tree-hover: rgb(60 64 67 / 4%);
+  --dsw-alias-json-tree-icon: #5f6368;
+  --dsw-alias-json-tree-keyword: #1c00cf;
+  --dsw-alias-json-tree-number: #1c00cf;
+  --dsw-alias-json-tree-property: #881391;
+  --dsw-alias-json-tree-punctuation: #202124;
+  --dsw-alias-json-tree-string: #c41a16;
+  --dsw-alias-label-caption: var(--dsw-static-neutral-bluish-400);
+  --dsw-alias-label-deep-diving: color-mix(in srgb, var(--dsw-static-deepseek-500) 70%, var(--dsw-static-blue-950));
+  --dsw-alias-label-deep-diving-shimmer: color-mix(in srgb, var(--dsw-static-deepseek-500) 30%, var(--dsw-static-blue-950));
+  --dsw-alias-label-dimmed: var(--dsw-static-neutral-bluish-200);
+  --dsw-alias-label-on-color: var(--dsw-static-neutral-bluish-00);
+  --dsw-alias-label-primary-bluish: var(--dsw-static-blue-900);
+  --dsw-alias-label-primary-dimmed: var(--dsw-static-neutral-bluish-950);
+  --dsw-alias-label-primary-foreground: var(--dsw-static-neutral-bluish-00);
+  --dsw-alias-label-primary-inverted: var(--dsw-static-neutral-bluish-00);
+  --dsw-alias-label-primary: var(--dsw-static-neutral-bluish-1000);
+  --dsw-alias-label-secondary: var(--dsw-static-neutral-bluish-700);
+  --dsw-alias-label-shimmer: color-mix(in srgb, var(--dsw-static-neutral-1000) 30%, transparent);
+  --dsw-alias-label-tertiary: var(--dsw-static-neutral-bluish-600);
+  --dsw-alias-menu-icon: var(--dsw-static-neutral-bluish-800);
+  --dsw-alias-link: var(--dsw-static-deepseek-500);
+  --dsw-alias-markdown-citation: var(--dsw-static-neutral-bluish-100);
+  --dsw-alias-markdown-code-block-banner: var(--dsw-static-neutral-bluish-50);
+  --dsw-alias-markdown-code-block: var(--dsw-static-neutral-bluish-50);
+  --dsw-alias-markdown-code-segment-selected: var(--dsw-static-neutral-bluish-00);
+  --dsw-alias-markdown-code-segment-unselected: var(--dsw-static-neutral-bluish-75);
+  --dsw-alias-markdown-inline-code: var(--dsw-static-neutral-50);
+  --dsw-alias-markdown-placeholder: var(--dsw-static-neutral-bluish-60);
+  --dsw-alias-markdown-tag: var(--dsw-static-neutral-bluish-75);
+  --dsw-alias-scrollbar-bg-l1: var(--dsw-static-neutral-200);
+  --dsw-alias-scrollbar-bg-l2: var(--dsw-static-neutral-200);
+  --dsw-alias-scrollbar-hover-l1: var(--dsw-static-neutral-300);
+  --dsw-alias-scrollbar-hover-l2: var(--dsw-static-neutral-300);
+  --dsw-alias-state-business-primary: var(--dsw-static-deepseek-500);
+  --dsw-alias-state-business-tertiary: var(--dsw-static-deepseek-100);
+  --dsw-alias-code-diff-added: var(--dsw-static-green-500-a08);
+  --dsw-alias-code-diff-deleted: var(--dsw-static-red-600-a08);
+  --dsw-alias-file-diff-added-bg: rgb(230, 244, 231);
+  --dsw-alias-file-diff-added-gutter: rgb(237, 247, 237);
+  --dsw-alias-file-diff-added-marker: rgb(1, 162, 65);
+  --dsw-alias-file-diff-deleted-bg: rgb(252, 230, 226);
+  --dsw-alias-file-diff-deleted-gutter: rgb(253, 236, 233);
+  --dsw-alias-file-diff-deleted-marker: rgb(186, 39, 35);
+  --dsw-alias-state-done-primary: var(--dsw-static-violet-600);
+  --dsw-alias-state-error-primary: var(--dsw-static-red-600);
+  --dsw-alias-state-error-secondary: var(--dsw-static-red-400);
+  --dsw-alias-state-idle-primary: var(--dsw-static-neutral-300);
+  --dsw-alias-state-success-primary: var(--dsw-static-green-500);
+  --dsw-alias-state-success-secondary: var(--dsw-static-green-400);
+  --dsw-alias-state-success-tertiary: var(--dsw-static-green-100);
+  --dsw-alias-state-warn-label: var(--dsw-static-amber-600);
+  --dsw-alias-state-warn-primary: var(--dsw-static-amber-500);
+  --dsw-alias-state-warn-secondary: var(--dsw-static-amber-400);
+  --dsw-alias-state-warn-tertiary: var(--dsw-static-amber-100);
+  --dsw-alias-switch-thumb: var(--dsw-static-neutral-bluish-00);
+  --dsw-alias-toast-action: var(--dsw-static-deepseek-400);
+  --dsw-alias-toast-bg: var(--dsw-static-neutral-bluish-800);
+  --dsw-alias-toast-label: var(--dsw-static-neutral-bluish-00);
+  --dsw-alias-tooltip-bg: var(--dsw-static-neutral-bluish-850);
+  --dsw-alias-tooltip-key-bg: color-mix(in srgb, var(--dsw-alias-tooltip-bg), white 18%);
+  --dsw-alias-tooltip-label: var(--dsw-static-neutral-bluish-00);
+  --dsw-alias-trajectory-accent: var(--dsw-static-blue-500);
+  --dsw-alias-turn-trigger-bg: var(--dsw-alias-markdown-code-block);
+  --dsw-alias-turn-trigger-bg-hover: var(--dsw-alias-interactive-bg-hover);
+  --dsw-specific-bubble-highlight: var(--dsw-static-deepseek-200);
+  --dsw-specific-bubble: var(--dsw-static-deepseek-50);
+  /* Black 8% in both palettes: the upload card keeps its original track value. */
+  --dsw-specific-file-upload-track: rgba(0, 0, 0, 0.08);
+  --dsw-specific-guide-hero: var(--dsw-static-neutral-200);
+  --dsw-specific-sidebar-right-flash: var(--dsw-alias-brand-primary-new-colorprimary-new-color);
+  --dsw-specific-input-major: var(--dsw-static-neutral-bluish-00);
+  --dsw-specific-login-input: var(--dsw-static-neutral-bluish-50);
+  --dsw-menu-surface-fill: rgba(252, 253, 254, 0.7);
+  --dsw-alias-menu-group-header-fill: rgba(248, 249, 250, 0.94);
+  --dsw-specific-menu: var(--dsw-menu-surface-fill);
+  --dsw-specific-selector: var(--dsw-static-neutral-bluish-60);
+  --dsw-specific-sidebar-fill: var(--dsw-static-neutral-bluish-50);
+  --dsw-specific-sidebar-nav-item-active-accent: var(--dsw-static-deepseek-100);
+  --dsw-specific-sidebar-nav-item-active: var(--dsw-static-neutral-bluish-100);
+  --dsw-specific-tip: var(--dsw-static-neutral-bluish-60);
+
+  background-color: var(--dsw-alias-bg-base);
+}
+
+body[data-ds-dark-theme] {
+  --dsw-alias-bg-base: var(--dsw-static-neutral-bluish-950);
+  --dsw-alias-bg-document-preview: var(--dsw-static-neutral-bluish-950);
+  --dsw-alias-bg-document-selection: color-mix(in srgb, var(--dsw-static-blue-500) 40%, transparent);
+  --dsw-alias-label-document-preview: var(--dsw-static-neutral-bluish-300);
+  --dsw-alias-bg-layer-1: var(--dsw-static-neutral-bluish-875);
+  --dsw-alias-bg-layer-2: var(--dsw-static-neutral-bluish-850);
+  --dsw-alias-bg-layer-3: var(--dsw-static-neutral-bluish-800);
+  --dsw-alias-bg-mask-1: rgba(0, 0, 0, 0.5);
+  --dsw-alias-bg-mask-2: rgba(0, 0, 0, 0.2);
+  --dsw-alias-bg-mask-3: rgba(0, 0, 0, 0.48);
+  --dsw-alias-bg-mask-photo: rgba(0, 0, 0, 0.88);
+  --dsw-alias-bg-mask-drop: rgba(39, 39, 48, 0.7);
+  --dsw-alias-bg-module-platform: var(--dsw-static-neutral-bluish-800);
+  --dsw-alias-bg-multi-select: var(--dsw-static-neutral-850);
+  --dsw-alias-bg-overlay: var(--dsw-static-neutral-bluish-700);
+  --dsw-alias-bg-skeleton: rgba(255, 255, 255, 0.08);
+  --dsw-alias-border-inverted2: rgba(255, 255, 255, 0.08);
+  --dsw-alias-border-inverted: rgba(255, 255, 255, 0.06);
+  --dsw-alias-border-l1: rgba(255, 255, 255, 0.06);
+  --dsw-alias-border-l2-darkmode-thin: rgba(255, 255, 255, 0.06);
+  --dsw-alias-border-l2: rgba(255, 255, 255, 0.12);
+  --dsw-alias-border-l3: rgba(255, 255, 255, 0.16);
+  --dsw-alias-border-l4: rgba(255, 255, 255, 0.2);
+  --dsw-alias-border-selected: var(--dsw-static-neutral-bluish-400);
+  --dsw-alias-brand-primary-invert: var(--dsw-static-neutral-bluish-50);
+  --dsw-alias-brand-primary-new-colorprimary-new-color: var(--dsw-static-deepseek-450);
+  --dsw-alias-brand-primary: var(--dsw-static-neutral-bluish-50);
+  --dsw-alias-brand-text: var(--dsw-static-neutral-bluish-50);
+  --dsw-alias-button-contrast-fill: var(--dsw-static-neutral-bluish-50);
+  --dsw-alias-button-elevated-fill: var(--dsw-static-neutral-bluish-750);
+  --dsw-alias-button-floating-fill: var(--dsw-static-neutral-bluish-850);
+  --dsw-alias-button-floating-hover: var(--dsw-static-neutral-bluish-800);
+  --dsw-alias-button-ghost-active-border: var(--dsw-static-neutral-bluish-600);
+  --dsw-alias-button-ghost-active-fill: var(--dsw-static-neutral-bluish-750);
+  --dsw-alias-button-ghost-active-hover: var(--dsw-static-neutral-bluish-700);
+  --dsw-alias-button-info-fill: var(--dsw-static-deepseek-400);
+  --dsw-alias-button-info-hover: var(--dsw-static-deepseek-500);
+  --dsw-alias-button-primary-dimmed: var(--dsw-static-neutral-bluish-750);
+  --dsw-alias-button-primary-fill: var(--dsw-alias-brand-primary);
+  --dsw-alias-button-primary-hover: var(--dsw-static-neutral-bluish-100);
+  --dsw-alias-button-tool-bar-fill-invisible: rgba(31, 31, 31, 0.36);
+  --dsw-alias-button-tool-bar-fill: rgba(84, 85, 87, 0.5);
+  --dsw-alias-button-tool-bar-hover: rgba(84, 85, 87, 0.6);
+  --dsw-alias-card-fill: var(--dsw-static-neutral-850);
+  --dsw-alias-card-fill-hover: var(--dsw-static-neutral-800);
+  --dsw-alias-card-tile-fill: color-mix(in srgb, var(--dsw-static-neutral-00) 5%, transparent);
+  --dsw-alias-chart-messages: var(--dsw-static-blue-450);
+  --dsw-alias-chart-system: var(--dsw-static-neutral-bluish-400);
+  --dsw-alias-chart-tools: var(--dsw-static-violet-400);
+  --dsw-alias-hovercard-bg: var(--dsw-static-neutral-bluish-850);
+  --dsw-alias-hovercard-label-primary: var(--dsw-static-neutral-bluish-00);
+  --dsw-alias-hovercard-label-secondary: var(--dsw-static-neutral-bluish-300);
+  --dsw-alias-hovercard-label-tertiary: var(--dsw-static-neutral-bluish-400);
+  --dsw-alias-hovercard-state-done: var(--dsw-static-violet-400);
+  --dsw-alias-hovercard-state-error: var(--dsw-static-red-400);
+  --dsw-alias-illustration-background: var(--dsw-static-neutral-bluish-850);
+  --dsw-alias-illustration-backing: var(--dsw-static-neutral-bluish-750);
+  --dsw-alias-illustration-detail: var(--dsw-static-neutral-bluish-600);
+  --dsw-alias-illustration-inset: var(--dsw-alias-illustration-backing);
+  --dsw-alias-illustration-shadow: var(--dsw-alias-illustration-backing);
+  --dsw-alias-illustration-surface: var(--dsw-static-neutral-bluish-700);
+  --dsw-alias-interactive-bg-active: rgba(255, 255, 255, 0.14);
+  --dsw-alias-interactive-bg-hover-accent: rgba(255, 255, 255, 0.24);
+  --dsw-alias-interactive-bg-hover-danger: rgba(242, 90, 90, 0.15);
+  --dsw-alias-interactive-bg-hover-solid: var(--dsw-static-neutral-bluish-800);
+  --dsw-alias-interactive-bg-hover: rgba(255, 255, 255, 0.08);
+  --dsw-alias-json-tree-hover: rgb(232 234 237 / 5%);
+  --dsw-alias-json-tree-icon: #9aa0a6;
+  --dsw-alias-json-tree-keyword: #99c8ff;
+  --dsw-alias-json-tree-number: #99c8ff;
+  --dsw-alias-json-tree-property: #5db0d7;
+  --dsw-alias-json-tree-punctuation: #e8eaed;
+  --dsw-alias-json-tree-string: #f28b82;
+  --dsw-alias-label-caption: var(--dsw-static-neutral-bluish-600);
+  --dsw-alias-label-deep-diving: color-mix(in srgb, var(--dsw-static-deepseek-450) 55%, var(--dsw-static-neutral-bluish-400));
+  --dsw-alias-label-deep-diving-shimmer: color-mix(in srgb, var(--dsw-static-blue-300) 65%, var(--dsw-static-deepseek-400));
+  --dsw-alias-label-dimmed: var(--dsw-static-neutral-bluish-750);
+  --dsw-alias-label-on-color: var(--dsw-static-neutral-bluish-00);
+  --dsw-alias-label-primary-bluish: var(--dsw-static-neutral-bluish-50);
+  --dsw-alias-label-primary-dimmed: var(--dsw-static-neutral-bluish-100);
+  --dsw-alias-label-primary-foreground: var(--dsw-static-neutral-bluish-1000);
+  --dsw-alias-label-primary-inverted: var(--dsw-static-neutral-bluish-800);
+  --dsw-alias-label-primary: var(--dsw-static-neutral-bluish-50);
+  --dsw-alias-label-secondary: var(--dsw-static-neutral-bluish-300);
+  --dsw-alias-label-shimmer: color-mix(in srgb, var(--dsw-static-neutral-00) 45%, transparent);
+  --dsw-alias-label-tertiary: var(--dsw-static-neutral-bluish-400);
+  --dsw-alias-menu-icon: var(--dsw-alias-label-primary-dimmed);
+  --dsw-alias-link: var(--dsw-static-deepseek-400);
+  --dsw-alias-markdown-citation: var(--dsw-static-neutral-bluish-800);
+  --dsw-alias-markdown-code-block-banner: var(--dsw-static-neutral-bluish-850);
+  --dsw-alias-markdown-code-block: var(--dsw-static-neutral-bluish-900);
+  --dsw-alias-markdown-code-segment-selected: var(--dsw-static-neutral-bluish-800);
+  --dsw-alias-markdown-code-segment-unselected: var(--dsw-static-neutral-bluish-900);
+  --dsw-alias-markdown-inline-code: var(--dsw-static-neutral-800);
+  --dsw-alias-markdown-placeholder: var(--dsw-static-neutral-bluish-850);
+  --dsw-alias-markdown-tag: var(--dsw-static-neutral-bluish-850);
+  --dsw-alias-scrollbar-bg-l1: var(--dsw-static-neutral-700);
+  --dsw-alias-scrollbar-bg-l2: var(--dsw-static-neutral-600);
+  --dsw-alias-scrollbar-hover-l1: var(--dsw-static-neutral-600);
+  --dsw-alias-scrollbar-hover-l2: var(--dsw-static-neutral-550);
+  --dsw-alias-state-business-primary: var(--dsw-static-deepseek-400);
+  --dsw-alias-state-business-tertiary: var(--dsw-static-deepseek-800);
+  --dsw-alias-code-diff-added: var(--dsw-static-green-500-a12);
+  --dsw-alias-code-diff-deleted: var(--dsw-static-red-400-a12);
+  --dsw-alias-file-diff-added-bg: rgb(31, 49, 36);
+  --dsw-alias-file-diff-added-gutter: rgb(19, 32, 22);
+  --dsw-alias-file-diff-added-marker: rgb(65, 201, 119);
+  --dsw-alias-file-diff-deleted-bg: rgb(60, 31, 27);
+  --dsw-alias-file-diff-deleted-gutter: rgb(40, 19, 14);
+  --dsw-alias-file-diff-deleted-marker: rgb(250, 66, 62);
+  --dsw-alias-state-done-primary: var(--dsw-static-violet-400);
+  --dsw-alias-state-error-primary: var(--dsw-static-red-400);
+  --dsw-alias-state-error-secondary: var(--dsw-static-red-400);
+  --dsw-alias-state-idle-primary: var(--dsw-static-neutral-600);
+  --dsw-alias-state-success-primary: var(--dsw-static-green-500);
+  --dsw-alias-state-success-secondary: var(--dsw-static-green-400);
+  --dsw-alias-state-success-tertiary: var(--dsw-static-green-900);
+  --dsw-alias-state-warn-label: var(--dsw-static-amber-600);
+  --dsw-alias-state-warn-primary: var(--dsw-static-amber-500);
+  --dsw-alias-state-warn-secondary: var(--dsw-static-amber-400);
+  --dsw-alias-state-warn-tertiary: var(--dsw-static-amber-900);
+  --dsw-alias-switch-thumb: var(--dsw-static-neutral-bluish-400);
+  --dsw-alias-toast-action: var(--dsw-static-deepseek-400);
+  --dsw-alias-toast-bg: var(--dsw-static-neutral-bluish-750);
+  --dsw-alias-toast-label: var(--dsw-static-neutral-bluish-00);
+  --dsw-alias-turn-trigger-bg: var(--dsw-alias-interactive-bg-hover);
+  --dsw-alias-turn-trigger-bg-hover: var(--dsw-alias-interactive-bg-active);
+  --dsw-alias-tooltip-bg: var(--dsw-static-neutral-bluish-750);
+  --dsw-alias-tooltip-key-bg: color-mix(in srgb, var(--dsw-alias-tooltip-bg), white 18%);
+  --dsw-alias-tooltip-label: var(--dsw-static-neutral-bluish-00);
+  --dsw-alias-trajectory-accent: var(--dsw-static-blue-500);
+  --dsw-specific-bubble-highlight: var(--dsw-static-neutral-bluish-750);
+  --dsw-specific-bubble: var(--dsw-static-neutral-bluish-850);
+  --dsw-specific-file-upload-track: rgba(0, 0, 0, 0.08);
+  --dsw-specific-guide-hero: var(--dsw-static-neutral-700);
+  --dsw-specific-sidebar-right-flash: var(--dsw-static-neutral-00);
+  --dsw-specific-input-major: var(--dsw-static-neutral-bluish-850);
+  --dsw-specific-login-input: var(--dsw-static-neutral-bluish-900);
+  --dsw-menu-surface-fill: rgba(48, 49, 54, 0.64);
+  --dsw-alias-menu-group-header-fill: rgba(48, 49, 54, 0.94);
+  --dsw-specific-menu: var(--dsw-menu-surface-fill);
+  --dsw-specific-selector: var(--dsw-static-neutral-bluish-800);
+  --dsw-specific-sidebar-fill: var(--dsw-static-neutral-bluish-900);
+  --dsw-specific-sidebar-nav-item-active-accent: var(--dsw-static-neutral-bluish-800);
+  --dsw-specific-sidebar-nav-item-active: var(--dsw-static-neutral-bluish-750);
+  --dsw-specific-tip: var(--dsw-static-neutral-bluish-800);
+}
+
+/* Overlays without MenuSurface's opaque backing cannot blur page content over
+ * native vibrancy reliably, so their fill stays nearly opaque on macOS. */
+html[data-platform='darwin'] body {
+  --dsw-specific-menu: rgba(248, 249, 250, 0.94);
+}
+
+html[data-platform='darwin'] body[data-ds-dark-theme] {
+  --dsw-specific-menu: rgba(48, 49, 54, 0.94);
+}
+
+/* macOS vibrancy sidebar: glass control fills (the collapsed rail drops the
+ * light fill but keeps the dark one), the column's top and bottom
+ * washes with their fully transparent ends, and its translucent tint. Dark drops the tint's blue cast (it reads
+ * purple over dark fills) and thins it so more wallpaper shows. */
+html[data-platform='darwin'] body {
+  --dsw-specific-sidebar-glass-collapsed-fill: transparent;
+  --dsw-specific-sidebar-glass-collapsed-hover: var(--dsw-alias-interactive-bg-hover);
+  --dsw-specific-sidebar-glass-fill: rgb(255 255 255 / 0.55);
+  --dsw-specific-sidebar-glass-hover: rgb(255 255 255 / 0.3);
+  --dsw-specific-sidebar-tint: color-mix(in srgb, color-mix(in srgb, var(--dsw-specific-sidebar-fill) 97%, rgb(122 155 240)) 40%, transparent);
+  --dsw-specific-sidebar-wash-bottom: rgb(143 137 184 / 0.09);
+  --dsw-specific-sidebar-wash-bottom-clear: rgb(143 137 184 / 0);
+  --dsw-specific-sidebar-wash-top: rgb(122 155 240 / 0.1);
+  --dsw-specific-sidebar-wash-top-clear: rgb(122 155 240 / 0);
+}
+
+html[data-platform='darwin'] body[data-ds-dark-theme] {
+  --dsw-specific-sidebar-glass-collapsed-fill: var(--dsw-specific-sidebar-glass-fill);
+  --dsw-specific-sidebar-glass-collapsed-hover: var(--dsw-specific-sidebar-glass-hover);
+  --dsw-specific-sidebar-glass-fill: rgb(255 255 255 / 0.15);
+  --dsw-specific-sidebar-glass-hover: rgb(255 255 255 / 0.2);
+  --dsw-specific-sidebar-tint: color-mix(in srgb, var(--dsw-specific-sidebar-fill) 50%, transparent);
+  --dsw-specific-sidebar-wash-bottom: rgb(143 137 184 / 0.07);
+  --dsw-specific-sidebar-wash-top: rgb(122 155 240 / 0.08);
+}
+/* === end of design-platform.css === */
+
+/* --- mockup-only layout (no visual tokens) --- */
+* { box-sizing: border-box; }
+html, body { width: 100%; height: 100%; margin: 0; padding: 0; }
+.app-frame { display: grid; grid-template-columns: 280px minmax(0, 1fr) 296px; width: 100%; height: 100vh; }
+.app-frame.no-right { grid-template-columns: 280px minmax(0, 1fr) 0; }
+.sidebar { display: flex; flex-direction: column; height: 100vh; min-height: 0; overflow-y: auto; }
+.rightbar { display: flex; flex-direction: column; height: 100vh; min-height: 0; overflow-y: auto; }
+.main-col { display: flex; flex-direction: column; height: 100vh; min-width: 0; min-height: 0; }
+.main-scroll { flex: 1; min-height: 0; overflow-y: auto; }
+.page { width: 100%; max-width: 1040px; margin: 0 auto; padding: 28px 32px 72px; }
+.row { display: flex; align-items: center; }
+.row-top { display: flex; align-items: flex-start; }
+.between { display: flex; align-items: center; justify-content: space-between; }
+.col { display: flex; flex-direction: column; }
+.g2 { display: flex; gap: 8px; }
+.g4 { display: flex; gap: 4px; }
+.g6 { display: flex; gap: 6px; }
+.g12 { display: flex; flex-direction: column; gap: 12px; }
+.g16 { display: flex; flex-direction: column; gap: 16px; }
+.grow { flex: 1; min-width: 0; }
+.wrap { flex-wrap: wrap; }
+.card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(296px, 1fr)); gap: 12px; }
+.field-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+.field { display: flex; flex-direction: column; gap: 6px; }
+.skel-line { width: 100%; height: 10px; }
+.switch { position: relative; display: inline-flex; align-items: center; width: 34px; height: 20px; padding: 2px; flex: none; }
+.switch-thumb { position: absolute; top: 2px; left: 2px; width: 16px; height: 16px; }
+.switch.on .switch-thumb { transform: translateX(14px); }
+.overlay { position: fixed; inset: 0; z-index: 60; display: flex; align-items: center; justify-content: center; padding: 24px; }
+.dialog { width: min(560px, 100%); max-height: 84vh; overflow-y: auto; }
+.drawer { position: fixed; top: 0; right: 0; height: 100vh; width: 360px; max-width: 100%; overflow-y: auto; z-index: 70; }
+.toast-stack { position: fixed; right: 24px; bottom: 24px; z-index: 90; display: flex; flex-direction: column; gap: 8px; align-items: flex-end; }
+.dev-toggle { position: fixed; top: 10px; right: 12px; z-index: 100; }
+.qr-grid { display: grid; grid-template-columns: repeat(11, 9px); grid-template-rows: repeat(11, 9px); gap: 0; width: max-content; }
+.qr-cell { width: 9px; height: 9px; }
+.hide { display: none; }
+.table { display: grid; grid-template-columns: 1.35fr 1fr .72fr 1.25fr .9fr 1.15fr auto; align-items: center; gap: 10px; }
+.tabs { display: flex; align-items: center; gap: 4px; }
+.section-rule { width: 100%; height: 0.5px; }
+.code-chip { display: inline-block; }
+@media (max-width: 1100px) { .app-frame { grid-template-columns: 280px minmax(0, 1fr) 0; } }
+@media (max-width: 768px) {
+  .app-frame, .app-frame.no-right { grid-template-columns: minmax(0, 1fr); }
+  .sidebar, .rightbar { display: none; }
+  .page { padding-left: 20px; padding-right: 20px; }
+  .field-grid { grid-template-columns: minmax(0, 1fr); }
+  .table { grid-template-columns: minmax(0, 1fr); }
+}
+</style>
+</head>
+<body style="font-family:var(--dsw-font-family);font-size:13px;line-height:1.5;color:var(--dsw-alias-label-primary);background-color:var(--dsw-alias-bg-base)">
+
+<!-- Mockup-only dev controls: theme toggle + state-variant entry (not product UI). -->
+<div class="dev-toggle row g4">
+  <button data-action="toggle-theme" id="themeToggle" style="padding:6px 10px;border:0.5px solid var(--dsw-alias-border-l2);border-radius:var(--dsw-radius-sm);background-color:var(--dsw-alias-button-elevated-fill);color:var(--dsw-alias-label-secondary);font-family:var(--dsw-font-family);font-size:11px">切换暗色主题</button>
+  <button data-action="open-variants" style="padding:6px 10px;border:0.5px solid var(--dsw-alias-border-l2);border-radius:var(--dsw-radius-sm);background-color:var(--dsw-alias-button-elevated-fill);color:var(--dsw-alias-label-secondary);font-family:var(--dsw-font-family);font-size:11px">状态变体 · 10</button>
+</div>
+
+<div class="app-frame" id="appFrame">
+
+  <!-- ============ DSH native sidebar (280px) ============ -->
+  <aside class="sidebar" style="background-color:var(--dsw-specific-sidebar-fill);border-right:0.5px solid var(--dsw-alias-border-l1)">
+    <div class="col" style="padding:18px 14px 8px;gap:14px">
+      <div class="row" style="gap:10px">
+        <div class="row" style="width:28px;height:28px;align-items:center;justify-content:center;border-radius:var(--dsw-radius-sm);background-color:var(--dsw-alias-brand-primary);color:var(--dsw-alias-label-primary-foreground);font-weight:600">D</div>
+        <div class="col" style="gap:0">
+          <span style="font-size:13px;font-weight:600;color:var(--dsw-alias-label-primary)">DeepSeek</span>
+          <span style="font-size:11px;color:var(--dsw-alias-label-caption)">Personal workspace</span>
+        </div>
+        <span class="grow"></span>
+        <span style="font-size:11px;color:var(--dsw-alias-label-caption)">⌄</span>
+      </div>
+      <button data-action="new-session" style="width:100%;padding:8px 10px;display:flex;align-items:center;gap:8px;border:0.5px solid var(--dsw-alias-border-l2);border-radius:var(--dsw-radius-sm);background-color:var(--dsw-alias-button-elevated-fill);color:var(--dsw-alias-label-primary);font-family:var(--dsw-font-family);font-size:12px;text-align:left">
+        <span style="font-size:14px">＋</span> New session
+      </button>
+    </div>
+
+    <div class="col" style="padding:6px 10px;gap:18px">
+      <div class="col" style="gap:2px">
+        <div style="padding:6px 10px;font-size:10px;letter-spacing:.08em;color:var(--dsw-alias-label-caption)">SESSIONS</div>
+        <button class="nav-item row" data-action="nav" data-target="session" style="gap:10px;min-height:34px;padding:6px 10px;width:100%;border:0;border-radius:var(--dsw-radius-sm);background-color:transparent;color:var(--dsw-alias-label-secondary);font-family:var(--dsw-font-family);font-size:12px;text-align:left"><span>◷</span><span class="grow">Harmony 网关联调</span></button>
+        <button class="nav-item row" data-action="nav" data-target="session" style="gap:10px;min-height:34px;padding:6px 10px;width:100%;border:0;border-radius:var(--dsw-radius-sm);background-color:transparent;color:var(--dsw-alias-label-secondary);font-family:var(--dsw-font-family);font-size:12px;text-align:left"><span>◷</span><span class="grow">移动端访问排障</span></button>
+        <button class="nav-item row" data-action="nav" data-target="session" style="gap:10px;min-height:34px;padding:6px 10px;width:100%;border:0;border-radius:var(--dsw-radius-sm);background-color:transparent;color:var(--dsw-alias-label-secondary);font-family:var(--dsw-font-family);font-size:12px;text-align:left"><span>◷</span><span class="grow">每日构建巡检</span></button>
+      </div>
+      <div class="col" style="gap:2px">
+        <div style="padding:6px 10px;font-size:10px;letter-spacing:.08em;color:var(--dsw-alias-label-caption)">WORKSPACE</div>
+        <button class="nav-item row" data-action="nav" data-target="session" style="gap:10px;min-height:34px;padding:6px 10px;width:100%;border:0;border-radius:var(--dsw-radius-sm);background-color:transparent;color:var(--dsw-alias-label-secondary);font-family:var(--dsw-font-family);font-size:12px;text-align:left"><span>▤</span><span class="grow">Files</span></button>
+        <button class="nav-item row" data-action="nav" data-target="session" style="gap:10px;min-height:34px;padding:6px 10px;width:100%;border:0;border-radius:var(--dsw-radius-sm);background-color:transparent;color:var(--dsw-alias-label-secondary);font-family:var(--dsw-font-family);font-size:12px;text-align:left"><span>⌘</span><span class="grow">Terminal</span></button>
+        <button class="nav-item row" data-action="nav" data-target="plugins" id="navPlugins" style="gap:10px;min-height:34px;padding:6px 10px;width:100%;border:0;border-radius:var(--dsw-radius-sm);background-color:var(--dsw-specific-sidebar-nav-item-active);color:var(--dsw-alias-label-primary);font-family:var(--dsw-font-family);font-size:12px;font-weight:500;text-align:left">
+          <span style="color:var(--dsw-alias-state-business-primary)">⊞</span><span class="grow">Plugins</span><span style="font-size:10px;color:var(--dsw-alias-label-caption)">1</span>
+        </button>
+      </div>
+      <div class="col" style="gap:2px">
+        <div style="padding:6px 10px;font-size:10px;letter-spacing:.08em;color:var(--dsw-alias-label-caption)">GENERAL</div>
+        <button class="nav-item row" data-action="nav" data-target="settings" style="gap:10px;min-height:34px;padding:6px 10px;width:100%;border:0;border-radius:var(--dsw-radius-sm);background-color:transparent;color:var(--dsw-alias-label-secondary);font-family:var(--dsw-font-family);font-size:12px;text-align:left"><span>⚙</span><span class="grow">Settings</span></button>
+      </div>
+    </div>
+
+    <div class="grow"></div>
+    <div class="row" style="gap:10px;padding:12px 14px;border-top:0.5px solid var(--dsw-alias-border-l1)">
+      <div class="row" style="width:26px;height:26px;align-items:center;justify-content:center;border-radius:var(--dsw-radius-xl);background-color:var(--dsw-alias-markdown-tag);color:var(--dsw-alias-label-secondary);font-size:11px">L</div>
+      <div class="col"><span style="font-size:11px;color:var(--dsw-alias-label-primary)">lin@example.local</span><span style="font-size:10px;color:var(--dsw-alias-label-caption)">Local profile</span></div>
+    </div>
+  </aside>
+
+  <!-- ============ DSH main panel ============ -->
+  <main class="main-col">
+    <div class="main-scroll" id="mainScroll">
+
+      <!-- ---------- Plugins list ---------- -->
+      <section id="view-plugins" class="page">
+        <div class="row-top" style="justify-content:space-between;gap:16px">
+          <div class="col" style="gap:6px;min-width:0">
+            <div class="row" style="gap:8px">
+              <h1 style="margin:0;font-size:22px;line-height:1.3;font-weight:600;color:var(--dsw-alias-label-primary)">Plugins</h1>
+              <button data-action="info" aria-label="About this page" style="width:20px;height:20px;padding:0;border:0;border-radius:var(--dsw-radius-xs);background-color:transparent;color:var(--dsw-alias-label-caption);font-family:var(--dsw-font-family);font-size:11px">ⓘ</button>
+            </div>
+            <p id="infoLine" style="margin:0;font-size:12px;color:var(--dsw-alias-label-secondary)">Configure official plugins, and install, manage, and configure other plugins in this profile.</p>
+            <div id="infoTip" class="hide" style="max-width:520px;padding:8px 10px;border-radius:var(--dsw-radius-sm);background-color:var(--dsw-alias-tooltip-bg);color:var(--dsw-alias-tooltip-label);font-size:11px">This page is a shipped global panel of the DSH Web SPA. Settings → Plugins (settings.section id “plugins”, order 15) opens the same list.</div>
+          </div>
+          <div class="row g6" style="flex:none;position:relative;padding-top:2px">
+            <button data-action="refresh" id="refreshBtn" style="padding:7px 12px;border:0.5px solid var(--dsw-alias-border-l2);border-radius:var(--dsw-radius-sm);background-color:var(--dsw-alias-button-elevated-fill);color:var(--dsw-alias-label-primary);font-family:var(--dsw-font-family);font-size:12px;white-space:nowrap">Refresh</button>
+            <div class="row" style="border-radius:var(--dsw-radius-sm);background-color:var(--dsw-alias-button-primary-fill);color:var(--dsw-alias-label-primary-foreground)">
+              <button data-action="add-plugin" style="padding:7px 10px;border:0;background-color:transparent;color:var(--dsw-alias-label-primary-foreground);font-family:var(--dsw-font-family);font-size:12px">Add plugin</button>
+              <span style="width:0.5px;height:16px;background-color:var(--dsw-alias-border-inverted)"></span>
+              <button data-action="add-menu" aria-label="Choose how to add a plugin" style="padding:7px 8px;border:0;background-color:transparent;color:var(--dsw-alias-label-primary-foreground);font-family:var(--dsw-font-family);font-size:11px">▾</button>
+            </div>
+            <div id="addMenu" class="hide col" style="position:absolute;top:38px;right:0;z-index:20;width:250px;padding:5px;border:0;border-radius:var(--dsw-radius-md);background-color:var(--dsw-specific-menu)">
+              <button data-action="menu-action" data-name="Install a third-party plugin" style="padding:8px 10px;border:0;border-radius:var(--dsw-radius-xs);background-color:transparent;color:var(--dsw-alias-label-primary);font-family:var(--dsw-font-family);font-size:12px;text-align:left">Install a third-party plugin</button>
+              <button data-action="menu-action" data-name="Let the agent create a plugin" style="padding:8px 10px;border:0;border-radius:var(--dsw-radius-xs);background-color:transparent;color:var(--dsw-alias-label-primary);font-family:var(--dsw-font-family);font-size:12px;text-align:left">Let the agent create a plugin</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="tabs" style="margin-top:18px;gap:18px;border-bottom:0.5px solid var(--dsw-alias-border-l1)">
+          <button data-action="tab" data-tab="installed" id="tabInstalled" style="padding:8px 2px;border:0;border-bottom:2px solid var(--dsw-alias-brand-primary);background-color:transparent;color:var(--dsw-alias-label-primary);font-family:var(--dsw-font-family);font-size:12px;font-weight:500">Installed</button>
+          <button data-action="tab" data-tab="discover" id="tabDiscover" style="padding:8px 2px;border:0;border-bottom:2px solid transparent;background-color:transparent;color:var(--dsw-alias-label-secondary);font-family:var(--dsw-font-family);font-size:12px">Discover</button>
+        </div>
+
+        <!-- client sync status bar: present in every view of the page -->
+        <div id="syncSyncing" class="row" style="gap:10px;margin-top:16px;padding:10px 12px;border-radius:var(--dsw-radius-sm);background-color:var(--dsw-alias-state-business-tertiary);color:var(--dsw-alias-state-business-primary);font-size:12px">
+          <span style="font-size:12px">↻</span><span>Syncing plugins on this page…</span><span class="grow"></span><span style="font-size:11px">ctx.modules.entries.state = running</span>
+        </div>
+        <div id="syncFailure" class="hide" style="margin-top:16px;padding:12px;border:1px solid var(--dsw-alias-state-error-primary);border-radius:var(--dsw-radius-sm);background-color:var(--dsw-alias-bg-layer-2)">
+          <div style="font-size:12px;font-weight:600;color:var(--dsw-alias-state-error-primary)">Some plugins could not sync on this page</div>
+          <div style="margin-top:4px;font-size:11px;color:var(--dsw-alias-label-secondary)">Host enablement was not changed. Failures:</div>
+          <div style="margin-top:6px;font-family:var(--ds-font-family-code);font-size:11px;color:var(--dsw-alias-label-primary)">dsh-harmony#pairing: browser bridge unavailable</div>
+          <div style="font-family:var(--ds-font-family-code);font-size:11px;color:var(--dsw-alias-label-primary)">ui-plugin-market: registry read timed out</div>
+          <button data-action="retry-sync" style="margin-top:10px;padding:5px 10px;border:0.5px solid var(--dsw-alias-border-l2);border-radius:var(--dsw-radius-sm);background-color:var(--dsw-alias-button-elevated-fill);color:var(--dsw-alias-label-primary);font-family:var(--dsw-font-family);font-size:11px">Retry this page</button>
+        </div>
+        <div id="syncDone" class="hide row" style="gap:8px;margin-top:16px;padding:10px 12px;border-radius:var(--dsw-radius-sm);background-color:var(--dsw-alias-state-success-tertiary);color:var(--dsw-alias-state-success-primary);font-size:12px">
+          <span>✓</span><span>Client plugins on this page are in sync.</span><span class="grow"></span><span style="font-size:11px">1 update available</span>
+        </div>
+
+        <div id="installedContent" style="margin-top:26px">
+          <div class="col" style="gap:8px">
+            <div class="row" style="gap:8px"><h2 style="margin:0;font-size:14px;font-weight:600;color:var(--dsw-alias-label-primary)">Built-in plugin settings</h2><span style="font-size:11px;color:var(--dsw-alias-label-caption)">4</span></div>
+            <div class="col" style="border-radius:var(--dsw-radius-md);background-color:var(--dsw-alias-card-fill);border:0.5px solid var(--dsw-alias-border-l1)">
+              <div class="row between" style="padding:10px 14px"><div class="row" style="gap:10px"><span style="color:var(--dsw-alias-label-secondary)">◇</span><span style="font-size:12px">Subagent</span></div><button data-action="official" data-name="Subagent" style="border:0;background-color:transparent;color:var(--dsw-alias-link);font-family:var(--dsw-font-family);font-size:11px;font-weight:500">Configure</button></div>
+              <div class="section-rule" style="background-color:var(--dsw-alias-border-l1)"></div>
+              <div class="row between" style="padding:10px 14px"><div class="row" style="gap:10px"><span style="color:var(--dsw-alias-label-secondary)">◇</span><span style="font-size:12px">web search and fetch</span></div><button data-action="official" data-name="web search and fetch" style="border:0;background-color:transparent;color:var(--dsw-alias-link);font-family:var(--dsw-font-family);font-size:11px;font-weight:500">Configure</button></div>
+              <div class="section-rule" style="background-color:var(--dsw-alias-border-l1)"></div>
+              <div class="row between" style="padding:10px 14px"><div class="row" style="gap:10px"><span style="color:var(--dsw-alias-label-secondary)">◇</span><span style="font-size:12px">agent loop</span></div><button data-action="official" data-name="agent loop" style="border:0;background-color:transparent;color:var(--dsw-alias-link);font-family:var(--dsw-font-family);font-size:11px;font-weight:500">Configure</button></div>
+              <div class="section-rule" style="background-color:var(--dsw-alias-border-l1)"></div>
+              <div class="row between" style="padding:10px 14px"><div class="row" style="gap:10px"><span style="color:var(--dsw-alias-label-secondary)">◇</span><span style="font-size:12px">shell</span></div><button data-action="official" data-name="shell" style="border:0;background-color:transparent;color:var(--dsw-alias-link);font-family:var(--dsw-font-family);font-size:11px;font-weight:500">Configure</button></div>
+            </div>
+          </div>
+
+          <div class="col" style="gap:10px;margin-top:26px">
+            <div class="row" style="gap:8px"><h2 style="margin:0;font-size:14px;font-weight:600;color:var(--dsw-alias-label-primary)">Experimental plugins</h2><button data-action="more" style="border:0;background-color:transparent;color:var(--dsw-alias-link);font-family:var(--dsw-font-family);font-size:11px;font-weight:500">More</button></div>
+            <div class="card-grid">
+              <div class="col" style="gap:12px;padding:14px;border-radius:var(--dsw-radius-md);background-color:var(--dsw-alias-card-fill);border:0.5px solid var(--dsw-alias-border-l1)">
+                <div class="row" style="gap:10px"><div class="row" style="width:36px;height:36px;flex:none;align-items:center;justify-content:center;border-radius:var(--dsw-radius-sm);background-color:var(--dsw-alias-markdown-tag);color:var(--dsw-alias-label-secondary);font-weight:600">H</div><div class="col grow" style="gap:2px"><span style="font-size:13px;font-weight:600;color:var(--dsw-alias-label-primary)">dsh-harmony</span><span style="font-size:11px;color:var(--dsw-alias-label-caption)">0.1.0 · Built in</span></div><span style="padding:2px 7px;border-radius:var(--dsw-radius-xs);background-color:var(--dsw-alias-state-warn-tertiary);color:var(--dsw-alias-state-warn-label);font-size:10px">Experimental</span></div>
+                <div style="font-size:12px;color:var(--dsw-alias-label-secondary);min-height:36px">Harmony 移动端安全访问网关与配对管理插件。</div>
+                <div class="row between"><button data-action="open-detail" style="border:0;background-color:transparent;color:var(--dsw-alias-link);font-family:var(--dsw-font-family);font-size:11px;font-weight:500">View details →</button><span style="font-size:11px;color:var(--dsw-alias-label-caption)">In Experimental + Installed</span></div>
+              </div>
+              <div class="col" style="gap:12px;padding:14px;border-radius:var(--dsw-radius-md);background-color:var(--dsw-alias-card-fill);border:0.5px solid var(--dsw-alias-border-l1)">
+                <div class="row" style="gap:10px"><div class="row" style="width:36px;height:36px;flex:none;align-items:center;justify-content:center;border-radius:var(--dsw-radius-sm);background-color:var(--dsw-alias-markdown-tag);color:var(--dsw-alias-label-secondary);font-weight:600">M</div><div class="col grow" style="gap:2px"><span style="font-size:13px;font-weight:600;color:var(--dsw-alias-label-primary)">ui-plugin-market</span><span style="font-size:11px;color:var(--dsw-alias-label-caption)">0.4.1 · registry</span></div><span style="padding:2px 7px;border-radius:var(--dsw-radius-xs);background-color:var(--dsw-alias-state-warn-tertiary);color:var(--dsw-alias-state-warn-label);font-size:10px">Experimental</span></div>
+                <div style="font-size:12px;color:var(--dsw-alias-label-secondary);min-height:36px">Adds the Discover tab with registry catalog entries.</div>
+                <div class="row between"><button data-action="official" data-name="ui-plugin-market" style="border:0;background-color:transparent;color:var(--dsw-alias-link);font-family:var(--dsw-font-family);font-size:11px;font-weight:500">View details →</button><span style="font-size:11px;color:var(--dsw-alias-label-caption)">Contributes plugins.tab</span></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="col" style="gap:10px;margin-top:26px">
+            <div class="row" style="gap:8px"><h2 style="margin:0;font-size:14px;font-weight:600;color:var(--dsw-alias-label-primary)">Installed plugins</h2><span style="font-size:11px;color:var(--dsw-alias-label-caption)">1 bundle</span></div>
+            <div id="installedCard" class="card-grid">
+              <div class="col" style="gap:12px;padding:14px;border-radius:var(--dsw-radius-md);background-color:var(--dsw-alias-card-fill);border:0.5px solid var(--dsw-alias-border-l1)">
+                <div class="row" style="gap:10px">
+                  <div class="row" style="width:36px;height:36px;flex:none;align-items:center;justify-content:center;border-radius:var(--dsw-radius-sm);background-color:var(--dsw-alias-markdown-tag);color:var(--dsw-alias-label-secondary);font-weight:600">H</div>
+                  <button data-action="open-detail" class="col grow" style="gap:2px;border:0;background-color:transparent;text-align:left;font-family:var(--dsw-font-family);padding:0">
+                    <span style="font-size:13px;font-weight:600;color:var(--dsw-alias-link)">dsh-harmony</span>
+                    <span style="font-size:11px;color:var(--dsw-alias-label-caption)">dsh-harmony · 0.1.0</span>
+                  </button>
+                  <button class="switch on" id="cardSwitch" data-action="bundle-switch" role="switch" aria-checked="true" aria-label="Enable dsh-harmony" style="border:0;border-radius:var(--dsw-radius-xl);background-color:var(--dsw-alias-button-primary-fill)"><span class="switch-thumb" style="border-radius:var(--dsw-radius-xl);background-color:var(--dsw-alias-switch-thumb)"></span></button>
+                </div>
+                <div style="font-size:12px;color:var(--dsw-alias-label-secondary)">Harmony 移动端安全访问网关与配对管理插件。</div>
+                <div class="row wrap" style="gap:6px">
+                  <span style="padding:2px 7px;border-radius:var(--dsw-radius-xs);background-color:var(--dsw-alias-state-warn-tertiary);color:var(--dsw-alias-state-warn-label);font-size:10px">Experimental</span>
+                  <span style="padding:2px 7px;border-radius:var(--dsw-radius-xs);background-color:var(--dsw-alias-state-business-tertiary);color:var(--dsw-alias-state-business-primary);font-size:10px">Update available</span>
+                </div>
+                <div class="row between" style="border-top:0.5px solid var(--dsw-alias-border-l1);padding-top:10px">
+                  <span id="cardConfigureWrap"><button data-action="open-config" style="padding:5px 10px;border:0.5px solid var(--dsw-alias-border-l2);border-radius:var(--dsw-radius-sm);background-color:var(--dsw-alias-button-elevated-fill);color:var(--dsw-alias-label-primary);font-family:var(--dsw-font-family);font-size:11px">Configure</button></span>
+                  <span style="font-size:11px;color:var(--dsw-alias-label-caption)">Bundle switch changes layer selection</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- first-load skeleton demo -->
+          <div class="col" style="gap:10px;margin-top:26px">
+            <div class="row" style="gap:8px"><h2 style="margin:0;font-size:14px;font-weight:600;color:var(--dsw-alias-label-primary)">Loading preview</h2><span style="font-size:11px;color:var(--dsw-alias-label-caption)">first list read · short group placeholder + 4 skeleton cards · action area blank</span></div>
+            <div class="card-grid">
+              <div class="col" style="gap:10px;padding:14px;border-radius:var(--dsw-radius-md);background-color:var(--dsw-alias-card-fill);border:0.5px solid var(--dsw-alias-border-l1)"><div class="skel-line" style="border-radius:var(--dsw-radius-xs);background-color:var(--dsw-alias-bg-skeleton)"></div><div class="skel-line" style="width:62%;border-radius:var(--dsw-radius-xs);background-color:var(--dsw-alias-bg-skeleton)"></div><div class="skel-line" style="border-radius:var(--dsw-radius-xs);background-color:var(--dsw-alias-bg-skeleton)"></div></div>
+              <div class="col" style="gap:10px;padding:14px;border-radius:var(--dsw-radius-md);background-color:var(--dsw-alias-card-fill);border:0.5px solid var(--dsw-alias-border-l1)"><div class="skel-line" style="border-radius:var(--dsw-radius-xs);background-color:var(--dsw-alias-bg-skeleton)"></div><div class="skel-line" style="width:62%;border-radius:var(--dsw-radius-xs);background-color:var(--dsw-alias-bg-skeleton)"></div><div class="skel-line" style="border-radius:var(--dsw-radius-xs);background-color:var(--dsw-alias-bg-skeleton)"></div></div>
+              <div class="col" style="gap:10px;padding:14px;border-radius:var(--dsw-radius-md);background-color:var(--dsw-alias-card-fill);border:0.5px solid var(--dsw-alias-border-l1)"><div class="skel-line" style="border-radius:var(--dsw-radius-xs);background-color:var(--dsw-alias-bg-skeleton)"></div><div class="skel-line" style="width:62%;border-radius:var(--dsw-radius-xs);background-color:var(--dsw-alias-bg-skeleton)"></div><div class="skel-line" style="border-radius:var(--dsw-radius-xs);background-color:var(--dsw-alias-bg-skeleton)"></div></div>
+              <div class="col" style="gap:10px;padding:14px;border-radius:var(--dsw-radius-md);background-color:var(--dsw-alias-card-fill);border:0.5px solid var(--dsw-alias-border-l1)"><div class="skel-line" style="border-radius:var(--dsw-radius-xs);background-color:var(--dsw-alias-bg-skeleton)"></div><div class="skel-line" style="width:62%;border-radius:var(--dsw-radius-xs);background-color:var(--dsw-alias-bg-skeleton)"></div><div class="skel-line" style="border-radius:var(--dsw-radius-xs);background-color:var(--dsw-alias-bg-skeleton)"></div></div>
+            </div>
+          </div>
+        </div>
+
+        <div id="discoverContent" class="hide col" style="gap:12px;margin-top:26px">
+          <div style="font-size:12px;color:var(--dsw-alias-label-secondary)">Contributed by the <code style="font-family:var(--ds-font-family-code);color:var(--dsw-alias-link)">plugins.tab</code> list slot. Refresh and Add plugin are hidden on contributed tabs.</div>
+          <div class="card-grid">
+            <div class="col" style="gap:8px;padding:14px;border-radius:var(--dsw-radius-md);background-color:var(--dsw-alias-card-fill);border:0.5px solid var(--dsw-alias-border-l1)"><span style="font-size:13px;font-weight:600">ui-plugin-market · 0.4.1</span><span style="font-size:12px;color:var(--dsw-alias-label-secondary)">Registry catalog and Discover tab for the Plugins page.</span></div>
+            <div class="col" style="gap:8px;padding:14px;border-radius:var(--dsw-radius-md);background-color:var(--dsw-alias-card-fill);border:0.5px solid var(--dsw-alias-border-l1)"><span style="font-size:13px;font-weight:600">cordis-schedule · 0.3.2</span><span style="font-size:12px;color:var(--dsw-alias-label-secondary)">Scheduled tasks as Cordis rows in the active profile.</span></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ---------- Bundle detail ---------- -->
+      <section id="view-detail" class="page hide">
+        <div class="row" style="gap:8px;font-size:11px;color:var(--dsw-alias-label-caption)">
+          <button data-action="back-list" style="border:0;background-color:transparent;color:var(--dsw-alias-link);font-family:var(--dsw-font-family);font-size:11px">Plugins</button><span>›</span><span>dsh-harmony</span>
+        </div>
+        <div class="row-top" style="gap:14px;margin-top:18px">
+          <div class="row" style="width:44px;height:44px;flex:none;align-items:center;justify-content:center;border-radius:var(--dsw-radius-md);background-color:var(--dsw-alias-markdown-tag);color:var(--dsw-alias-label-secondary);font-weight:600">H</div>
+          <div class="col grow" style="gap:6px">
+            <div class="row wrap" style="gap:8px"><h1 style="margin:0;font-size:20px;font-weight:600">dsh-harmony</h1><span style="padding:2px 7px;border-radius:var(--dsw-radius-xs);background-color:var(--dsw-alias-markdown-tag);color:var(--dsw-alias-label-secondary);font-size:10px">0.1.0</span><span style="padding:2px 7px;border-radius:var(--dsw-radius-xs);background-color:var(--dsw-alias-state-warn-tertiary);color:var(--dsw-alias-state-warn-label);font-size:10px">Experimental</span><span style="padding:2px 7px;border-radius:var(--dsw-radius-xs);background-color:var(--dsw-alias-state-business-tertiary);color:var(--dsw-alias-state-business-primary);font-size:10px">plugins.detail.badge · demo</span></div>
+            <div style="font-size:11px;color:var(--dsw-alias-label-caption);font-family:var(--ds-font-family-code)">dsh-harmony</div>
+          </div>
+          <div class="row g6" style="flex:none">
+            <button class="switch on" id="detailSwitch" data-action="bundle-switch" role="switch" aria-checked="true" aria-label="Enable dsh-harmony" style="border:0;border-radius:var(--dsw-radius-xl);background-color:var(--dsw-alias-button-primary-fill);margin-right:22px"><span class="switch-thumb" style="border-radius:var(--dsw-radius-xl);background-color:var(--dsw-alias-switch-thumb)"></span></button>
+            <button data-action="open-update" style="padding:6px 10px;border:0.5px solid var(--dsw-alias-border-l2);border-radius:var(--dsw-radius-sm);background-color:var(--dsw-alias-button-elevated-fill);color:var(--dsw-alias-label-primary);font-family:var(--dsw-font-family);font-size:11px">Update to 0.2.0</button>
+          </div>
+        </div>
+
+        <div class="section-rule" style="margin:20px 0;background-color:var(--dsw-alias-border-l1)"></div>
+
+        <div class="col" style="gap:8px">
+          <div style="font-size:12px;color:var(--dsw-alias-label-secondary)">bundle detail document · first section, no heading of its own · loaded from the installed bundle’s own files</div>
+          <p style="margin:0;font-size:12px;color:var(--dsw-alias-label-primary)">dsh-harmony 是运行在 DSH Host 进程内的 Cordis 插件（<code style="font-family:var(--ds-font-family-code);background-color:var(--dsw-alias-markdown-code-block);border-radius:var(--dsw-radius-xs);padding:1px 4px">apply(ctx)</code>），随 webServer 启动一个仅由本机与已配对设备可达的 HTTPS 网关。</p>
+          <p style="margin:0;font-size:12px;color:var(--dsw-alias-label-secondary)">它负责移动工作区路径解析、一次性配对码、已配对设备的撤销、回环白名单、CA 指纹状态与版本缓存。所有配置都通过本页注入的 <code style="font-family:var(--ds-font-family-code);color:var(--dsw-alias-link)">plugins.bundle.config</code> 与 <code style="font-family:var(--ds-font-family-code);color:var(--dsw-alias-link)">plugins.row.config</code> 表单呈现，不另开后台站点。</p>
+        </div>
+
+        <div class="section-rule" style="margin:20px 0;background-color:var(--dsw-alias-border-l1)"></div>
+
+        <div class="col" style="gap:10px">
+          <div class="row wrap" style="gap:8px"><h2 style="margin:0;font-size:14px;font-weight:600">Bundle configuration</h2><span class="code-chip" style="padding:2px 7px;border-radius:var(--dsw-radius-xs);background-color:var(--dsw-alias-markdown-tag);color:var(--dsw-alias-label-secondary);font-size:10px;font-family:var(--ds-font-family-code)">plugins.bundle.config · key dsh-harmony · view:'page'</span></div>
+          <div style="font-size:12px;color:var(--dsw-alias-label-secondary)">网关与 origin、工作区路径、白名单、CA 状态、远程通道、版本监控六个分区内联在描述与 rows 之间。</div>
+          <button data-action="open-config" style="align-self:flex-start;padding:6px 10px;border:0.5px solid var(--dsw-alias-border-l2);border-radius:var(--dsw-radius-sm);background-color:var(--dsw-alias-button-elevated-fill);color:var(--dsw-alias-label-primary);font-family:var(--dsw-font-family);font-size:11px">Configure → open full form</button>
+        </div>
+
+        <div class="section-rule" style="margin:20px 0;background-color:var(--dsw-alias-border-l1)"></div>
+
+        <div class="col" style="gap:10px">
+          <div class="row between"><h2 style="margin:0;font-size:14px;font-weight:600">Rows</h2><span style="font-size:11px;color:var(--dsw-alias-label-caption)">2 declared · no filter needed (&lt;=10)</span></div>
+          <div id="rowsWrap" class="col" style="border:0.5px solid var(--dsw-alias-border-l1);border-radius:var(--dsw-radius-md);background-color:var(--dsw-alias-card-fill)">
+            <div class="row between" style="padding:11px 14px"><div class="col" style="gap:2px"><span style="font-size:12px;font-weight:500">pairing</span><span style="font-size:11px;color:var(--dsw-alias-label-caption)">One-time pairing key · dshharmony/gateway</span></div><div class="row g6"><span style="padding:2px 7px;border-radius:var(--dsw-radius-xs);background-color:var(--dsw-alias-state-success-tertiary);color:var(--dsw-alias-state-success-primary);font-size:10px">active</span><button class="switch on" data-action="row-switch" role="switch" aria-checked="true" aria-label="Enable pairing row" style="border:0;border-radius:var(--dsw-radius-xl);background-color:var(--dsw-alias-button-primary-fill)"><span class="switch-thumb" style="border-radius:var(--dsw-radius-xl);background-color:var(--dsw-alias-switch-thumb)"></span></button><button data-action="config-row" data-row="pairing" style="padding:5px 9px;border:0.5px solid var(--dsw-alias-border-l2);border-radius:var(--dsw-radius-sm);background-color:var(--dsw-alias-button-elevated-fill);color:var(--dsw-alias-label-primary);font-family:var(--dsw-font-family);font-size:11px">Configure</button></div></div>
+            <div class="section-rule" style="background-color:var(--dsw-alias-border-l1)"></div>
+            <div class="row between" style="padding:11px 14px"><div class="col" style="gap:2px"><span style="font-size:12px;font-weight:500">devices</span><span style="font-size:11px;color:var(--dsw-alias-label-caption)">Paired device inventory · reachable is logical presence</span></div><div class="row g6"><span style="padding:2px 7px;border-radius:var(--dsw-radius-xs);background-color:var(--dsw-alias-state-success-tertiary);color:var(--dsw-alias-state-success-primary);font-size:10px">active</span><button class="switch on" data-action="row-switch" role="switch" aria-checked="true" aria-label="Enable devices row" style="border:0;border-radius:var(--dsw-radius-xl);background-color:var(--dsw-alias-button-primary-fill)"><span class="switch-thumb" style="border-radius:var(--dsw-radius-xl);background-color:var(--dsw-alias-switch-thumb)"></span></button><button data-action="config-row" data-row="devices" style="padding:5px 9px;border:0.5px solid var(--dsw-alias-border-l2);border-radius:var(--dsw-radius-sm);background-color:var(--dsw-alias-button-elevated-fill);color:var(--dsw-alias-label-primary);font-family:var(--dsw-font-family);font-size:11px">Configure</button></div></div>
+          </div>
+          <div id="disabledHint" class="hide" style="padding:10px 12px;border-radius:var(--dsw-radius-sm);background-color:var(--dsw-alias-state-warn-tertiary);color:var(--dsw-alias-state-warn-label);font-size:11px">Bundle is off: row switches and Configure controls are hidden, and browser-half registrations are unmounted.</div>
+        </div>
+
+        <div class="section-rule" style="margin:20px 0;background-color:var(--dsw-alias-border-l1)"></div>
+
+        <div class="col" style="gap:8px">
+          <h2 style="margin:0;font-size:14px;font-weight:600">Source</h2>
+          <div class="row wrap" style="gap:8px;font-size:11px"><span style="color:var(--dsw-alias-label-caption)">spec</span><code style="font-family:var(--ds-font-family-code);padding:2px 6px;border-radius:var(--dsw-radius-xs);background-color:var(--dsw-alias-markdown-code-block);color:var(--dsw-alias-label-primary)">dsh-harmony@0.1.0</code><span style="padding:2px 7px;border-radius:var(--dsw-radius-xs);background-color:var(--dsw-alias-markdown-tag);color:var(--dsw-alias-label-secondary)">Built in · installation-carried bundle</span><span style="color:var(--dsw-alias-label-caption)">current version 0.1.0</span></div>
+        </div>
+
+        <div class="section-rule" style="margin:20px 0;background-color:var(--dsw-alias-border-l1)"></div>
+
+        <div class="col" style="gap:10px">
+          <div class="row between"><h2 style="margin:0;font-size:14px;font-weight:600">Versions</h2><div class="row g6"><span style="font-size:11px;color:var(--dsw-alias-label-caption)">checked just now · registry npmjs</span><button data-action="check-again" style="padding:5px 9px;border:0.5px solid var(--dsw-alias-border-l2);border-radius:var(--dsw-radius-sm);background-color:var(--dsw-alias-button-elevated-fill);color:var(--dsw-alias-label-primary);font-family:var(--dsw-font-family);font-size:11px">Check again</button></div></div>
+          <div class="col" style="border:0.5px solid var(--dsw-alias-border-l1);border-radius:var(--dsw-radius-md);background-color:var(--dsw-alias-card-fill);padding:12px 14px;gap:8px">
+            <div class="row wrap" style="gap:8px"><span style="font-size:12px;font-weight:600;color:var(--dsw-alias-state-business-primary)">Update available</span><span style="font-size:11px;color:var(--dsw-alias-label-secondary)">0.1.0 → 0.2.0 · latest stable, declares bundle, accepts running DSH</span></div>
+            <div class="row between" style="padding-top:6px;border-top:0.5px solid var(--dsw-alias-border-l1)"><span style="font-size:11px;color:var(--dsw-alias-label-caption)">0.2.0 · published 2026-06-18 · dist-tag latest · installed version closes the list</span><button data-action="open-update" style="padding:5px 9px;border:0.5px solid var(--dsw-alias-border-l2);border-radius:var(--dsw-radius-sm);background-color:var(--dsw-alias-button-elevated-fill);color:var(--dsw-alias-label-primary);font-family:var(--dsw-font-family);font-size:11px">Update</button></div>
+          </div>
+        </div>
+
+        <div class="section-rule" style="margin:20px 0;background-color:var(--dsw-alias-border-l1)"></div>
+
+        <div class="col" style="gap:8px;padding:12px 14px;border-radius:var(--dsw-radius-md);background-color:var(--dsw-alias-card-fill);border:0.5px solid var(--dsw-alias-border-l1)">
+          <div class="row wrap" style="gap:8px"><span style="font-size:12px;font-weight:600">Runtime health</span><span class="code-chip" style="padding:2px 7px;border-radius:var(--dsw-radius-xs);background-color:var(--dsw-alias-markdown-tag);color:var(--dsw-alias-label-secondary);font-size:10px;font-family:var(--ds-font-family-code)">plugins.detail.section · subject { kind:'bundle', pkg:'dsh-harmony' } · order 20</span></div>
+          <div style="font-size:11px;color:var(--dsw-alias-label-secondary)">Gateway fiber active · 3 paired devices · 2 reachable · 1 cached app update · CA fingerprint unchanged since 2026-01-12.</div>
+        </div>
+      </section>
+
+      <!-- ---------- Configuration form (the plugin's real job) ---------- -->
+      <section id="view-config" class="page hide">
+        <div class="row" style="gap:8px;font-size:11px;color:var(--dsw-alias-label-caption)">
+          <button data-action="back-list" style="border:0;background-color:transparent;color:var(--dsw-alias-link);font-family:var(--dsw-font-family);font-size:11px">Plugins</button><span>›</span><button data-action="back-detail" style="border:0;background-color:transparent;color:var(--dsw-alias-link);font-family:var(--dsw-font-family);font-size:11px">dsh-harmony</button><span>›</span><span>Configure</span>
+        </div>
+        <div class="row-top between" style="gap:16px;margin-top:16px">
+          <div class="col" style="gap:6px"><h1 style="margin:0;font-size:20px;font-weight:600">dsh-harmony · Configuration</h1><div style="font-size:11px;color:var(--dsw-alias-label-caption)">Saved: <span id="savedAt">not yet saved — edits are staged</span></div></div>
+          <div class="row g6" style="flex:none"><button data-action="discard" style="padding:7px 12px;border:0.5px solid var(--dsw-alias-border-l2);border-radius:var(--dsw-radius-sm);background-color:var(--dsw-alias-button-elevated-fill);color:var(--dsw-alias-label-primary);font-family:var(--dsw-font-family);font-size:12px">Discard changes</button><button data-action="save" id="saveBtn" style="padding:7px 14px;border:0;border-radius:var(--dsw-radius-sm);background-color:var(--dsw-alias-button-primary-fill);color:var(--dsw-alias-label-primary-foreground);font-family:var(--dsw-font-family);font-size:12px">Save</button></div>
+        </div>
+        <div style="margin-top:14px;padding:10px 12px;border-radius:var(--dsw-radius-sm);background-color:var(--dsw-alias-state-business-tertiary);color:var(--dsw-alias-label-primary);font-size:11px">
+          This form is injected into the DSH Web SPA by <code style="font-family:var(--ds-font-family-code);color:var(--dsw-alias-link)">plugins.bundle.config</code> (key <code style="font-family:var(--ds-font-family-code);color:var(--dsw-alias-link)">dsh-harmony</code>) and <code style="font-family:var(--ds-font-family-code);color:var(--dsw-alias-link)">plugins.row.config</code> (keys <code style="font-family:var(--ds-font-family-code);color:var(--dsw-alias-link)">dsh-harmony#pairing</code>, <code style="font-family:var(--ds-font-family-code);color:var(--dsw-alias-link)">dsh-harmony#devices</code>) with <strong>view:'page'</strong>: the page owns its title, crumb and save controls. Only Save writes; staged edits drop on leave.
+        </div>
+        <div id="rePairBanner" class="hide" style="margin-top:12px;padding:12px;border:1px solid var(--dsw-alias-state-error-primary);border-radius:var(--dsw-radius-sm);background-color:var(--dsw-alias-bg-layer-2)">
+          <div style="font-size:12px;font-weight:600;color:var(--dsw-alias-state-error-primary)">CA anchor changed · rePairRequired: true</div>
+          <div style="margin-top:4px;font-size:11px;color:var(--dsw-alias-label-secondary)">旧 pin 与 token 全部失效，所有设备 reachable=false，必须重新扫码。当前 CA rotate 为 stub（真实证书生成与双 Origin 重叠窗口未完成）。</div>
+          <button data-action="generate-pair" style="margin-top:8px;padding:6px 10px;border:0;border-radius:var(--dsw-radius-sm);background-color:var(--dsw-alias-button-primary-fill);color:var(--dsw-alias-label-primary-foreground);font-family:var(--dsw-font-family);font-size:11px">Generate new pairing code</button>
+        </div>
+
+        <div class="col g16" style="margin-top:20px">
+
+          <!-- 1 网关与 origin -->
+          <section class="col" style="gap:12px;padding:16px;border-radius:var(--dsw-radius-md);background-color:var(--dsw-alias-card-fill);border:0.5px solid var(--dsw-alias-border-l1)">
+            <div class="row wrap" style="gap:8px"><h2 style="margin:0;font-size:14px;font-weight:600">1 · 网关与 origin</h2><span class="code-chip" style="padding:2px 7px;border-radius:var(--dsw-radius-xs);background-color:var(--dsw-alias-markdown-tag);color:var(--dsw-alias-label-secondary);font-size:10px;font-family:var(--ds-font-family-code)">plugins.bundle.config / dsh-harmony · view:'page'</span></div>
+            <div class="field-grid">
+              <label class="field"><span style="font-size:11px;color:var(--dsw-alias-label-secondary)">host</span><input value="0.0.0.0" style="width:100%;padding:8px 10px;border:0.5px solid var(--dsw-alias-border-l2);border-radius:var(--dsw-radius-sm);background-color:var(--dsw-specific-input-major);color:var(--dsw-alias-label-primary);font-family:var(--ds-font-family-code);font-size:12px"></label>
+              <label class="field"><span style="font-size:11px;color:var(--dsw-alias-label-secondary)">port <span style="color:var(--dsw-alias-label-caption)">· integer 1–65535</span></span><input id="portInput" value="3443" style="width:100%;padding:8px 10px;border:0.5px solid var(--dsw-alias-border-l2);border-radius:var(--dsw-radius-sm);background-color:var(--dsw-specific-input-major);color:var(--dsw-alias-label-primary);font-family:var(--ds-font-family-code);font-size:12px"><span id="portError" class="hide" style="font-size:11px;color:var(--dsw-alias-state-error-primary)">port must be an integer between 1 and 65535</span></label>
+              <label class="field"><span style="font-size:11px;color:var(--dsw-alias-label-secondary)">origin <span style="color:var(--dsw-alias-label-caption)">· absolute https://host:port, explicit port, no path/query/fragment/userinfo</span></span><input id="originInput" value="https://0.0.0.0:3443" style="width:100%;padding:8px 10px;border:0.5px solid var(--dsw-alias-border-l2);border-radius:var(--dsw-radius-sm);background-color:var(--dsw-specific-input-major);color:var(--dsw-alias-label-primary);font-family:var(--ds-font-family-code);font-size:12px"><span id="originError" class="hide" style="font-size:11px;color:var(--dsw-alias-state-error-primary)">origin must be an absolute https URL with an explicit port</span></label>
+              <div class="field"><span style="font-size:11px;color:var(--dsw-alias-label-secondary)">upstreamOrigin <span style="color:var(--dsw-alias-label-caption)">· read-only, ctx.webServer.getOrigin()</span></span><div style="padding:8px 10px;border-radius:var(--dsw-radius-sm);background-color:var(--dsw-alias-markdown-code-block);color:var(--dsw-alias-label-secondary);font-family:var(--ds-font-family-code);font-size:12px">https://127.0.0.1:3080 · Host @ 3080</div></div>
+              <div class="field"><span style="font-size:11px;color:var(--dsw-alias-label-secondary)">tls.certFile <span style="color:var(--dsw-alias-label-caption)">· path only</span></span><div style="padding:8px 10px;border-radius:var(--dsw-radius-sm);background-color:var(--dsw-alias-markdown-code-block);color:var(--dsw-alias-label-secondary);font-family:var(--ds-font-family-code);font-size:11px">$DSH_HOME/mobile-access/certs/server/server.crt</div></div>
+              <div class="field"><span style="font-size:11px;color:var(--dsw-alias-label-secondary)">tls.keyFile <span style="color:var(--dsw-alias-label-caption)">· path only, never key material</span></span><div style="padding:8px 10px;border-radius:var(--dsw-radius-sm);background-color:var(--dsw-alias-markdown-code-block);color:var(--dsw-alias-label-secondary);font-family:var(--ds-font-family-code);font-size:11px">$DSH_HOME/mobile-access/certs/server/server.key</div></div>
+              <label class="field"><span style="font-size:11px;color:var(--dsw-alias-label-secondary)">maxRequestBytes</span><input value="10485760" style="width:100%;padding:8px 10px;border:0.5px solid var(--dsw-alias-border-l2);border-radius:var(--dsw-radius-sm);background-color:var(--dsw-specific-input-major);color:var(--dsw-alias-label-primary);font-family:var(--ds-font-family-code);font-size:12px"></label>
+              <label class="field"><span style="font-size:11px;color:var(--dsw-alias-label-secondary)">upstreamTimeoutMs</span><input value="30000" style="width:100%;padding:8px 10px;border:0.5px solid var(--dsw-alias-border-l2);border-radius:var(--dsw-radius-sm);background-color:var(--dsw-specific-input-major);color:var(--dsw-alias-label-primary);font-family:var(--ds-font-family-code);font-size:12px"></label>
+            </div>
+          </section>
+
+          <!-- 2 工作区路径 -->
+          <section class="col" style="gap:12px;padding:16px;border-radius:var(--dsw-radius-md);background-color:var(--dsw-alias-card-fill);border:0.5px solid var(--dsw-alias-border-l1)">
+            <div class="row wrap" style="gap:8px"><h2 style="margin:0;font-size:14px;font-weight:600">2 · 移动工作区路径</h2><span class="code-chip" style="padding:2px 7px;border-radius:var(--dsw-radius-xs);background-color:var(--dsw-alias-markdown-tag);color:var(--dsw-alias-label-secondary);font-size:10px;font-family:var(--ds-font-family-code)">plugins.bundle.config / dsh-harmony · view:'page'</span></div>
+            <div class="field-grid">
+              <label class="field"><span style="font-size:11px;color:var(--dsw-alias-label-secondary)">dshHome</span><input value="$DSH_HOME/mobile-access/" style="width:100%;padding:8px 10px;border:0.5px solid var(--dsw-alias-border-l2);border-radius:var(--dsw-radius-sm);background-color:var(--dsw-specific-input-major);color:var(--dsw-alias-label-primary);font-family:var(--ds-font-family-code);font-size:12px"></label>
+              <label class="field"><span style="font-size:11px;color:var(--dsw-alias-label-secondary)">ca.anchorCertFile</span><input value="$DSH_HOME/mobile-access/certs/ca/ca.crt" style="width:100%;padding:8px 10px;border:0.5px solid var(--dsw-alias-border-l2);border-radius:var(--dsw-radius-sm);background-color:var(--dsw-specific-input-major);color:var(--dsw-alias-label-primary);font-family:var(--ds-font-family-code);font-size:12px"></label>
+            </div>
+            <div style="font-size:11px;color:var(--dsw-alias-label-caption)">Derived read-only paths (recomputed when dshHome changes; file I/O belongs to the Host):</div>
+            <div class="col" style="gap:4px;padding:10px 12px;border-radius:var(--dsw-radius-sm);background-color:var(--dsw-alias-markdown-code-block);font-family:var(--ds-font-family-code);font-size:11px;color:var(--dsw-alias-label-secondary)">
+              <div>mobile-access/certs/ca/ca.crt</div><div>mobile-access/certs/server/server.crt</div><div>mobile-access/certs/server/server.key · path declared only, content never displayed</div>
+            </div>
+          </section>
+
+          <!-- 3 配对管理 -->
+          <section class="col" style="gap:12px;padding:16px;border-radius:var(--dsw-radius-md);background-color:var(--dsw-alias-card-fill);border:0.5px solid var(--dsw-alias-border-l1)">
+            <div class="row wrap" style="gap:8px"><h2 style="margin:0;font-size:14px;font-weight:600">3 · 配对管理</h2><span class="code-chip" style="padding:2px 7px;border-radius:var(--dsw-radius-xs);background-color:var(--dsw-alias-markdown-tag);color:var(--dsw-alias-label-secondary);font-size:10px;font-family:var(--ds-font-family-code)">plugins.row.config / dsh-harmony#pairing · view:'page'</span></div>
+            <div style="font-size:12px;color:var(--dsw-alias-label-secondary)">一次性 key 由 PC 端进程内 createPairingKey() 生成，5 分钟 TTL，消费或过期后即失效；没有独立签发 HTTP 端点。payload 为 PairingKeyPayload 的 base64url，以 dshpair://v1/ 开头。</div>
+            <div class="row wrap" style="gap:8px"><button data-action="generate-pair" style="padding:7px 12px;border:0;border-radius:var(--dsw-radius-sm);background-color:var(--dsw-alias-button-primary-fill);color:var(--dsw-alias-label-primary-foreground);font-family:var(--dsw-font-family);font-size:12px">Generate pairing code</button><span id="pairState" style="font-size:11px;color:var(--dsw-alias-label-caption)">未生成 · no active pairing key</span></div>
+            <div class="field-grid">
+              <div class="field"><span style="font-size:11px;color:var(--dsw-alias-label-secondary)">v</span><div style="font-family:var(--ds-font-family-code);font-size:12px">1</div></div>
+              <div class="field"><span style="font-size:11px;color:var(--dsw-alias-label-secondary)">expiresAt</span><div style="font-family:var(--ds-font-family-code);font-size:12px">2026-06-24T14:37:00Z · 05:00 remaining (MOCK)</div></div>
+              <div class="field"><span style="font-size:11px;color:var(--dsw-alias-label-secondary)">origin</span><div style="font-family:var(--ds-font-family-code);font-size:12px">https://0.0.0.0:3443</div></div>
+              <div class="field"><span style="font-size:11px;color:var(--dsw-alias-label-secondary)">pairingKey</span><div style="font-family:var(--ds-font-family-code);font-size:11px;word-break:break-all">MOCK_cGFpcmluZ0tleV8wMWFiYzJkZTNmNDU2Nzg5MGFiY2RlZg</div></div>
+              <div class="field" style="grid-column:1 / -1"><span style="font-size:11px;color:var(--dsw-alias-label-secondary)">caFingerprint <span style="color:var(--dsw-alias-label-caption)">· anchor DER SHA-256, 64 lowercase hex (示意假值)</span></span><div style="font-family:var(--ds-font-family-code);font-size:11px;word-break:break-all;color:var(--dsw-alias-label-secondary)">a1b2c3d4e5f60718a1b2c3d4e5f60718a1b2c3d4e5f60718a1b2c3d4e5f60718</div></div>
+              <div class="field" style="grid-column:1 / -1"><span style="font-size:11px;color:var(--dsw-alias-label-secondary)">dshpair link + QR (示意方格，非真实二维码)</span><div class="row" style="gap:14px;align-items:flex-start"><div id="qrPreview" class="qr-grid" style="padding:8px;border-radius:var(--dsw-radius-sm);background-color:var(--dsw-alias-markdown-inline-code)"></div><code style="font-family:var(--ds-font-family-code);font-size:11px;word-break:break-all;color:var(--dsw-alias-link)">dshpair://v1/MOCK_cGFpcmluZ0tleV8wMWFiYzJkZTNmNDU2Nzg5MGFiY2RlZg</code></div></div>
+            </div>
+          </section>
+
+          <!-- 4 已配对设备 -->
+          <section class="col" style="gap:12px;padding:16px;border-radius:var(--dsw-radius-md);background-color:var(--dsw-alias-card-fill);border:0.5px solid var(--dsw-alias-border-l1)">
+            <div class="row wrap" style="gap:8px"><h2 style="margin:0;font-size:14px;font-weight:600">4 · 已配对设备</h2><span class="code-chip" style="padding:2px 7px;border-radius:var(--dsw-radius-xs);background-color:var(--dsw-alias-markdown-tag);color:var(--dsw-alias-label-secondary);font-size:10px;font-family:var(--ds-font-family-code)">plugins.row.config / dsh-harmony#devices · view:'page'</span></div>
+            <div style="font-size:11px;color:var(--dsw-alias-label-caption)">GET /mobile/devices 仅回环读取；reachable 逻辑在线：由 token 有效/撤销推导，不是实时心跳。Revoke 需二次确认，撤销后 token 立即作废。</div>
+            <div class="table" style="padding:8px 10px;border-radius:var(--dsw-radius-sm);background-color:var(--dsw-alias-markdown-code-block);font-size:10px;color:var(--dsw-alias-label-secondary)"><span>deviceId</span><span>name</span><span>platform</span><span>origin</span><span>reachable</span><span>lastSeenAt</span><span></span></div>
+            <div id="deviceRows" class="col" style="gap:0">
+              <div class="table device-row" data-device="dev_mock_01H9ZK3Y7Q" data-name="Pixel 8 · 工作台" style="padding:9px 10px;border-bottom:0.5px solid var(--dsw-alias-border-l1);font-size:11px"><span style="font-family:var(--ds-font-family-code)">dev_mock_01H9ZK3Y7Q</span><span>Pixel 8 · 工作台</span><span>android</span><span style="font-family:var(--ds-font-family-code)">https://10.0.12.24:3443</span><span class="reach-cell"><span style="padding:2px 6px;border-radius:var(--dsw-radius-xs);background-color:var(--dsw-alias-state-success-tertiary);color:var(--dsw-alias-state-success-primary);font-size:10px">true · 逻辑在线</span></span><span style="font-family:var(--ds-font-family-code);color:var(--dsw-alias-label-caption)">2026-06-24T09:41:22Z</span><button data-action="revoke" data-device="dev_mock_01H9ZK3Y7Q" data-name="Pixel 8 · 工作台" style="border:0;background-color:transparent;color:var(--dsw-alias-state-error-primary);font-family:var(--dsw-font-family);font-size:11px">Revoke</button></div>
+              <div class="table device-row" data-device="dev_mock_01H9ZK9F2M" data-name="iPad Air · 现场" style="padding:9px 10px;border-bottom:0.5px solid var(--dsw-alias-border-l1);font-size:11px"><span style="font-family:var(--ds-font-family-code)">dev_mock_01H9ZK9F2M</span><span>iPad Air · 现场</span><span>ios</span><span style="font-family:var(--ds-font-family-code)">https://192.168.1.38:3443</span><span class="reach-cell"><span style="padding:2px 6px;border-radius:var(--dsw-radius-xs);background-color:var(--dsw-alias-markdown-tag);color:var(--dsw-alias-label-tertiary);font-size:10px">false · 已撤销</span></span><span style="font-family:var(--ds-font-family-code);color:var(--dsw-alias-label-caption)">2026-06-21T18:02:57Z</span><button data-action="revoke" data-device="dev_mock_01H9ZK9F2M" data-name="iPad Air · 现场" style="border:0;background-color:transparent;color:var(--dsw-alias-state-error-primary);font-family:var(--dsw-font-family);font-size:11px">Revoke</button></div>
+              <div class="table device-row" data-device="dev_mock_01H9ZLD4P6" data-name="MacBook Pro · 调试" style="padding:9px 10px;font-size:11px"><span style="font-family:var(--ds-font-family-code)">dev_mock_01H9ZLD4P6</span><span>MacBook Pro · 调试</span><span>darwin</span><span style="font-family:var(--ds-font-family-code)">https://10.0.12.9:3443</span><span class="reach-cell"><span style="padding:2px 6px;border-radius:var(--dsw-radius-xs);background-color:var(--dsw-alias-state-success-tertiary);color:var(--dsw-alias-state-success-primary);font-size:10px">true · 逻辑在线</span></span><span style="font-family:var(--ds-font-family-code);color:var(--dsw-alias-label-caption)">2026-06-24T09:38:10Z</span><button data-action="revoke" data-device="dev_mock_01H9ZLD4P6" data-name="MacBook Pro · 调试" style="border:0;background-color:transparent;color:var(--dsw-alias-state-error-primary);font-family:var(--dsw-font-family);font-size:11px">Revoke</button></div>
+            </div>
+          </section>
+
+          <!-- 5 白名单 -->
+          <section class="col" style="gap:12px;padding:16px;border-radius:var(--dsw-radius-md);background-color:var(--dsw-alias-card-fill);border:0.5px solid var(--dsw-alias-border-l1)">
+            <div class="row wrap" style="gap:8px"><h2 style="margin:0;font-size:14px;font-weight:600">5 · 白名单</h2><span class="code-chip" style="padding:2px 7px;border-radius:var(--dsw-radius-xs);background-color:var(--dsw-alias-markdown-tag);color:var(--dsw-alias-label-secondary);font-size:10px;font-family:var(--ds-font-family-code)">plugins.bundle.config / dsh-harmony · view:'page'</span></div>
+            <div style="padding:10px 12px;border-radius:var(--dsw-radius-sm);background-color:var(--dsw-alias-state-warn-tertiary);color:var(--dsw-alias-state-warn-label);font-size:11px">配对与白名单是两把独立的锁：配对决定“哪台设备能 enrol”，trustedProxies / allowUsers 决定“哪条网络路径与哪个用户能进入”。allowUsers 为空表示不做用户门禁。</div>
+            <div class="field-grid">
+              <div class="field"><span style="font-size:11px;color:var(--dsw-alias-label-secondary)">trustedProxies: string[]</span><div class="row wrap g4" style="padding:6px;border:0.5px solid var(--dsw-alias-border-l2);border-radius:var(--dsw-radius-sm);background-color:var(--dsw-specific-input-major)"><span style="padding:2px 7px;border-radius:var(--dsw-radius-xs);background-color:var(--dsw-alias-markdown-tag);color:var(--dsw-alias-label-primary);font-size:11px">10.0.0.0/8 ×</span><span style="padding:2px 7px;border-radius:var(--dsw-radius-xs);background-color:var(--dsw-alias-markdown-tag);color:var(--dsw-alias-label-primary);font-size:11px">192.168.1.0/24 ×</span></div></div>
+              <div class="field"><span style="font-size:11px;color:var(--dsw-alias-label-secondary)">allowUsers: string[]</span><div class="row wrap g4" style="padding:6px;border:0.5px solid var(--dsw-alias-border-l2);border-radius:var(--dsw-radius-sm);background-color:var(--dsw-specific-input-major)"><span style="padding:2px 7px;border-radius:var(--dsw-radius-xs);background-color:var(--dsw-alias-markdown-tag);color:var(--dsw-alias-label-primary);font-size:11px">alice ×</span><span style="padding:2px 7px;border-radius:var(--dsw-radius-xs);background-color:var(--dsw-alias-markdown-tag);color:var(--dsw-alias-label-primary);font-size:11px">bob ×</span></div></div>
+              <label class="field"><span style="font-size:11px;color:var(--dsw-alias-label-secondary)">userHeader <span style="color:var(--dsw-alias-label-caption)">· default x-forwarded-user</span></span><input value="x-forwarded-user" style="width:100%;padding:8px 10px;border:0.5px solid var(--dsw-alias-border-l2);border-radius:var(--dsw-radius-sm);background-color:var(--dsw-specific-input-major);color:var(--dsw-alias-label-primary);font-family:var(--ds-font-family-code);font-size:12px"><span id="whitelistError" class="hide" style="font-size:11px;color:var(--dsw-alias-state-error-primary)">WHITELIST_DENIED: trustedProxies entries must be CIDR strings</span></label>
+            </div>
+            <div style="font-size:11px;color:var(--dsw-alias-label-caption)">PUT /mobile/whitelist 原子提交三项；失败保留草稿并显示字段级错误。</div>
+          </section>
+
+          <!-- 6 CA 状态与轮换 -->
+          <section class="col" style="gap:12px;padding:16px;border-radius:var(--dsw-radius-md);background-color:var(--dsw-alias-card-fill);border:0.5px solid var(--dsw-alias-border-l1)">
+            <div class="row wrap" style="gap:8px"><h2 style="margin:0;font-size:14px;font-weight:600">6 · CA 状态与轮换警示</h2><span class="code-chip" style="padding:2px 7px;border-radius:var(--dsw-radius-xs);background-color:var(--dsw-alias-markdown-tag);color:var(--dsw-alias-label-secondary);font-size:10px;font-family:var(--ds-font-family-code)">plugins.bundle.config / dsh-harmony · view:'page'</span></div>
+            <div class="field-grid">
+              <div class="field"><span style="font-size:11px;color:var(--dsw-alias-label-secondary)">active.caFingerprint <span style="color:var(--dsw-alias-label-caption)">· fingerprint only, 64 hex</span></span><div style="font-family:var(--ds-font-family-code);font-size:11px;word-break:break-all;color:var(--dsw-alias-label-secondary)">a1b2c3d4e5f60718a1b2c3d4e5f60718a1b2c3d4e5f60718a1b2c3d4e5f60718</div></div>
+              <div class="field"><span style="font-size:11px;color:var(--dsw-alias-label-secondary)">active.status</span><div><span style="padding:2px 7px;border-radius:var(--dsw-radius-xs);background-color:var(--dsw-alias-state-success-tertiary);color:var(--dsw-alias-state-success-primary);font-size:10px">active</span></div></div>
+              <div class="field"><span style="font-size:11px;color:var(--dsw-alias-label-secondary)">active.notBefore</span><div style="font-family:var(--ds-font-family-code);font-size:11px">2026-01-12T00:00:00Z</div></div>
+              <div class="field"><span style="font-size:11px;color:var(--dsw-alias-label-secondary)">active.notAfter</span><div style="font-family:var(--ds-font-family-code);font-size:11px">2027-01-12T00:00:00Z</div></div>
+              <div class="field" style="grid-column:1 / -1"><span style="font-size:11px;color:var(--dsw-alias-label-secondary)">retired[0].retiredAt</span><div style="font-family:var(--ds-font-family-code);font-size:11px;color:var(--dsw-alias-label-caption)">b2c3d4e5f60718a1b2c3d4e5f60718a1b2c3d4e5f60718b2c3d4e5f60718a1 · 2025-08-03T11:20:00Z</div></div>
+            </div>
+            <div class="row wrap g6"><button data-action="rotate-leaf" style="padding:6px 10px;border:0.5px solid var(--dsw-alias-border-l2);border-radius:var(--dsw-radius-sm);background-color:var(--dsw-alias-button-elevated-fill);color:var(--dsw-alias-label-primary);font-family:var(--dsw-font-family);font-size:11px">Rotate leaf certificate</button><button data-action="rotate-ca" style="padding:6px 10px;border:0;border-radius:var(--dsw-radius-sm);background-color:var(--dsw-alias-state-error-primary);color:var(--dsw-alias-label-on-color);font-family:var(--dsw-font-family);font-size:11px">Rotate CA anchor</button><span style="font-size:11px;color:var(--dsw-alias-label-caption)">实现为 stub：不展示 / 不返回私钥、CSR 或证书本体。</span></div>
+          </section>
+
+          <!-- 7 远程通道 -->
+          <section class="col" style="gap:12px;padding:16px;border-radius:var(--dsw-radius-md);background-color:var(--dsw-alias-card-fill);border:0.5px solid var(--dsw-alias-border-l1)">
+            <div class="row wrap" style="gap:8px"><h2 style="margin:0;font-size:14px;font-weight:600">7 · 远程通道开关</h2><span class="code-chip" style="padding:2px 7px;border-radius:var(--dsw-radius-xs);background-color:var(--dsw-alias-markdown-tag);color:var(--dsw-alias-label-secondary);font-size:10px;font-family:var(--ds-font-family-code)">plugins.bundle.config / dsh-harmony · view:'page'</span></div>
+            <div class="row between" style="padding:9px 10px;border-radius:var(--dsw-radius-sm);background-color:var(--dsw-alias-markdown-code-block)"><div class="col"><span style="font-size:12px">Proxy /mobile/api/**</span><span style="font-size:11px;color:var(--dsw-alias-label-caption)">转发到 Host @ 3080 · default off</span></div><button class="switch" data-action="row-switch" role="switch" aria-checked="false" aria-label="Proxy mobile api" style="border:0;border-radius:var(--dsw-radius-xl);background-color:var(--dsw-alias-state-idle-primary)"><span class="switch-thumb" style="border-radius:var(--dsw-radius-xl);background-color:var(--dsw-alias-switch-thumb)"></span></button></div>
+            <div class="row between" style="padding:9px 10px;border-radius:var(--dsw-radius-sm);background-color:var(--dsw-alias-markdown-code-block)"><div class="col"><span style="font-size:12px">WebSocket /mobile/ws</span><span style="font-size:11px;color:var(--dsw-alias-label-caption)">首帧必须发送 token + deviceId · tailnet 优先 · default off</span></div><button class="switch" data-action="row-switch" role="switch" aria-checked="false" aria-label="WebSocket mobile ws" style="border:0;border-radius:var(--dsw-radius-xl);background-color:var(--dsw-alias-state-idle-primary)"><span class="switch-thumb" style="border-radius:var(--dsw-radius-xl);background-color:var(--dsw-alias-switch-thumb)"></span></button></div>
+            <div style="font-size:11px;color:var(--dsw-alias-label-caption)">GATEWAY_WS_PATH = <code style="font-family:var(--ds-font-family-code)">/mobile/ws</code>. HarmonyConfig 未声明对应字段、契约无配置端点：这里只保留本地 staged 状态，不显示为已持久化。WS 鉴权失败时显示首帧鉴权提示。</div>
+          </section>
+
+          <!-- 8 版本监控 -->
+          <section class="col" style="gap:12px;padding:16px;border-radius:var(--dsw-radius-md);background-color:var(--dsw-alias-card-fill);border:0.5px solid var(--dsw-alias-border-l1)">
+            <div class="row wrap" style="gap:8px"><h2 style="margin:0;font-size:14px;font-weight:600">8 · 版本监控</h2><span class="code-chip" style="padding:2px 7px;border-radius:var(--dsw-radius-xs);background-color:var(--dsw-alias-markdown-tag);color:var(--dsw-alias-label-secondary);font-size:10px;font-family:var(--ds-font-family-code)">plugins.bundle.config / dsh-harmony · view:'page'</span></div>
+            <div class="col" style="gap:6px;padding:12px;border-radius:var(--dsw-radius-sm);background-color:var(--dsw-alias-markdown-code-block);font-size:11px">
+              <div class="row wrap" style="gap:8px"><span style="font-weight:600">plugin</span><span style="color:var(--dsw-alias-label-caption)">npm tag</span><span>current <strong>0.1.0</strong> · latest <strong style="color:var(--dsw-alias-state-business-primary)">0.2.0</strong> · required <strong>false</strong></span></div>
+              <div style="font-family:var(--ds-font-family-code);color:var(--dsw-alias-label-secondary);word-break:break-all">url registry.npmjs.org/dsh-harmony/-/dsh-harmony-0.2.0.tgz · sha256 c3d4e5f60718a1b2c3d4e5f60718a1b2c3d4e5f60718a1b2c3d4e5f60718 (MOCK)</div>
+              <div class="section-rule" style="background-color:var(--dsw-alias-border-l1)"></div>
+              <div class="row wrap" style="gap:8px"><span style="font-weight:600">app</span><span style="color:var(--dsw-alias-label-caption)">GitHub Release tag · 网关段仅缓存</span><span>current <strong>1.4.2</strong> · latest <strong>1.5.0</strong> · required <strong>false</strong></span></div>
+              <div style="font-family:var(--ds-font-family-code);color:var(--dsw-alias-label-secondary);word-break:break-all">url github.com/deepseek-ai/DeepSeek-App/releases/tag/v1.5.0 · sha256 e5f60718a1b2c3d4e5f60718a1b2c3d4e5f60718e5f60718a1b2c3d4e5f60718 (MOCK)</div>
+            </div>
+            <div class="row between wrap" style="gap:8px"><span style="font-size:11px;color:var(--dsw-alias-label-caption)">dshVersion 1.9.4 (read-only) · App 主通道直查 GitHub Release；网关 app 段仅作已配对电脑缓存参考，required:true 时 App 强制升级并阻断连接。</span><div class="row g6"><button data-action="check-again" style="padding:5px 9px;border:0.5px solid var(--dsw-alias-border-l2);border-radius:var(--dsw-radius-sm);background-color:var(--dsw-alias-button-elevated-fill);color:var(--dsw-alias-label-primary);font-family:var(--dsw-font-family);font-size:11px">Check again</button><button data-action="open-update" style="padding:5px 9px;border:0.5px solid var(--dsw-alias-border-l2);border-radius:var(--dsw-radius-sm);background-color:var(--dsw-alias-button-elevated-fill);color:var(--dsw-alias-label-primary);font-family:var(--dsw-font-family);font-size:11px">Update to 0.2.0</button></div></div>
+          </section>
+        </div>
+      </section>
+
+      <!-- ---------- Sidebar navigation targets (concrete, DSH-native) ---------- -->
+      <section id="view-session" class="page hide">
+        <div class="row" style="gap:8px;font-size:11px;color:var(--dsw-alias-label-caption)"><button data-action="back-list" style="border:0;background-color:transparent;color:var(--dsw-alias-link);font-family:var(--dsw-font-family);font-size:11px">Plugins</button><span>›</span><span>Harmony 网关联调</span></div>
+        <h1 style="margin:16px 0 6px;font-size:20px;font-weight:600">Harmony 网关联调</h1>
+        <p style="margin:0;font-size:12px;color:var(--dsw-alias-label-secondary)">Session 是 DSH Web SPA 的保留主面板；本 mockup 的重点是 Plugins 面板及其注入配置页，返回 Plugins 查看 dsh-harmony。</p>
+        <div class="col" style="gap:12px;margin-top:18px">
+          <div style="max-width:76%;padding:12px 14px;border-radius:var(--dsw-radius-md);background-color:var(--dsw-specific-bubble);font-size:12px;color:var(--dsw-alias-label-primary)">把 mobile-access 的网关切到 3443，然后生成一次性配对码给我。</div>
+          <div style="max-width:76%;margin-left:auto;padding:12px 14px;border-radius:var(--dsw-radius-md);background-color:var(--dsw-alias-card-fill);font-size:12px;color:var(--dsw-alias-label-primary)">已更新 origin 为 https://0.0.0.0:3443。配对码在 Plugins › dsh-harmony › Configure › 配对管理，5 分钟后过期。</div>
+        </div>
+      </section>
+      <section id="view-settings" class="page hide">
+        <h1 style="margin:0 0 6px;font-size:20px;font-weight:600">Settings</h1>
+        <p style="margin:0;font-size:12px;color:var(--dsw-alias-label-secondary)">settings.section 列表按 order 排列；Plugins 为 order 15。</p>
+        <div class="col" style="margin-top:18px;border:0.5px solid var(--dsw-alias-border-l1);border-radius:var(--dsw-radius-md);background-color:var(--dsw-alias-card-fill)">
+          <div class="row between" style="padding:12px 14px;border-bottom:0.5px solid var(--dsw-alias-border-l1)"><span style="font-size:12px">General</span><span style="font-size:11px;color:var(--dsw-alias-label-caption)">order 10</span></div>
+          <button data-action="back-list" class="row between" style="padding:12px 14px;border:0;background-color:transparent;font-family:var(--dsw-font-family);font-size:12px;color:var(--dsw-alias-link);text-align:left"><span>Plugins · opens the main plugin list</span><span style="font-size:11px;color:var(--dsw-alias-label-caption)">order 15 →</span></button>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <!-- ============ DSH native right track (optional) ============ -->
+  <aside class="rightbar" id="rightbar" style="background-color:var(--dsw-alias-bg-layer-1);border-left:0.5px solid var(--dsw-alias-border-l1)">
+    <div class="row between" style="padding:16px 14px 10px"><span style="font-size:12px;font-weight:600">At a glance</span><button data-action="toggle-right" aria-label="Collapse right sidebar" style="border:0;background-color:transparent;color:var(--dsw-alias-label-caption);font-family:var(--dsw-font-family);font-size:13px">›</button></div>
+    <div class="col" style="gap:10px;padding:0 14px 16px">
+      <div class="col" style="gap:6px;padding:12px;border-radius:var(--dsw-radius-md);background-color:var(--dsw-alias-card-fill);border:0.5px solid var(--dsw-alias-border-l1)"><span style="font-size:11px;color:var(--dsw-alias-label-caption)">BUNDLE</span><span style="font-size:12px;font-weight:600">dsh-harmony · 0.1.0</span><span style="font-size:11px;color:var(--dsw-alias-label-secondary)">Enabled · Experimental · 2 rows</span></div>
+      <div class="col" style="gap:6px;padding:12px;border-radius:var(--dsw-radius-md);background-color:var(--dsw-alias-card-fill);border:0.5px solid var(--dsw-alias-border-l1)"><span style="font-size:11px;color:var(--dsw-alias-label-caption)">GATEWAY</span><span style="font-family:var(--ds-font-family-code);font-size:11px">https://0.0.0.0:3443</span><span style="font-size:11px;color:var(--dsw-alias-label-secondary)">upstream Host @ 3080</span></div>
+      <div class="col" style="gap:6px;padding:12px;border-radius:var(--dsw-radius-md);background-color:var(--dsw-alias-card-fill);border:0.5px solid var(--dsw-alias-border-l1)"><span style="font-size:11px;color:var(--dsw-alias-label-caption)">DEVICES</span><span style="font-size:12px">3 paired · 2 reachable</span><span style="font-size:11px;color:var(--dsw-alias-label-secondary)">reachable = token 有效，逻辑在线</span></div>
+      <div class="col" style="gap:6px;padding:12px;border-radius:var(--dsw-radius-md);background-color:var(--dsw-alias-card-fill);border:0.5px solid var(--dsw-alias-border-l1)"><span style="font-size:11px;color:var(--dsw-alias-label-caption)">VERSIONS</span><span style="font-size:12px;color:var(--dsw-alias-state-business-primary)">plugin 0.2.0 available</span><span style="font-size:11px;color:var(--dsw-alias-label-secondary)">app 1.5.0 cached · App 直查 Release</span></div>
+    </div>
+  </aside>
+</div>
+
+<!-- ============ Modals ============ -->
+<div id="modalPairing" class="overlay hide" data-modal="pairing" style="background-color:var(--dsw-alias-bg-mask-2)">
+  <div class="dialog col" style="gap:14px;padding:20px;border:0;border-radius:var(--dsw-radius-lg);background-color:var(--dsw-alias-bg-layer-2)">
+    <div class="row between"><h2 style="margin:0;font-size:16px;font-weight:600">Generate pairing code</h2><button data-action="close-modal" aria-label="Close" style="border:0;background-color:transparent;color:var(--dsw-alias-label-caption);font-family:var(--dsw-font-family);font-size:16px">×</button></div>
+    <div style="font-size:12px;color:var(--dsw-alias-label-secondary)">PairingKeyPayload · 一次性 · TTL 5 分钟 · consumed/expired 后需重新生成。以下全部为示意假值。</div>
+    <div class="row" style="gap:16px;align-items:flex-start">
+      <div id="qrModal" class="qr-grid" style="padding:10px;border-radius:var(--dsw-radius-sm);background-color:var(--dsw-alias-markdown-inline-code)"></div>
+      <div class="col" style="gap:8px;min-width:0">
+        <div style="font-size:11px;color:var(--dsw-alias-label-caption)">dshpair link</div>
+        <code style="font-family:var(--ds-font-family-code);font-size:11px;word-break:break-all;color:var(--dsw-alias-link)">dshpair://v1/MOCK_cGFpcmluZ0tleV8wMWFiYzJkZTNmNDU2Nzg5MGFiY2RlZg</code>
+        <div style="font-size:11px;color:var(--dsw-alias-label-caption)">v: 1 · expiresAt: 2026-06-24T14:37:00Z · 倒计时 04:58</div>
+        <div style="font-size:11px;color:var(--dsw-alias-label-caption);word-break:break-all">caFingerprint a1b2c3d4e5f60718a1b2c3d4e5f60718a1b2c3d4e5f60718a1b2c3d4e5f60718</div>
+      </div>
+    </div>
+    <div class="row" style="justify-content:flex-end;gap:8px"><button data-action="close-modal" style="padding:7px 12px;border:0.5px solid var(--dsw-alias-border-l2);border-radius:var(--dsw-radius-sm);background-color:var(--dsw-alias-button-elevated-fill);color:var(--dsw-alias-label-primary);font-family:var(--dsw-font-family);font-size:12px">Close</button><button data-action="regenerate" style="padding:7px 12px;border:0;border-radius:var(--dsw-radius-sm);background-color:var(--dsw-alias-button-primary-fill);color:var(--dsw-alias-label-primary-foreground);font-family:var(--dsw-font-family);font-size:12px">Regenerate</button></div>
+  </div>
+</div>
+
+<div id="modalRevoke" class="overlay hide" data-modal="revoke" style="background-color:var(--dsw-alias-bg-mask-2)">
+  <div class="dialog col" style="gap:12px;padding:20px;border:0;border-radius:var(--dsw-radius-lg);background-color:var(--dsw-alias-bg-layer-2)">
+    <div class="row between"><h2 style="margin:0;font-size:16px;font-weight:600">Revoke paired device</h2><button data-action="close-modal" aria-label="Close" style="border:0;background-color:transparent;color:var(--dsw-alias-label-caption);font-family:var(--dsw-font-family);font-size:16px">×</button></div>
+    <div style="font-size:12px;color:var(--dsw-alias-label-secondary)">撤销 <strong id="revokeTarget">dev_mock_01H9ZK3Y7Q · Pixel 8 · 工作台</strong> 后，该设备的 token 立即作废，reachable 变为 false；操作通过 DELETE /mobile/devices/:deviceId（回环 + Authorization + X-Device-Id）。</div>
+    <div class="row" style="justify-content:flex-end;gap:8px"><button data-action="close-modal" style="padding:7px 12px;border:0.5px solid var(--dsw-alias-border-l2);border-radius:var(--dsw-radius-sm);background-color:var(--dsw-alias-button-elevated-fill);color:var(--dsw-alias-label-primary);font-family:var(--dsw-font-family);font-size:12px">Cancel</button><button data-action="confirm-revoke" style="padding:7px 12px;border:0;border-radius:var(--dsw-radius-sm);background-color:var(--dsw-alias-state-error-primary);color:var(--dsw-alias-label-on-color);font-family:var(--dsw-font-family);font-size:12px">Revoke device</button></div>
+  </div>
+</div>
+
+<div id="modalLeaf" class="overlay hide" data-modal="leaf" style="background-color:var(--dsw-alias-bg-mask-2)">
+  <div class="dialog col" style="gap:12px;padding:20px;border:0;border-radius:var(--dsw-radius-lg);background-color:var(--dsw-alias-bg-layer-2)">
+    <div class="row between"><h2 style="margin:0;font-size:16px;font-weight:600">Rotate leaf certificate</h2><button data-action="close-modal" aria-label="Close" style="border:0;background-color:transparent;color:var(--dsw-alias-label-caption);font-family:var(--dsw-font-family);font-size:16px">×</button></div>
+    <div style="font-size:12px;color:var(--dsw-alias-label-secondary)">POST /mobile/ca/leaf/rotate：CA 锚不变、token 不失效、App 免重配对。当前实现为 stub，不展示私钥或证书本体。</div>
+    <div class="row" style="justify-content:flex-end;gap:8px"><button data-action="close-modal" style="padding:7px 12px;border:0.5px solid var(--dsw-alias-border-l2);border-radius:var(--dsw-radius-sm);background-color:var(--dsw-alias-button-elevated-fill);color:var(--dsw-alias-label-primary);font-family:var(--dsw-font-family);font-size:12px">Cancel</button><button data-action="confirm-leaf" style="padding:7px 12px;border:0;border-radius:var(--dsw-radius-sm);background-color:var(--dsw-alias-button-primary-fill);color:var(--dsw-alias-label-primary-foreground);font-family:var(--dsw-font-family);font-size:12px">Rotate leaf</button></div>
+  </div>
+</div>
+
+<div id="modalCa" class="overlay hide" data-modal="ca" style="background-color:var(--dsw-alias-bg-mask-3)">
+  <div class="dialog col" style="gap:14px;padding:20px;border:1px solid var(--dsw-alias-state-error-primary);border-radius:var(--dsw-radius-lg);background-color:var(--dsw-alias-bg-layer-2)">
+    <div class="row between"><h2 style="margin:0;font-size:16px;font-weight:600;color:var(--dsw-alias-state-error-primary)">⚠ Rotate CA anchor — strong warning</h2><button data-action="close-modal" aria-label="Close" style="border:0;background-color:transparent;color:var(--dsw-alias-label-caption);font-family:var(--dsw-font-family);font-size:16px">×</button></div>
+    <div style="padding:12px;border:1px solid var(--dsw-alias-state-error-primary);border-radius:var(--dsw-radius-sm);background-color:var(--dsw-alias-bg-layer-3);font-size:12px;color:var(--dsw-alias-state-error-primary)">rePairRequired: true — 旧 pin 与 token 全部失效，所有已配对设备必须重新扫码。</div>
+    <div class="field-grid" style="font-size:11px">
+      <div class="field"><span style="color:var(--dsw-alias-label-caption)">current caFingerprint</span><span style="font-family:var(--ds-font-family-code);word-break:break-all">a1b2c3d4e5f60718a1b2c3d4e5f60718a1b2c3d4e5f60718a1b2c3d4e5f60718</span></div>
+      <div class="field"><span style="color:var(--dsw-alias-label-caption)">new caFingerprint (MOCK)</span><span style="font-family:var(--ds-font-family-code);word-break:break-all">f1e2d3c4b5a60718f1e2d3c4b5a60718f1e2d3c4b5a60718f1e2d3c4b5a60718</span></div>
+      <div class="field"><span style="color:var(--dsw-alias-label-caption)">newOrigin</span><span style="font-family:var(--ds-font-family-code)">https://0.0.0.0:3444</span></div>
+      <div class="field"><span style="color:var(--dsw-alias-label-caption)">affected devices</span><span style="font-family:var(--ds-font-family-code)">3 / 3 → reachable: false</span></div>
+    </div>
+    <div style="font-size:11px;color:var(--dsw-alias-label-secondary)">当前为 stub：真实证书生成与双 Origin 重叠窗口尚未完成；端点只返回指纹与元数据。</div>
+    <div class="row" style="justify-content:flex-end;gap:8px"><button data-action="close-modal" style="padding:7px 12px;border:0.5px solid var(--dsw-alias-border-l2);border-radius:var(--dsw-radius-sm);background-color:var(--dsw-alias-button-elevated-fill);color:var(--dsw-alias-label-primary);font-family:var(--dsw-font-family);font-size:12px">Cancel</button><button data-action="confirm-ca" style="padding:7px 12px;border:0;border-radius:var(--dsw-radius-sm);background-color:var(--dsw-alias-state-error-primary);color:var(--dsw-alias-label-on-color);font-family:var(--dsw-font-family);font-size:12px">I understand — rotate CA anchor</button></div>
+  </div>
+</div>
+
+<div id="modalUpdate" class="overlay hide" data-modal="update" style="background-color:var(--dsw-alias-bg-mask-2)">
+  <div class="dialog col" style="gap:12px;padding:20px;border:0;border-radius:var(--dsw-radius-lg);background-color:var(--dsw-alias-bg-layer-2)">
+    <div class="row between"><h2 style="margin:0;font-size:16px;font-weight:600">Update dsh-harmony</h2><button data-action="close-modal" aria-label="Close" style="border:0;background-color:transparent;color:var(--dsw-alias-label-caption);font-family:var(--dsw-font-family);font-size:16px">×</button></div>
+    <div class="field-grid" style="font-size:11px"><div class="field"><span style="color:var(--dsw-alias-label-caption)">installed version</span><span style="font-family:var(--ds-font-family-code)">0.1.0</span></div><div class="field"><span style="color:var(--dsw-alias-label-caption)">target version</span><span style="font-family:var(--ds-font-family-code)">0.2.0</span></div><div class="field" style="grid-column:1 / -1"><span style="color:var(--dsw-alias-label-caption)">registry</span><span style="font-family:var(--ds-font-family-code)">registry.npmjs.org</span></div></div>
+    <div id="updateSteps" style="font-size:11px;color:var(--dsw-alias-label-secondary)">A failed installation keeps or reinstalls the installed version. Steps will appear here while the Host runs the update.</div>
+    <div class="row" style="justify-content:flex-end;gap:8px"><button data-action="close-modal" style="padding:7px 12px;border:0.5px solid var(--dsw-alias-border-l2);border-radius:var(--dsw-radius-sm);background-color:var(--dsw-alias-button-elevated-fill);color:var(--dsw-alias-label-primary);font-family:var(--dsw-font-family);font-size:12px">Cancel</button><button data-action="confirm-update" style="padding:7px 12px;border:0;border-radius:var(--dsw-radius-sm);background-color:var(--dsw-alias-button-primary-fill);color:var(--dsw-alias-label-primary-foreground);font-family:var(--dsw-font-family);font-size:12px">Update to 0.2.0</button></div>
+  </div>
+</div>
+
+<!-- ============ State variant drawer ============ -->
+<div id="variantDrawer" class="drawer hide" style="background-color:var(--dsw-alias-bg-layer-2);border-left:0.5px solid var(--dsw-alias-border-l2)">
+  <div class="row between" style="padding:16px 14px 10px"><div class="col"><span style="font-size:14px;font-weight:600">状态变体 · 10</span><span style="font-size:11px;color:var(--dsw-alias-label-caption)">源自 02 文档 §7 · 点击进入对应形态</span></div><button data-action="close-variants" aria-label="Close" style="border:0;background-color:transparent;color:var(--dsw-alias-label-caption);font-family:var(--dsw-font-family);font-size:16px">×</button></div>
+  <div class="col" style="gap:6px;padding:0 14px 24px">
+    <button data-action="variant" data-variant="1" class="variant-chip" style="padding:10px;border:0.5px solid var(--dsw-alias-border-l2);border-radius:var(--dsw-radius-sm);background-color:var(--dsw-alias-card-fill);color:var(--dsw-alias-label-primary);font-family:var(--dsw-font-family);font-size:11px;text-align:left">1 · 正常已加载 — 卡片 / 分组 / rows / Source / Versions 全部就位</button>
+    <button data-action="variant" data-variant="2" class="variant-chip" style="padding:10px;border:0.5px solid var(--dsw-alias-border-l2);border-radius:var(--dsw-radius-sm);background-color:var(--dsw-alias-card-fill);color:var(--dsw-alias-label-primary);font-family:var(--dsw-font-family);font-size:11px;text-align:left">2 · 加载骨架 — 短分组标题 + 4 张骨架卡，操作区空白</button>
+    <button data-action="variant" data-variant="3" class="variant-chip" style="padding:10px;border:0.5px solid var(--dsw-alias-border-l2);border-radius:var(--dsw-radius-sm);background-color:var(--dsw-alias-card-fill);color:var(--dsw-alias-label-primary);font-family:var(--dsw-font-family);font-size:11px;text-align:left">3 · 插件未启用 — bundle switch off，row / Configure 隐藏</button>
+    <button data-action="variant" data-variant="4" class="variant-chip" style="padding:10px;border:0.5px solid var(--dsw-alias-border-l2);border-radius:var(--dsw-radius-sm);background-color:var(--dsw-alias-card-fill);color:var(--dsw-alias-label-primary);font-family:var(--dsw-font-family);font-size:11px;text-align:left">4 · client sync 同步中 — Syncing plugins on this page…</button>
+    <button data-action="variant" data-variant="5" class="variant-chip" style="padding:10px;border:0.5px solid var(--dsw-alias-border-l2);border-radius:var(--dsw-radius-sm);background-color:var(--dsw-alias-card-fill);color:var(--dsw-alias-label-primary);font-family:var(--dsw-font-family);font-size:11px;text-align:left">5 · client sync 失败 — 通知 + id: message + Retry this page</button>
+    <button data-action="variant" data-variant="6" class="variant-chip" style="padding:10px;border:0.5px solid var(--dsw-alias-border-l2);border-radius:var(--dsw-radius-sm);background-color:var(--dsw-alias-card-fill);color:var(--dsw-alias-label-primary);font-family:var(--dsw-font-family);font-size:11px;text-align:left">6 · 配置错误 — port / origin / whitelist 字段级错误，草稿保留</button>
+    <button data-action="variant" data-variant="7" class="variant-chip" style="padding:10px;border:0.5px solid var(--dsw-alias-border-l2);border-radius:var(--dsw-radius-sm);background-color:var(--dsw-alias-card-fill);color:var(--dsw-alias-label-primary);font-family:var(--dsw-font-family);font-size:11px;text-align:left">7 · 危险确认 — Revoke 设备 / leaf rotate 普通确认框</button>
+    <button data-action="variant" data-variant="8" class="variant-chip" style="padding:10px;border:0.5px solid var(--dsw-alias-border-l2);border-radius:var(--dsw-radius-sm);background-color:var(--dsw-alias-card-fill);color:var(--dsw-alias-label-primary);font-family:var(--dsw-font-family);font-size:11px;text-align:left">8 · CA 强警示 — rePairRequired: true、全员重配</button>
+    <button data-action="variant" data-variant="9" class="variant-chip" style="padding:10px;border:0.5px solid var(--dsw-alias-border-l2);border-radius:var(--dsw-radius-sm);background-color:var(--dsw-alias-card-fill);color:var(--dsw-alias-label-primary);font-family:var(--dsw-font-family);font-size:11px;text-align:left">9 · 版本更新 — Update available + 确认 + 步骤 + 结果态</button>
+    <button data-action="variant" data-variant="10" class="variant-chip" style="padding:10px;border:0.5px solid var(--dsw-alias-border-l2);border-radius:var(--dsw-radius-sm);background-color:var(--dsw-alias-card-fill);color:var(--dsw-alias-label-primary);font-family:var(--dsw-font-family);font-size:11px;text-align:left">10 · 同步失败但列表可用 — 保留缓存 + failure toast</button>
+  </div>
+</div>
+
+<div class="toast-stack" id="toasts"></div>
+
+<script>
+(function () {
+  var $ = function (id) { return document.getElementById(id); };
+  var views = ['plugins', 'detail', 'config', 'session', 'settings'];
+  function show(name) {
+    views.forEach(function (v) { $('view-' + v).classList.toggle('hide', v !== name); });
+    $('mainScroll').scrollTop = 0;
+    document.querySelectorAll('.nav-item').forEach(function (n) {
+      var on = n.getAttribute('data-target') === name || (name !== 'plugins' && n.id === 'navPlugins');
+      n.style.backgroundColor = on ? 'var(--dsw-specific-sidebar-nav-item-active)' : 'transparent';
+      n.style.color = on ? 'var(--dsw-alias-label-primary)' : 'var(--dsw-alias-label-secondary)';
+    });
+  }
+  function toast(msg) {
+    var el = document.createElement('div');
+    el.textContent = msg;
+    el.style.cssText = 'padding:10px 14px;border:0;border-radius:var(--dsw-radius-sm);background-color:var(--dsw-alias-toast-bg);color:var(--dsw-alias-toast-label);font-size:12px';
+    $('toasts').appendChild(el);
+    setTimeout(function () { el.remove(); }, 3800);
+  }
+  function openModal(key) { $('modal' + key).classList.remove('hide'); }
+  function closeModals() { document.querySelectorAll('.overlay').forEach(function (m) { m.classList.add('hide'); }); }
+  function setSync(mode) {
+    ['syncSyncing', 'syncFailure', 'syncDone'].forEach(function (id) { $(id).classList.add('hide'); });
+    $({ syncing: 'syncSyncing', failure: 'syncFailure', done: 'syncDone' }[mode]).classList.remove('hide');
+  }
+  function setBundle(on) {
+    ['cardSwitch', 'detailSwitch'].forEach(function (id) {
+      var s = $(id); s.classList.toggle('on', on); s.setAttribute('aria-checked', String(on));
+      s.style.backgroundColor = on ? 'var(--dsw-alias-button-primary-fill)' : 'var(--dsw-alias-state-idle-primary)';
+    });
+    $('rowsWrap').classList.toggle('hide', !on);
+    $('disabledHint').classList.toggle('hide', on);
+    $('cardConfigureWrap').classList.toggle('hide', !on);
+    $('syncDone').classList.remove('hide');
+  }
+  function paintQR(id) {
+    var host = $(id);
+    if (!host) return;
+    host.innerHTML = '';
+    var pattern = [1,1,1,0,1,0,1,1,1,0,1, 1,0,1,0,1,0,1,0,1,0,1, 1,1,1,0,1,1,1,1,1,0,1, 0,0,0,0,1,0,0,0,0,0,1, 1,1,1,0,1,0,1,1,1,0,1, 1,0,1,0,1,0,1,0,1,0,1, 1,1,1,0,1,1,1,1,1,0,1, 0,0,0,0,1,0,0,0,0,0,1, 1,1,1,0,1,0,1,1,1,0,1, 1,0,1,0,1,0,1,0,1,0,1, 1,1,1,0,1,1,1,1,1,0,1, 0,0,0,0,1,0,0,0,0,0,1];
+    pattern.forEach(function (v) {
+      var c = document.createElement('div'); c.className = 'qr-cell';
+      c.style.backgroundColor = v ? 'var(--dsw-alias-label-primary)' : 'var(--dsw-alias-markdown-inline-code)';
+      host.appendChild(c);
+    });
+  }
+  paintQR('qrPreview'); paintQR('qrModal');
+
+  document.addEventListener('click', function (e) {
+    var el = e.target.closest('[data-action]');
+    if (!el) { $('addMenu').classList.add('hide'); $('infoTip').classList.add('hide'); return; }
+    var a = el.getAttribute('data-action');
+    if (a === 'toggle-theme') {
+      document.body.toggleAttribute('data-ds-dark-theme');
+      $('themeToggle').textContent = document.body.hasAttribute('data-ds-dark-theme') ? '切换亮色主题' : '切换暗色主题';
+    } else if (a === 'open-variants') { $('variantDrawer').classList.remove('hide'); }
+    else if (a === 'close-variants') { $('variantDrawer').classList.add('hide'); }
+    else if (a === 'nav') { show(el.getAttribute('data-target')); }
+    else if (a === 'new-session') { show('session'); toast('New session draft opened in the DSH Web SPA.'); }
+    else if (a === 'back-list') { show('plugins'); setSync('done'); }
+    else if (a === 'back-detail') { show('detail'); }
+    else if (a === 'open-detail') { show('detail'); }
+    else if (a === 'open-config') { show('config'); }
+    else if (a === 'config-row') {
+      show('config');
+      var target = el.getAttribute('data-row') === 'pairing' ? '3 · 配对管理' : '4 · 已配对设备';
+      toast('Opened plugins.row.config · dsh-harmony#' + el.getAttribute('data-row') + ' — ' + target);
+    }
+    else if (a === 'info') { $('infoTip').classList.toggle('hide'); }
+    else if (a === 'add-menu') { $('addMenu').classList.toggle('hide'); }
+    else if (a === 'add-plugin' || a === 'menu-action') {
+      $('addMenu').classList.add('hide');
+      toast(a === 'add-plugin' ? 'Install dialog: package name, Git URL, tarball or local path.' : (el.getAttribute('data-name') + ' — action opened from Add plugin menu.'));
+    }
+    else if (a === 'official' || a === 'more') { toast(el.getAttribute('data-name') || 'Experimental plugins · More list'); }
+    else if (a === 'tab') {
+      var t = el.getAttribute('data-tab');
+      $('tabInstalled').style.borderBottom = t === 'installed' ? '2px solid var(--dsw-alias-brand-primary)' : '2px solid transparent';
+      $('tabDiscover').style.borderBottom = t === 'discover' ? '2px solid var(--dsw-alias-brand-primary)' : '2px solid transparent';
+      $('installedContent').classList.toggle('hide', t !== 'installed');
+      $('discoverContent').classList.toggle('hide', t !== 'discover');
+    }
+    else if (a === 'refresh') {
+      var b = $('refreshBtn'); b.textContent = 'Refreshing…'; b.disabled = true;
+      setTimeout(function () { b.textContent = 'Refresh'; b.disabled = false; toast('List refreshed — cached list kept, 1 update available.'); }, 450);
+    }
+    else if (a === 'retry-sync') {
+      setSync('syncing'); toast('ctx.modules.entries.retry() — retrying this page…');
+      setTimeout(function () { setSync('done'); }, 700);
+    }
+    else if (a === 'bundle-switch') {
+      var next = el.getAttribute('aria-checked') !== 'true'; setBundle(next);
+      toast(next ? 'dsh-harmony enabled · rows and Configure available.' : 'dsh-harmony switched off · browser-half registrations unmounted.');
+    }
+    else if (a === 'row-switch') {
+      var on = el.getAttribute('aria-checked') !== 'true';
+      el.classList.toggle('on', on); el.setAttribute('aria-checked', String(on));
+      el.style.backgroundColor = on ? 'var(--dsw-alias-button-primary-fill)' : 'var(--dsw-alias-state-idle-primary)';
+      toast('Local switch ' + (on ? 'on' : 'off') + ' · staged only where no config endpoint exists.');
+    }
+    else if (a === 'save') {
+      var s = $('saveBtn'); s.textContent = 'Saving…'; s.disabled = true;
+      setTimeout(function () {
+        s.textContent = 'Save'; s.disabled = false;
+        var d = new Date(); $('savedAt').textContent = 'saved at ' + d.toTimeString().slice(0, 8);
+        toast('Saved · form.state → form.mutate committed at expectedRevision.');
+      }, 520);
+    }
+    else if (a === 'discard') { toast('Staged edits discarded — Host values remain unchanged.'); }
+    else if (a === 'generate-pair') { openModal('Pairing'); $('pairState').textContent = '有效倒计时 · one-time key active (MOCK)'; }
+    else if (a === 'regenerate') { toast('New one-time pairing key generated (MOCK) · TTL reset to 05:00.'); closeModals(); }
+    else if (a === 'revoke') {
+      $('revokeTarget').textContent = el.getAttribute('data-device') + ' · ' + el.getAttribute('data-name');
+      openModal('Revoke');
+    }
+    else if (a === 'confirm-revoke') {
+      var id = $('revokeTarget').textContent.split(' · ')[0];
+      var row = document.querySelector('.device-row[data-device="' + id + '"]');
+      if (row) {
+        var cell = row.querySelector('.reach-cell');
+        cell.innerHTML = '<span style="padding:2px 6px;border-radius:var(--dsw-radius-xs);background-color:var(--dsw-alias-markdown-tag);color:var(--dsw-alias-label-tertiary);font-size:10px">false · 已撤销</span>';
+      }
+      closeModals(); toast('Device revoked · target token invalidated immediately (MOCK).');
+    }
+    else if (a === 'rotate-leaf') { openModal('Leaf'); }
+    else if (a === 'confirm-leaf') { closeModals(); toast('Leaf certificate rotated · CA anchor unchanged, tokens still valid (stub).'); }
+    else if (a === 'rotate-ca' || a === 'confirm-ca') {
+      if (a === 'rotate-ca') { openModal('Ca'); }
+      else {
+        closeModals(); $('rePairBanner').classList.remove('hide');
+        document.querySelectorAll('.reach-cell').forEach(function (c) {
+          c.innerHTML = '<span style="padding:2px 6px;border-radius:var(--dsw-radius-xs);background-color:var(--dsw-alias-markdown-tag);color:var(--dsw-alias-label-tertiary);font-size:10px">false · 需重新配对</span>';
+        });
+        $('pairState').textContent = '旧码不可再用 · rePairRequired: true';
+        toast('CA anchor rotated (stub) · rePairRequired true, all devices need re-pairing.');
+      }
+    }
+    else if (a === 'check-again') { toast('Checking registry again… 0.2.0 available for plugin; app cache 1.5.0.'); }
+    else if (a === 'open-update') { openModal('Update'); }
+    else if (a === 'confirm-update') {
+      $('updateSteps').textContent = 'Steps: inspect → remove 0.1.0 → install 0.2.0 → select layer · result: new version runs (MOCK).';
+      toast('Update finished · 0.2.0 is running (mock result).');
+    }
+    else if (a === 'toggle-right') {
+      $('rightbar').classList.toggle('hide');
+      $('appFrame').classList.toggle('no-right');
+    }
+    else if (a === 'close-modal') { closeModals(); }
+    else if (a === 'variant') { applyVariant(parseInt(el.getAttribute('data-variant'), 10)); }
+  });
+
+  function applyVariant(n) {
+    closeModals();
+    $('variantDrawer').classList.add('hide');
+    setBundle(true);
+    setSync('done');
+    $('portError').classList.add('hide'); $('originError').classList.add('hide'); $('whitelistError').classList.add('hide');
+    document.querySelectorAll('.variant-chip').forEach(function (c) {
+      c.style.backgroundColor = c.getAttribute('data-variant') === String(n) ? 'var(--dsw-alias-state-business-tertiary)' : 'var(--dsw-alias-card-fill)';
+    });
+    if (n === 1) { show('plugins'); toast('Variant 1 · normal loaded state.'); }
+    if (n === 2) { show('plugins'); $('installedContent').classList.add('hide'); toast('Variant 2 · first list read skeleton (4 cards, blank action areas).'); }
+    if (n === 3) { show('detail'); setBundle(false); toast('Variant 3 · bundle off, row switches and Configure hidden.'); }
+    if (n === 4) { show('plugins'); setSync('syncing'); toast('Variant 4 · Syncing plugins on this page…'); }
+    if (n === 5) { show('plugins'); setSync('failure'); toast('Variant 5 · client sync failed; Host enablement unchanged.'); }
+    if (n === 6) {
+      show('config');
+      ['portError', 'originError', 'whitelistError'].forEach(function (id) { $(id).classList.remove('hide'); });
+      $('portInput').style.border = '1px solid var(--dsw-alias-state-error-primary)';
+      $('originInput').style.border = '1px solid var(--dsw-alias-state-error-primary)';
+      toast('Variant 6 · field-level errors shown; staged edits kept.');
+    }
+    if (n === 7) { show('config'); openModal('Revoke'); }
+    if (n === 8) { show('config'); openModal('Ca'); }
+    if (n === 9) { show('detail'); openModal('Update'); }
+    if (n === 10) { show('plugins'); setSync('failure'); toast('Refresh failed · cached list kept (variant 10).'); }
+  }
+})();
+</script>
+</body>
+</html>
