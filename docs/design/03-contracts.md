@@ -2,15 +2,15 @@
 读者: App Agent / Plugin Agent / Docs/Architect
 类型: design（契约真源）
 权威: 高（App↔Plugin 接口域真源；需求域最高见 raw）
-状态: v0.2（评审有条件通过；2 项 Critical 中 R1 已修、R2 待负责人）
+状态: v0.3（R1 已修；R2 由 Q7 决策关闭；Q8/Q9 已定，见 ADR-0007）
 依赖: docs/design/02-architecture.md
 ---
 
 # 03 App ↔ Plugin 契约（字段级）
 
 > 本文件是 App 与 Plugin 的**唯一接口真源**。规则：先改本文、再改实现；跨端字段改动同批改完两侧，只改一侧视为未完成；遇歧义登记 `docs/open-questions.md`，不自行决定。
-> 契约版本号 `v0.2`；所有 JSON 字段用 camelCase；时间戳 ISO8601 UTC。
-> 评审见 `docs/review/02-contracts-review.md`（R1 已修 / R2 待负责人，见 open-questions Q7）。
+> 契约版本号 `v0.3`；所有 JSON 字段用 camelCase；时间戳 ISO8601 UTC。
+> 评审见 `docs/review/02-contracts-review.md`（R1/R2 已关闭）；Q7/Q8/Q9 决策见 `docs/decisions/ADR-0007-...md`。
 
 ## 1 传输与常量
 
@@ -19,8 +19,8 @@
 | 传输 | 仅 HTTPS（App 侧禁明文） |
 | 默认端口 | 网关 3443（可配）；Host 上游 3080 |
 | 认证头 | `Authorization: Bearer <token>`、`X-Device-Id: <deviceId>` |
-| 消息上限 | 请求 ≤ 1 MiB，剪贴板 ≤ 256 KiB，二进制 ≤ 8 MiB，回复 ≤ 12 MiB |
-| Content-Type | `application/json`（除二进制上传） |
+| 消息上限 | 请求 ≤ 1 MiB，剪贴板 ≤ 256 KiB，WS 二进制消息 ≤ 8 MiB，回复 ≤ 12 MiB（Q9：本期无二进制上传端点） |
+| Content-Type | `application/json` |
 | 版本 | 响应头 `X-Contract-Version: v0.1` |
 
 ## 2 数据模型
@@ -38,8 +38,10 @@
 
 ### PairingKey（一次性、短时效，PC 端生成）
 ```json
-{ "pairingKey": "opaque", "expiresAt": "...", "origin": "https://..." }
+{ "v": 1, "pairingKey": "opaque", "origin": "https://192.168.1.5:3443",
+  "expiresAt": "...", "caFingerprint": "sha256" }
 ```
+> **Q8 定稿**：二维码/链接内容 = 上述 JSON 的 base64url 编码（以 `dshpair://v1/<base64url>` 开头）。`origin` 为网关 base URL（App 扫码后无需手填）；`caFingerprint` 为网关 TLS 证书/CA 的 SHA-256 指纹，**App 配对时固定该指纹到精确 Origin**（防 MITM，纯原生 App 同样沿用 dsh-mobile 的 CA 绑定做法）。
 
 ### VersionInfo
 ```json
@@ -55,8 +57,8 @@
 ### 3.2 配对（无鉴权，一次性密钥）
 `POST /mobile/pair`
 请求：`{ "pairingKey":"...", "deviceName":"...", "platform":"harmony" }`
-成功：`201 { "deviceId":"...", "token":"...", "expiresAt":"...", "caFingerprint":"sha256" }`
-> `caFingerprint` 为保留字段（是否作为绑定凭据，见 §7 未决）。
+成功：`201 { "deviceId":"...", "token":"...", "issuedAt":"...", "expiresAt":"...", "caFingerprint":"sha256" }`
+> `caFingerprint` 为绑定凭据（Q8 定稿）：App 必须校验证书指纹与扫码 payload 一致才建立信任，否则拒绝。
 失败：`409` 密钥已用/过期｜`403` 来源不在白名单｜`429` 限流
 
 > **统一鉴权规则（R1 已修）**：所有**写请求**（POST/PUT/PATCH/DELETE）必须带 `Authorization: Bearer` + `X-Device-Id`，与 02 §3.2 一致。管理端点（devices/whitelist）另要求 TCP 对端为回环。读端点（GET）仅需回环或已配对 token，见各端点标注。
@@ -81,7 +83,8 @@
 ### 3.7 版本查询（无鉴权，只读非敏感信息）
 `GET /mobile/version`
 → `200 { "plugin":VersionInfo, "app":VersionInfo }`
-> `plugin`/`app` 段的 `url`/`sha256` 分别指向 npm tarball / hap；`dshVersion` 来源为 Host 实际运行版本（见 §3.1）。App 版本**拉取通道**待定（Q7）：直查 GitHub 或经本端点。
+> `plugin`/`app` 段的 `url`/`sha256` 分别指向 npm tarball / hap；`dshVersion` 来源为 Host 实际运行版本（见 §3.1）。
+> **Q7 定稿**：App 升级检查的**主通道是 App 直查 GitHub Release**（版本真源统一在仓库 tag，不受网关可达性影响）；本端点的 `app` 段降级为"已配对电脑缓存的最近已知版本"，仅作参考展示，不作为升级判据。
 
 ## 4 WebSocket 事件流
 
@@ -119,16 +122,15 @@
 ## 6 版本升级通道（Q6）
 
 - Plugin：比对 npm/GitHub tag（`dsh-harmony`）；下载 → 校验 SHA-256 → 提示/自动升级。
-- App：下载 hap → 校验签名 + SHA-256 → 拉起系统安装（In-house 证书签名）。
-- **⚠ Q7 待负责人定**：App 版本 tag 的拉取通道——① App 直查 GitHub Release（02 §7 口径）｜② 经网关 `GET /mobile/version` 的 `app` 段（03 §3.7 口径）。两者二选一后同步 02/03，未定前 App 侧不实现升级检查。
+- App（Q7 定稿）：**直查 GitHub Release** 取最新 tag → 下载 hap → 校验签名 + SHA-256 → 拉起系统安装（In-house 证书签名）。网关 `GET /mobile/version` 的 `app` 段仅作缓存展示，不作升级判据。
 
 ## 7 未决（转 open-questions）
 
 - [x] DSH session 事件词汇核对完成（`dsh-v0.2.3-alpha.2`）：4 个业务事件均需映射，详见 §4 与 `docs/review/02-contracts-review.md`。
-- [ ] 配对是否需 CA 指纹绑定（dsh-mobile 有，我们 App 纯原生是否沿用）。→ Q8
-- [ ] App 版本 tag 拉取通道（Q7）。
-- [ ] 配对二维码/链接 payload 格式（`PairingKey.origin` 如何用）。→ Q8
-- [ ] 二进制上传端点是否新增（§1 提到但 §3 无端点）。→ Q9
+- [x] Q7 App 版本拉取通道 → App 直查 GitHub Release（ADR-0007）。
+- [x] Q8 配对 payload + CA 指纹绑定 → `dshpair://v1/<base64url>` + 指纹固定（ADR-0007）。
+- [x] Q9 二进制上传端点 → 本期不加（ADR-0007）。
+- 当前无未决项；新问题请开 issue 并登记 `docs/open-questions.md`。
 
 ## 8 验收矩阵（怎么验）
 
@@ -136,5 +138,5 @@
 |---|---|---|---|---|
 | 3 health | `GET /mobile/health` | 无鉴权 GET | `200 status:ok` + 版本 | `check-contracts` C1 |
 | 4 WS | `WS /mobile/ws` | 首帧 auth+deviceId，subscribe | 收到一条 `session.updated` 映射事件 | `check-contracts` C3 |
-| 5 配对 | `POST /mobile/pair` | 一次性 pairingKey | `201` 返回 token；二次重连免配对 | `check-contracts` C2 |
+| 5 配对 | `POST /mobile/pair` | 扫 `dshpair://v1/...` 得 pairingKey + caFingerprint | `201` 返回 token；指纹不符则拒绝；二次重连免配对 | `check-contracts` C2 |
 | 升级 | `GET /mobile/version` | 无鉴权 GET | `200 plugin/app VersionInfo` | `check-plugin-version` |

@@ -16,6 +16,7 @@
 5. 安全双闸：配对设备模型 + OpenClaw 式白名单（`trustedProxies` IP / `allowUsers` 用户 / `userHeader` 身份头），两把锁独立。
 6. 契约真源是 `docs/design/03-contracts.md`：改字段先改契约、再改实现，**同批改完 app 侧**。
 7. 发布：npm 包名 `dsh-harmony`；版本监控 + 升级校验（SHA-256），禁静默自更新。
+8. Q7 定稿：App 升级直查 GitHub Release，`/mobile/version` 的 `app` 段仅为缓存；Q8 定稿：配对 payload 固定 CA 指纹（`dshpair://v1/...`）。见 ADR-0007。
 
 ## 3 去哪查
 

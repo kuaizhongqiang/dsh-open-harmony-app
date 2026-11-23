@@ -2,7 +2,7 @@
 读者: 全体 Agent / 负责人
 类型: design
 权威: 高
-状态: 草案（Q1 目标平台待定，其余已定）
+状态: v0.2（Q1/Q7 已定：双平台 + App 直查 GitHub，ADR-0007）
 依赖: docs/design/01-requirements-analysis.md
 ---
 
@@ -40,7 +40,15 @@
 | 网络层 | HTTP 请求 + WebSocket 事件流 | `@ohos.net.http`、`@ohos.net.webSocket` |
 | 安全层 | token / CA 指纹 / 配对凭据 | **HUKS**（`@ohos.security.huks`） |
 | 能力层 | 通知、权限、相机扫码、文件、剪贴板、后台任务 | `@ohos.notificationManager`、`@ohos.abilityAccessCtrl`、`@ohos.multimedia.camera`、`@ohos.file.picker`、`@ohos.pasteboard`、`@ohos.resourceschedule.backgroundTaskManager` |
-| 更新层 | 查 GitHub tag → 下载 hap → 校验 → 拉起安装 | `@ohos.net.http` + 文件 + 系统安装入口 |
+| 更新层 | 查 GitHub Release tag → 下载 hap → 校验 → 拉起安装（Q7 定稿：直查 GitHub） | `@ohos.net.http` + 文件 + 系统安装入口 |
+| **平台适配层（Q1 新增）** | 屏蔽 HarmonyOS NEXT(API 12+) 与纯 OpenHarmony(API 9+) 的 `@ohos.*` 差异；能力探测 + 条件编译 | 自建 `PlatformAdapter`（网络/HUKS/通知/后台/扫码/安装统一接口） |
+
+### 2.1.1 双平台支持（Q1 决策）
+
+- **两个都支持**：HarmonyOS NEXT（商用/API 12+）与纯 OpenHarmony（开源/API 9+）。
+- 所有平台相关能力经 `PlatformAdapter` 抽象：上层只调统一接口，底层按平台选择 `@ohos.*` 实现或降级。
+- 差异清单与回退策略见 `docs/design/06-app-ui-architecture.md` §7（原 `【Q1】` 项改为双平台适配清单）。
+- 远程通道：NEXT 上 TailMesh/HarmoTail 走 tailnet；纯 OpenHarmony 无原生客户端时用公网隧道兜底，App 侧 base URL 抽象屏蔽差异。
 
 ### 2.2 关键约束（因放弃 WebView 而新增）
 
@@ -131,7 +139,7 @@ dsh 是 Cordis 微内核、"Everything is a plugin"。本插件为**进程内插
   - 自更新链路：查 GitHub Release tag → 下载新 hap → 校验签名/SHA-256 → 拉起系统安装。
   - 注意：企业应用（MDM/HEM）仅支持鸿蒙电脑擎云设备，**手机不适用**，故手机必须走 In-house。
 - 版本监控范围：**plugin + app 都监控**（Q6）。
-- **⚠ Q7 待定**：App 版本 tag 拉取通道——本 §7 写"直查 GitHub Release"，而 03 §3.7 经网关 `/mobile/version`；两者二选一（评审 R2 Critical），未定前 App 不实现升级检查。
+- **Q7 已定**：App 直查 GitHub Release 作为升级判据；网关 `/mobile/version` 的 `app` 段仅为缓存展示（ADR-0007）。评审 R2 Critical 已关闭。
 
 ## 8 垂直切片（纯原生版）
 
@@ -143,6 +151,6 @@ dsh 是 Cordis 微内核、"Everything is a plugin"。本插件为**进程内插
 
 ## 9 待定项
 
-- Q1 目标平台未定：若最终选纯 OpenHarmony（API 9），需复核 `@ohos.*` 可用面与 TailMesh/HarmoTail 兼容性（它们要求 HarmonyOS NEXT）。
-- 字段级契约 `03-contracts.md` 已出 v0.1 草案，待评审。
-- 证书/CA 生命周期（签发/分发/轮换/吊销）待定 → 开 `type:decision` issue。
+- Q1/Q7/Q8/Q9 已定（ADR-0007）：双平台支持、App 直查 GitHub、配对 CA 指纹绑定、本期无二进制上传端点。
+- 字段级契约 `03-contracts.md` 已出 v0.3（R1/R2 已关闭）。
+- 证书/CA **生命周期**（签发/分发/轮换/吊销）仍需方案定稿 → issue #2（Q8 只定了"配对时固定指纹"，未覆盖轮换/吊销）。
