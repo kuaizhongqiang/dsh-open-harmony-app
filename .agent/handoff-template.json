@@ -1,0 +1,12 @@
+{
+  "workflow": "<工作流名，如 m3-vertical-slice>",
+  "date": "YYYY-MM-DD",
+  "from": "<交接方 agent>",
+  "to": "<接手方 agent>",
+  "done": ["<已完成项>"],
+  "todo": ["<待办项>"],
+  "blocked_by": ["<阻塞点 / 依赖谁>"],
+  "contracts_touched": ["<改动的契约字段，需对方同批>"],
+  "acceptance": ["<怎么验>"],
+  "notes": "<备注>"
+}
