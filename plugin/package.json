@@ -1,0 +1,40 @@
+{
+  "name": "dsh-harmony",
+  "version": "0.1.0",
+  "description": "M3 vertical slice: HTTPS gateway and in-process plugin for the OpenHarmony mobile client.",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "scripts": {
+    "clean": "node -e \"require('node:fs').rmSync('dist',{recursive:true,force:true})\"",
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "npm run clean && npm run build && node --test dist/test/*.test.js",
+    "prepack": "npm run build"
+  },
+  "keywords": [
+    "dsh",
+    "harmony",
+    "plugin",
+    "mobile-access"
+  ],
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^24.0.0",
+    "@types/ws": "^8.18.1",
+    "typescript": "^5.8.3"
+  },
+  "dependencies": {
+    "ws": "^8.18.3"
+  }
+}
