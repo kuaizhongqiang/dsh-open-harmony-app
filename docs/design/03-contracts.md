@@ -2,15 +2,15 @@
 读者: App Agent / Plugin Agent / Docs/Architect
 类型: design（契约真源）
 权威: 高（App↔Plugin 接口域真源；需求域最高见 raw）
-状态: v0.3（R1 已修；R2 由 Q7 决策关闭；Q8/Q9 已定，见 ADR-0007）
+状态: v0.4（CA 生命周期定稿，ADR-0008；前序 v0.3 = ADR-0007）
 依赖: docs/design/02-architecture.md
 ---
 
 # 03 App ↔ Plugin 契约（字段级）
 
 > 本文件是 App 与 Plugin 的**唯一接口真源**。规则：先改本文、再改实现；跨端字段改动同批改完两侧，只改一侧视为未完成；遇歧义登记 `docs/open-questions.md`，不自行决定。
-> 契约版本号 `v0.3`；所有 JSON 字段用 camelCase；时间戳 ISO8601 UTC。
-> 评审见 `docs/review/02-contracts-review.md`（R1/R2 已关闭）；Q7/Q8/Q9 决策见 `docs/decisions/ADR-0007-...md`。
+> 契约版本号 `v0.4`；所有 JSON 字段用 camelCase；时间戳 ISO8601 UTC。
+> 评审见 `docs/review/02-contracts-review.md`（R1/R2 已关闭）；Q7/Q8/Q9 见 ADR-0007，CA 生命周期见 ADR-0008。
 
 ## 1 传输与常量
 
@@ -41,7 +41,8 @@
 { "v": 1, "pairingKey": "opaque", "origin": "https://192.168.1.5:3443",
   "expiresAt": "...", "caFingerprint": "sha256" }
 ```
-> **Q8 定稿**：二维码/链接内容 = 上述 JSON 的 base64url 编码（以 `dshpair://v1/<base64url>` 开头）。`origin` 为网关 base URL（App 扫码后无需手填）；`caFingerprint` 为网关 TLS 证书/CA 的 SHA-256 指纹，**App 配对时固定该指纹到精确 Origin**（防 MITM，纯原生 App 同样沿用 dsh-mobile 的 CA 绑定做法）。
+> **Q8 定稿**：二维码/链接内容 = 上述 JSON 的 base64url 编码（以 `dshpair://v1/<base64url>` 开头）。`origin` 为网关 base URL（App 扫码后无需手填，显式 https + 端口、无路径无查询串）。
+> `caFingerprint` 语义（ADR-0008 定稿）= **该 Origin 信任锚证书 DER 的 SHA-256，64 位小写 hex**：私有 CA 模式取 `certs/ca/ca.crt` 或 `certs/remote-ca/ca.crt`；公开域名（系统信任证书）模式取证书链根锚 DER（无法确定根则配对失败，禁只 pin 叶子）。**App 配对时固定该指纹到精确 Origin**（HUKS 存储，防 MITM，两平台一致）。
 
 ### VersionInfo
 ```json
@@ -58,7 +59,7 @@
 `POST /mobile/pair`
 请求：`{ "pairingKey":"...", "deviceName":"...", "platform":"harmony" }`
 成功：`201 { "deviceId":"...", "token":"...", "issuedAt":"...", "expiresAt":"...", "caFingerprint":"sha256" }`
-> `caFingerprint` 为绑定凭据（Q8 定稿）：App 必须校验证书指纹与扫码 payload 一致才建立信任，否则拒绝。
+> `caFingerprint` 为绑定凭据（ADR-0008）：建连前按扫码 payload 指纹校验对端锚（不符即断连 `CA_FINGERPRINT_MISMATCH`、不发 pairingKey、不落盘）；收到 `201` 后**再次比对响应指纹与扫码 payload**，不符则丢弃 token 并清理本地记录。
 失败：`409` 密钥已用/过期｜`403` 来源不在白名单｜`429` 限流
 
 > **统一鉴权规则（R1 已修）**：所有**写请求**（POST/PUT/PATCH/DELETE）必须带 `Authorization: Bearer` + `X-Device-Id`，与 02 §3.2 一致。管理端点（devices/whitelist）另要求 TCP 对端为回环。读端点（GET）仅需回环或已配对 token，见各端点标注。
@@ -86,6 +87,14 @@
 > `plugin`/`app` 段的 `url`/`sha256` 分别指向 npm tarball / hap；`dshVersion` 来源为 Host 实际运行版本（见 §3.1）。
 > **Q7 定稿**：App 升级检查的**主通道是 App 直查 GitHub Release**（版本真源统一在仓库 tag，不受网关可达性影响）；本端点的 `app` 段降级为"已配对电脑缓存的最近已知版本"，仅作参考展示，不作为升级判据。
 
+### 3.8 CA 管理端点（仅回环，ADR-0008）
+`GET /mobile/ca`（回环读）→ `200 { "active":{ "caFingerprint":"hex", "notBefore":"...", "notAfter":"...", "status":"active" }, "retired":[...] }`
+> **禁返私钥 / CSR / CA 证书本体**，只返回指纹与元数据。
+`POST /mobile/ca/leaf/rotate`（回环 + `Authorization` + `X-Device-Id`）→ `200 { "caFingerprint":"hex", "rotatedAt":"..." }`
+> 同一 CA 重签叶子：锚指纹不变 → token 不失效、App 免重配对。
+`POST /mobile/ca/rotate`（回环 + 鉴权）→ `200 { "caFingerprint":"hex（新）", "newOrigin":"https://...:port", "rePairRequired":true }`
+> 换 CA：新锚 + 双 Origin 重叠窗口；旧 pin/token 全失效，全员重新扫码（ADR-0008 §4.3）。
+
 ## 4 WebSocket 事件流
 
 `WS /mobile/ws`（**首帧鉴权**：握手后客户端首帧发 token + deviceId，避免 token 入 URL）。
@@ -109,7 +118,7 @@
 | 码 | 含义 | 机器子码（响应体 `error.code`） |
 |---|---|---|
 | `401` | 未配对 / token 过期或撤销 | `UNAUTHORIZED` |
-| `403` | 白名单拒绝 / 非回环对端 / 设备未授权 | `WHITELIST_DENIED` / `NOT_LOOPBACK` / `DEVICE_UNAUTHORIZED` |
+| `403` | 白名单拒绝 / 非回环对端 / 设备未授权 / 指纹不符 | `WHITELIST_DENIED` / `NOT_LOOPBACK` / `DEVICE_UNAUTHORIZED` / `CA_FINGERPRINT_MISMATCH` |
 | `404` | 未知端点 | `NOT_FOUND` |
 | `409` | 配对密钥已用或过期 | `PAIRING_CONSUMED` |
 | `413` | 请求/剪贴板/二进制超限 | `PAYLOAD_TOO_LARGE` |
@@ -130,6 +139,7 @@
 - [x] Q7 App 版本拉取通道 → App 直查 GitHub Release（ADR-0007）。
 - [x] Q8 配对 payload + CA 指纹绑定 → `dshpair://v1/<base64url>` + 指纹固定（ADR-0007）。
 - [x] Q9 二进制上传端点 → 本期不加（ADR-0007）。
+- [x] CA 生命周期（签发/分发/轮换/吊销）→ ADR-0008 定稿，v0.4 同步端点/错误码/验收三例。
 - 当前无未决项；新问题请开 issue 并登记 `docs/open-questions.md`。
 
 ## 8 验收矩阵（怎么验）
@@ -140,3 +150,6 @@
 | 4 WS | `WS /mobile/ws` | 首帧 auth+deviceId，subscribe | 收到一条 `session.updated` 映射事件 | `check-contracts` C3 |
 | 5 配对 | `POST /mobile/pair` | 扫 `dshpair://v1/...` 得 pairingKey + caFingerprint | `201` 返回 token；指纹不符则拒绝；二次重连免配对 | `check-contracts` C2 |
 | 升级 | `GET /mobile/version` | 无鉴权 GET | `200 plugin/app VersionInfo` | `check-plugin-version` |
+| CA-叶子续期 | `POST /mobile/ca/leaf/rotate` | 回环 + 鉴权 | 锚指纹不变；token 有效；App 无感 | `check-contracts` C1 |
+| CA-换锚 | `POST /mobile/ca/rotate` | 回环 + 鉴权 | 新锚 + `rePairRequired:true`；旧 token 失效 | `check-contracts` C1 |
+| 设备撤销 | `DELETE /mobile/devices/:deviceId` | 回环 + 鉴权 | 目标 token 立即作废；CA pin 可复用 | `check-contracts` C1 |
